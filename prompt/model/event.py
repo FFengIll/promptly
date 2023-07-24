@@ -21,6 +21,7 @@ class Event(BaseModel):
 class UpdateEvent(Event):
     node: str = ""
     id: int
+    key: str
     value: str | int | float
 
 

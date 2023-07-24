@@ -1,6 +1,6 @@
 from typing import List, Any
 
-from prompt.server.node import Node
+from prompt.model.node import Node
 
 
 class Component():

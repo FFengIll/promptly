@@ -32,7 +32,7 @@ class Node():
 
         prev = []
         post = []
-        from prompt.server.graph import Chain
+        from prompt.model.graph import Chain
         chain = Chain()
 
         for n in post:
