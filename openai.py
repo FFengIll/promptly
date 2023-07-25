@@ -1,7 +1,7 @@
 import uvicorn
 import json
 from fastapi import openapi
-from prompt.server.server import app
+from prompt.server import app
 
 if __name__ == "__main__":
     with open("openai.json", "w") as fd:
