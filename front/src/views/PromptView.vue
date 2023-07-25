@@ -5,22 +5,44 @@
                 <div v-for="item in profile.messages" :key="item.id" class="card">
                     <a-card>
                         <!-- <template #extra><a href="#">more</a></template> -->
-                        <!-- role select -->
-                        <a-select ref="select" v-model:value="item.role" style="width: 120px">
-                            <a-select-option value="user">User</a-select-option>
-                            <a-select-option value="system">System</a-select-option>
-                            <a-select-option value="assistant">Assistant</a-select-option>
-                        </a-select>
 
-                        <!-- enable toggle -->
-                        <a-switch v-model:checked="item.enable">Enable</a-switch>
+                        <a-row>
+                            <a-col :span="4">
+                                <a-space direction="vertical">
+                                    <!-- role select -->
+                                    <a-select ref="select" v-model:value="item.role" style="width: 120px">
+                                        <a-select-option value="user">User</a-select-option>
+                                        <a-select-option value="system">System</a-select-option>
+                                        <a-select-option value="assistant">Assistant</a-select-option>
+                                    </a-select>
 
-                        <a-button @click="order(item.id, -1)">Up</a-button>
-                        <a-button @click="order(item.id, 1)">Down</a-button>
+                                    <!-- enable toggle -->
+                                    <a-switch v-model:checked="item.enable"></a-switch>
 
-                        <!-- content edit -->
-                        <a-textarea v-model:value="item.content" placeholder="textarea with clear icon" allow-clear
-                            :auto-size="{ minRows: 4, maxRows: 6 }" />
+                                </a-space>
+                            </a-col>
+                            <a-col :span="16">
+                                <!-- content edit -->
+                                <a-textarea v-model:value="item.content" placeholder="textarea with clear icon" allow-clear
+                                    :auto-size="{ minRows: 4, maxRows: 6 }" />
+
+                            </a-col>
+                            <a-col :span="4">
+                                <a-space direction="vertical">
+                                    <!-- up down the order -->
+                                    <a-button type="primary" shape="round" @click="order(item.id, -1)">
+                                        <template #icon>
+                                            <UpOutlined />
+                                        </template>
+                                    </a-button>
+                                    <a-button type="primary" shape="round" @click="order(item.id, 1)">
+                                        <template #icon>
+                                            <DownOutlined />
+                                        </template>
+                                    </a-button>
+                                </a-space>
+                            </a-col>
+                        </a-row>
 
 
                         <!-- TODO: history select -->
@@ -48,11 +70,23 @@
                 <div>
                     <a-button @click="reload">reload</a-button>
                     <a-button @click="chat">Chat</a-button>
-                    <a-button>Go To Test</a-button>
+                    <a-button @click="goToDebug">Go To Debug</a-button>
                     <a-button>Good</a-button>
                     <a-button>Bad</a-button>
-                    <a-textarea v-model:value="response" :auto-size="{ minRows: 20 }" placeholder="textarea with clear icon"
-                        allow-clear />
+
+                    <div>
+                        <div v-for="item in profile.messages">
+                            <a-list-item v-if="item.enable">
+                                <span :style="{ color: 'blue' }">{{ item.role }} </span><span>:&nbsp;</span>
+                                <span>{{ item.content }}</span>
+                            </a-list-item>
+                        </div>
+                        <a-textarea v-model:value="response" :auto-size="{ minRows: 20 }"
+                            placeholder="textarea with clear icon" allow-clear />
+
+                    </div>
+
+
 
                 </div>
             </a-col>
@@ -63,8 +97,13 @@
 <script lang="ts">
 import useClipboard from 'vue-clipboard3';
 
+import { DownOutlined, UpOutlined } from '@ant-design/icons-vue';
+
 import { useRoute } from 'vue-router';
 import { DefaultApiFactory } from '../../sdk/apis/default-api';
+
+import { useSnapshotStore } from '@/stores/snapshot';
+import { mapActions } from 'pinia';
 
 const api = DefaultApiFactory(undefined, "http://localhost:8000")
 const { toClipboard } = useClipboard()
@@ -75,7 +114,10 @@ export default {
         return {
             modal: false,
             key: "",
-            history: [],
+            history: [{
+                messages: [],
+                response: ""
+            }],
             response: "",
             profile: {
                 "messages": [
@@ -93,11 +135,23 @@ export default {
         const route = useRoute();
         this.key = route.params.key.toString();
         this.fetchProfile(this.key);
+
+        const store = useSnapshotStore()
+    },
+    components: {
+        UpOutlined,
+        DownOutlined
     },
     computed: {
-        api: () => api
+        api: () => api,
     },
     methods: {
+        ...mapActions(useSnapshotStore, ['sendToDebug']),
+
+        goToDebug() {
+            this.sendToDebug(this.profile.messages)
+            this.$router.push('/view/debug')
+        },
         order(id: number, delta: number) {
             let index = this.profile.messages.findIndex((m) => {
                 return (m.id == id)
@@ -153,6 +207,13 @@ export default {
                 .then(response => {
                     console.log(response.data);
                     this.response = response.data;
+
+                    this.history.push(
+                        {
+                            messages: this.profile.messages,
+                            response: response.data
+                        }
+                    )
                 })
                 .catch(error => {
                     console.error(error);
