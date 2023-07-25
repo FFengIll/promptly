@@ -1,0 +1,58 @@
+from typing import List
+
+import fastapi
+import loguru
+
+from prompt.model.profile import Message, ProfileManager
+from prompt.server import api
+from prompt.server.app import app
+from prompt.server.util import to_message
+
+log = loguru.logger
+
+manager = ProfileManager("./profile")
+
+
+@app.on_event("shutdown")
+def shutdown_event():
+    manager.save()
+
+
+@app.get("/profile/{key}")
+def load_profile(key: str):
+    profile = manager.get(key=key)
+    if not profile:
+        return fastapi.HTTPException(status_code=404)
+    return dict(profile=profile.dict())
+
+
+@app.post("/profile/{key}")
+def update_profile(key: str, update: List[Message]):
+    for m in update:
+        manager.update_one(key, m)
+
+    p = manager.get(key)
+    return p.dict()
+
+
+@app.post("/chat/{key}")
+def chat(key: str, update: List[Message]):
+    # manager.update(
+    #     key, [UpdateEvent(id=i.id, key="enable", value=i.enable) for i in update]
+    # )
+
+    for m in update:
+        manager.update_one(key, m)
+
+    profile = manager.get(key)
+
+    ms = to_message(profile.messages)
+    log.info(ms)
+    res = api.chat(ms)
+    return res["data"]["choices"][0]["message"]["content"]
+
+
+
+@app.get("/profile")
+def list_profile():
+    return dict(keys=manager.list_profile())
