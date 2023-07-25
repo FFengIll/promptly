@@ -82,6 +82,8 @@ class ProfileManager:
                     m.history.append(msg.content)
                 log.info(m)
 
+        p.messages.sort(key=lambda x:x.order)
+
     def update(self, name, events: List[UpdateEvent]):
         p: Profile = self.index[name]
 
