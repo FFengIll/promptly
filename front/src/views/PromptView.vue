@@ -6,8 +6,8 @@
                     <div v-for="item in profile.messages" :key="item.id" class="card">
                         <!-- <template #extra><a href="#">more</a></template> -->
 
-                        <a-row :gutter="12">
-                            <a-col :span="6">
+                        <a-row :gutter="12" align="middle">
+                            <a-col :span="4">
                                 <a-space direction="vertical">
                                     <!-- role select -->
                                     <a-select ref="select" v-model:value="item.role" style="width: 120px">
@@ -17,14 +17,17 @@
                                     </a-select>
 
                                     <!-- enable toggle -->
-                                    <a-switch v-model:checked="item.enable"></a-switch>
+                                    <a-space direction="horizon">
+                                        Enable&nbsp;
+                                        <a-switch v-model:checked="item.enable"></a-switch>
+                                    </a-space>
 
                                 </a-space>
                             </a-col>
-                            <a-col :span="16">
+                            <a-col :span="18">
                                 <!-- content edit -->
                                 <a-textarea v-model:value="item.content" placeholder="textarea with clear icon" allow-clear
-                                    :auto-size="{ minRows: 4, maxRows: 6 }" />
+                                    :auto-size="{ minRows: 3, maxRows: 5 }" />
 
                             </a-col>
                             <a-col :span="2">
