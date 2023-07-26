@@ -1,38 +1,56 @@
 <template>
     <div>
         <!-- prompt view -->
-        <a-space direction="horizon">
-            <a-card title="Prompt Snapshot">
-                <div v-for="item in debug" :key="item.id">
-                    <span :style="{ color: 'blue' }">{{ item.role }} </span><span>:&nbsp;</span>
-                    <span>{{ item.content }}</span>
-                </div>
-            </a-card>
-        </a-space>
-        <a-row>
-            <!-- case select -->
-            <a-select style="width:300px" @change="getCase">
-                <div v-for="item in case_list" :key="item.id">
-                    <a-select-option value="item.id">
-                        {{ item.name }}
-                    </a-select-option>
-                </div>
-            </a-select>
+        <a-row :gutter="12">
+            <a-col :span="12">
+                <a-card title="Prompt Snapshot">
+                    <a-space direction="vertical" :style="{ width: '100%' }">
+                        <div v-for="item in debug" :key="item.id">
+                            <span :style="{ color: 'blue' }">{{ item.role }} </span><span>:&nbsp;</span>
+                            <span>
+                                <a-textarea v-model:value="item.content" auto-size></a-textarea>
+                            </span>
+                        </div>
+                    </a-space>
+                </a-card>
+            </a-col>
+            <a-col :span="12">
 
-            <!-- click to run -->
-            <a-button type="primary" @click="run">Run Test</a-button>
-        </a-row>
-        <a-row>
-            <a-col :xs="2" :sm="4" :md="6" :lg="8" :xl="10">
+
+
+
+
                 <!-- show dataset info -->
                 <a-card title="Case List">
-                    <p>{{ option.case.description }}</p>
+                    <!-- case select -->
+                    Select Case to Debug:&nbsp;&nbsp;
+                    <a-select style="width:300px" @change="getCase">
+                        <div v-for="item in case_list" :key="item.id">
+                            <a-select-option value="item.id">
+                                {{ item.name }}
+                            </a-select-option>
+                        </div>
+                    </a-select>
+                    <a-divider />
+
+                    <!-- case description -->
+                    Case Description:&nbsp;&nbsp;
+                    <span>{{ option.case.description }}</span>
+                    <a-divider />
+
                     <div v-for="item in option.case.data" :key="item">
                         <a-list-item>{{ item }}</a-list-item>
                     </div>
                 </a-card>
             </a-col>
-            <a-col :xs="2" :sm="4" :md="6" :lg="8" :xl="10">
+
+
+        </a-row>
+        <a-row>
+            <a-col :span="24">
+                <!-- click to run -->
+                <a-button type="primary" @click="run">Run Test</a-button>
+
                 <!-- show result -->
                 <a-table :dataSource="dataSource" :columns="columns" :rowKey="(record) => record.id" />
             </a-col>

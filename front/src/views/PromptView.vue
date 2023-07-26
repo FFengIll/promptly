@@ -1,13 +1,13 @@
 <template>
     <div>
-        <a-row :span="26">
-            <a-col class="gutter-row" :span="12">
-                <div v-for="item in profile.messages" :key="item.id" class="card">
-                    <a-card>
+        <a-row :gutter='12'>
+            <a-col class="gutter-row" :span="14">
+                <a-card title="Prompt">
+                    <div v-for="item in profile.messages" :key="item.id" class="card">
                         <!-- <template #extra><a href="#">more</a></template> -->
 
-                        <a-row>
-                            <a-col :span="4">
+                        <a-row :gutter="12">
+                            <a-col :span="6">
                                 <a-space direction="vertical">
                                     <!-- role select -->
                                     <a-select ref="select" v-model:value="item.role" style="width: 120px">
@@ -27,7 +27,7 @@
                                     :auto-size="{ minRows: 4, maxRows: 6 }" />
 
                             </a-col>
-                            <a-col :span="4">
+                            <a-col :span="2">
                                 <a-space direction="vertical">
                                     <!-- up down the order -->
                                     <a-button type="primary" shape="round" @click="order(item.id, -1)">
@@ -44,51 +44,45 @@
                             </a-col>
                         </a-row>
 
-
-                        <!-- TODO: history select -->
                         <a-collapse>
                             <a-collapse-panel>
                                 <div v-for="h in item.history">
-                                    <a-row>
-                                        <a-col :span="20">
-                                            <p>{{ h }}</p>
-                                            <!-- <a-textarea v-bind="h"> </a-textarea> -->
-                                        </a-col>
+                                    <a-space direction="horizon">
+
+                                        <p>{{ h }}</p>
+                                        <!-- <a-textarea v-bind="h"> </a-textarea> -->
+
                                         <!-- <button v-on:click="copy(h)">复制到剪贴板</button> -->
-                                        <a-col :span="2">
-                                            <button v-on:click="setContent(item.id, h)">Set</button>
-                                        </a-col>
-                                    </a-row>
+
+                                        <button v-on:click="setContent(item.id, h)">Set</button>
+
+                                    </a-space>
                                 </div>
                             </a-collapse-panel>
                         </a-collapse>
-
-                    </a-card>
-                </div>
+                    </div>
+                </a-card>
             </a-col>
-            <a-col class="gutter-row" :span="12">
-                <div>
+            <a-col class="gutter-row" :span="10">
+                <a-card title="Operation">
                     <a-button @click="reload">reload</a-button>
                     <a-button @click="chat">Chat</a-button>
                     <a-button @click="goToDebug">Go To Debug</a-button>
                     <a-button>Good</a-button>
                     <a-button>Bad</a-button>
+                </a-card>
 
-                    <div>
-                        <div v-for="item in profile.messages">
-                            <a-list-item v-if="item.enable">
-                                <span :style="{ color: 'blue' }">{{ item.role }} </span><span>:&nbsp;</span>
-                                <span>{{ item.content }}</span>
-                            </a-list-item>
-                        </div>
-                        <a-textarea v-model:value="response" :auto-size="{ minRows: 20 }"
-                            placeholder="textarea with clear icon" allow-clear />
-
+                <a-card title="Prompt Result">
+                    <div v-for="item in profile.messages">
+                        <a-list-item v-if="item.enable">
+                            <span :style="{ color: 'blue' }">{{ item.role }} </span><span>:&nbsp;</span>
+                            <span>{{ item.content }}</span>
+                        </a-list-item>
                     </div>
+                    <a-textarea v-model:value="response" :auto-size="{ minRows: 20 }" placeholder="textarea with clear icon"
+                        allow-clear />
+                </a-card>
 
-
-
-                </div>
             </a-col>
         </a-row>
     </div>
