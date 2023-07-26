@@ -1,30 +1,14 @@
 
 
 <template>
-    <div>
-        <table>
-            <thead>
-                <tr>
-                    <th>ID</th>
-                    <th>Name</th>
-                    <th>Button</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr v-for="item in keys" :key="item">
-                    <td>{{ item }}</td>
+    <a-card title="Click to Open Prompt Detail">
+        <a-list v-for="item in keys" :key="item" size="small">
+            <a-list-item>
+                <a v-bind:href="handleButtonClick(item)">{{ item }}</a>
+            </a-list-item>
+        </a-list>
 
-                    <!-- <td>{{ item.id }}</td>
-                    <td>{{ item.name }}</td> -->
-                    <td>
-                        <!-- FIXME: now we only use a name, not id -->
-                        <button @click="handleButtonClick(item)">Jump</button>
-
-                    </td>
-                </tr>
-            </tbody>
-        </table>
-    </div>
+    </a-card>
 </template>
   
 <script lang="ts">
@@ -44,7 +28,7 @@ export default {
     created() {
         this.fetchList()
     },
-    computed:{
+    computed: {
         api: () => api
     },
     methods: {
@@ -57,7 +41,9 @@ export default {
             console.log("Button clicked for item with ID:", key);
 
             // TODO: jump to another page /prompt/id
-            this.redirectToPage(key)
+            // this.redirectToPage(key)
+
+            return '/view/prompt/' + key
         },
 
         async fetchList() {
