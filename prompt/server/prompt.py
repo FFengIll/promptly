@@ -36,7 +36,7 @@ def update_profile(key: str, update: List[Message]):
 
 
 @app.post("/chat/{key}")
-def chat(key: str, update: List[Message]):
+async def chat(key: str, update: List[Message]):
     # manager.update(
     #     key, [UpdateEvent(id=i.id, key="enable", value=i.enable) for i in update]
     # )
@@ -48,9 +48,8 @@ def chat(key: str, update: List[Message]):
 
     ms = to_message(profile.messages)
     log.info(ms)
-    res = api.chat(ms)
+    res = await api.chat(ms)
     return res["data"]["choices"][0]["message"]["content"]
-
 
 
 @app.get("/profile")
