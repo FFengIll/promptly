@@ -1,4 +1,4 @@
 from . import case
-from . import index
+from . import view
 from . import prompt
 from .app import app

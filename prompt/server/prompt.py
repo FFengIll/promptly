@@ -18,7 +18,7 @@ def shutdown_event():
     manager.save()
 
 
-@app.get("/profile/{key}")
+@app.get("/api/profile/{key}")
 def load_profile(key: str):
     profile = manager.get(key=key)
     if not profile:
@@ -26,7 +26,7 @@ def load_profile(key: str):
     return dict(profile=profile.dict())
 
 
-@app.post("/profile/{key}")
+@app.post("/api/profile/{key}")
 def update_profile(key: str, update: List[Message]):
     for m in update:
         manager.update_one(key, m)
@@ -35,7 +35,7 @@ def update_profile(key: str, update: List[Message]):
     return p.dict()
 
 
-@app.post("/chat/{key}")
+@app.post("/api/chat/{key}")
 async def chat(key: str, update: List[Message]):
     # manager.update(
     #     key, [UpdateEvent(id=i.id, key="enable", value=i.enable) for i in update]
@@ -52,6 +52,6 @@ async def chat(key: str, update: List[Message]):
     return res["data"]["choices"][0]["message"]["content"]
 
 
-@app.get("/profile")
+@app.get("/api/profile")
 def list_profile():
     return dict(keys=manager.list_profile())

@@ -49,6 +49,8 @@ async def chat(messages):
 
     async with AsyncClient() as c:
         response = await c.post(url, headers=headers, json=data, timeout=10)
+        if response.status_code != 200:
+            return "error"
         answer = response.json()
 
     return answer
