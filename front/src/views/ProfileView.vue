@@ -38,7 +38,7 @@ function generateHref(key: string) {
 }
 
 async function fetchList() {
-    return api.listProfileProfileGet().then(
+    return api.listProfileApiProfileGet().then(
         response => {
             console.log(response.data)
             keys.value = response.data.keys

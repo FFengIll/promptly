@@ -52,7 +52,7 @@
                 <a-button type="primary" @click="run">Run Test</a-button>
 
                 <!-- show result -->
-                <a-table :dataSource="dataSource" :columns="columns" :rowKey="(record) => record.id" />
+                <a-table :dataSource="dataSource" :columns="columns" :rowKey="(record:any) => record.id" />
             </a-col>
         </a-row>
     </div>

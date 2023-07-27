@@ -47,7 +47,7 @@
               </a-col>
               <a-col :span="2">
 
-                <a-button @click="addContent(item.id,item.order)">
+                <a-button @click="addContent(item.id)">
                   <template #icon>
                     <PlusOutlined/>
                   </template>
@@ -120,15 +120,15 @@ export default {
       modal: false,
       key: "",
       history: [{
-        messages: [],
+        messages: [
+          {id: 1, role: "角色1", content: "内容1", enable: true, order: 0},
+        ],
         response: ""
       }],
       response: "",
       profile: {
         "messages": [
-          {id: 1, role: "角色1", content: "内容1", enable: true, order: 0},
-          {id: 2, role: "角色2", content: "内容2", enable: true, order: 1},
-          {id: 3, role: "角色3", content: "内容3", enable: false, order: 2},
+          {id: 1, role: "角色1", content: "内容1", enable: true, order: 0, history: []},
           // 其他数据项
         ]
       }
@@ -158,10 +158,10 @@ export default {
       this.sendToDebug(this.profile.messages)
       this.$router.push('/view/debug')
     },
-    addContent(id: number, order: number) {
-      var index = this.profile.messages.findIndex((item) => item.id == id)
-      var order = this.profile.messages[index].order
-      var max_id = 0
+    addContent(id: number) {
+      let index = this.profile.messages.findIndex((item) => item.id == id)
+      let order = this.profile.messages[index].order
+      let max_id = 0
       this.profile.messages.forEach((item) => {
         if (item.id > max_id) {
           max_id = item.id
@@ -171,7 +171,7 @@ export default {
       this.profile.messages.splice(
           index + 1,
           0,
-          {role: "user", id: max_id + 1, enable: true, content: "", order: order}
+          {role: "user", id: max_id + 1, enable: true, content: "", order: order, history: []}
       )
 
       var cur = 0
@@ -218,7 +218,7 @@ export default {
       this.modal = false;
     },
     async fetchProfile(key: string) {
-      this.api.loadProfileProfileKeyGet(key)
+      this.api.apiProfileKeyGet(key)
           .then(response => {
             this.profile = response.data.profile;
           })
@@ -233,7 +233,7 @@ export default {
     chat() {
       var res = this.profile.messages;
       console.log(res);
-      this.api.chatChatKeyPost(res, this.key)
+      this.api.apiProfileKeyPost(res, this.key)
           .then(response => {
             console.log(response.data);
             this.response = response.data;
