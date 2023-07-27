@@ -20,9 +20,9 @@ def use_route_names_as_operation_ids(app: FastAPI) -> None:
             # route.operation_id = route.name  # in this case, 'read_items'
 
             # operation_id = route.name + route.path
-            operation_id = route.path + '_' + list(route.methods)[0]
+            operation_id = route.path + "_" + list(route.methods)[0]
             operation_id = re.sub(r"\W", "_", operation_id)
-            operation_id = operation_id.strip('_')
+            operation_id = operation_id.strip("_")
             operation_id = operation_id.lower()
             loguru.logger.info(operation_id)
             route.operation_id = operation_id
