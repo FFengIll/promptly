@@ -65,14 +65,16 @@ class ProfileManager:
         self.save()
         self.load()
 
-    def get(self, key=None, ) -> Profile:
+    def get(
+        self,
+        key=None,
+    ) -> Profile:
         return self.index.get(key, None)
 
     def update_one(self, key: str, msg: Message):
         p: Profile = self.get(key)
         for m in p.messages:
             if m.id == msg.id:
-
                 for k, v in msg.dict().items():
                     log.info("{}={}", k, v)
                     # FIXME: ignore any none data
@@ -82,7 +84,7 @@ class ProfileManager:
                     m.history.append(msg.content)
                 log.info(m)
 
-        p.messages.sort(key=lambda x:x.order)
+        p.messages.sort(key=lambda x: x.order)
 
     def update(self, name, events: List[UpdateEvent]):
         p: Profile = self.index[name]

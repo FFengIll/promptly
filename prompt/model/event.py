@@ -1,4 +1,6 @@
-from pydantic import  BaseModel
+from pydantic import BaseModel
+
+
 class Event(BaseModel):
     """
     For event:
@@ -23,7 +25,6 @@ class UpdateEvent(Event):
     id: int
     key: str
     value: str | int | float
-
 
 
 class ActionEvent(Event):

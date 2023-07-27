@@ -44,12 +44,12 @@ class CaseManager:
     def keys(self):
         return list(self.index.keys())
 
-    def values(self)->List[Case]:
+    def values(self) -> List[Case]:
         return list(self.index.values())
 
     def refresh(self):
         # self.save()
         self.load()
 
-    def get(self, key)->Case:
+    def get(self, key) -> Case:
         return self.index.get(key, None)

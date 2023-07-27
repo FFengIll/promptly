@@ -1,17 +1,16 @@
 from typing import List
 
 
-
-class NodeType():
+class NodeType:
     def __init__(self, *args):
         pass
 
 
-message = NodeType("role", ["dropdown", 'text'])
+message = NodeType("role", ["dropdown", "text"])
 runner = NodeType("runner", ["output"])
 
 
-class Node():
+class Node:
     id: str
     components: List["Component"]
 
@@ -33,6 +32,7 @@ class Node():
         prev = []
         post = []
         from prompt.model.graph import Chain
+
         chain = Chain()
 
         for n in post:

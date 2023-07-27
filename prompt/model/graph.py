@@ -3,13 +3,12 @@ from typing import List, Any
 from prompt.model.node import Node
 
 
-class Component():
+class Component:
     id: int
     value: Any
 
 
-
-class Graph():
+class Graph:
     nodes: List[Node]
 
     def json(self):
@@ -52,7 +51,7 @@ class Graph():
         return res
 
 
-class Chain():
+class Chain:
     def __init__(self):
         pass
 
