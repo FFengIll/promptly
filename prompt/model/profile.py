@@ -71,10 +71,34 @@ class ProfileManager:
     ) -> Profile:
         return self.index.get(key, None)
 
+    def update_all(self, key: str, ms: List[Message]):
+        p: Profile = self.get(key)
+        pending = []
+        for msg in ms:
+            found = False
+            for m in p.messages:
+                if m.id == msg.id:
+                    found = True
+                    for k, v in msg.dict().items():
+                        log.info("{}={}", k, v)
+                        # FIXME: ignore any none data
+                        m.__setattr__(k, v)
+
+                    if msg.content not in m.history:
+                        m.history.append(msg.content)
+                    log.info(m)
+
+            if not found:
+                pending.append(msg)
+        p.messages.extend(pending)
+        p.messages.sort(key=lambda x: x.order)
+
     def update_one(self, key: str, msg: Message):
         p: Profile = self.get(key)
+        found = False
         for m in p.messages:
             if m.id == msg.id:
+                found = True
                 for k, v in msg.dict().items():
                     log.info("{}={}", k, v)
                     # FIXME: ignore any none data

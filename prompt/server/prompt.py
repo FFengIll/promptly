@@ -41,14 +41,14 @@ async def chat(key: str, update: List[Message]):
     #     key, [UpdateEvent(id=i.id, key="enable", value=i.enable) for i in update]
     # )
 
-    for m in update:
-        manager.update_one(key, m)
+    manager.update_all(key, update)
 
     profile = manager.get(key)
 
     ms = to_message(profile.messages)
     log.info(ms)
     res = await api.chat(ms)
+    log.info("result: {}", res)
     return res["data"]["choices"][0]["message"]["content"]
 
 
