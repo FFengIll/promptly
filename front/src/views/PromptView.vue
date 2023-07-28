@@ -1,5 +1,5 @@
 <style>
-.scroll-200 {
+.scroll-sort {
     height: 300px;
     /* 设置组件容器的固定高度 */
     overflow: auto;
@@ -93,7 +93,7 @@
                 </a-card>
 
                 <a-card title="Prompt Preview">
-                    <div class="scroll-200">
+                    <div class="scroll-short">
                         <div v-for="item in data.profile.messages">
                             <a-list-item v-if="item.enable">
                                 <span :style="{ color: 'blue' }">{{ item.role }} </span><span>:&nbsp;</span>
