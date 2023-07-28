@@ -1,3 +1,12 @@
+<style>
+.scroll-200 {
+    height: 300px;
+    /* 设置组件容器的固定高度 */
+    overflow: auto;
+    /* 设置溢出部分自动滚动 */
+}
+</style>
+
 <template>
     <div>
         <a-row :gutter='12'>
@@ -83,20 +92,20 @@
                     <a-button>Bad</a-button>
                 </a-card>
 
-                <a-card title="Prompt Result">
-                    <a-card title="Prompt Preview">
+                <a-card title="Prompt Preview">
+                    <div class="scroll-200">
                         <div v-for="item in data.profile.messages">
                             <a-list-item v-if="item.enable">
                                 <span :style="{ color: 'blue' }">{{ item.role }} </span><span>:&nbsp;</span>
                                 <span>{{ item.content }}</span>
                             </a-list-item>
                         </div>
-                    </a-card>
-                    <a-card title="Corresponding Response">
-                        <a-button @click="sendToPrompt">Send To Prompt</a-button>
-                        <a-textarea v-model:value="data.response" :auto-size="{ minRows: 20 }"
-                            placeholder="textarea with clear icon" allow-clear />
-                    </a-card>
+                    </div>
+                </a-card>
+                <a-card title="Corresponding Response">
+                    <a-button @click="sendToPrompt">Send To Prompt</a-button>
+                    <a-textarea v-model:value="data.response" :auto-size="{ minRows: 20 }"
+                        placeholder="textarea with clear icon" allow-clear />
                 </a-card>
 
             </a-col>
@@ -105,8 +114,8 @@
 </template>
 
 <script lang="ts" setup>
-import useClipboard from 'vue-clipboard3';
 import { ref } from 'vue';
+import useClipboard from 'vue-clipboard3';
 
 import { DownOutlined, PlusOutlined, UpOutlined } from '@ant-design/icons-vue';
 
@@ -114,8 +123,6 @@ import { useRoute, useRouter } from 'vue-router';
 import { DefaultApiFactory } from '../../sdk/apis/default-api';
 
 import { useSnapshotStore } from '@/stores/snapshot';
-import { mapActions } from 'pinia';
-import create from '@ant-design/icons-vue/lib/components/IconFont';
 
 // use
 const store = useSnapshotStore()
