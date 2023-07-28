@@ -1,6 +1,8 @@
-
-
 <template>
+    <a-button @click="refresh">
+        Refresh
+    </a-button>
+
     <a-card title="Click to Open Prompt Detail">
         <a-list v-for="item in keys" :key="item" size="small">
             <a-list-item>
@@ -12,10 +14,9 @@
 </template>
   
 <script lang="ts" setup>
-import router from "@/router";
 import { DefaultApiFactory } from "../../sdk/apis/default-api";
 
-import { ref } from 'vue'
+import { ref } from 'vue';
 
 const keys = ref([
     '1', '2', '3'
@@ -25,6 +26,10 @@ const api = DefaultApiFactory(undefined, "http://localhost:8000")
 
 fetchList()
 
+function refresh() {
+    api.apiCaseRefreshGet()
+    fetchList()
+}
 
 
 function generateHref(key: string) {
@@ -38,7 +43,7 @@ function generateHref(key: string) {
 }
 
 async function fetchList() {
-    return api.listProfileApiProfileGet().then(
+    return api.apiProfileGet().then(
         response => {
             console.log(response.data)
             keys.value = response.data.keys
