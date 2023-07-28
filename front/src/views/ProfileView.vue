@@ -18,19 +18,20 @@ import { DefaultApiFactory } from "../../sdk/apis/default-api";
 
 import { ref } from 'vue';
 
+const api = DefaultApiFactory(undefined, "http://localhost:8000")
+
+// field
 const keys = ref([
     '1', '2', '3'
 ])
 
-const api = DefaultApiFactory(undefined, "http://localhost:8000")
-
+// created
 fetchList()
 
 function refresh() {
     api.apiCaseRefreshGet()
     fetchList()
 }
-
 
 function generateHref(key: string) {
     // 处理按钮点击事件
