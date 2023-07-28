@@ -1,10 +1,11 @@
 from copy import deepcopy
 
+import httpx
 import requests
+from httpx import AsyncClient
 from sqlalchemy import func
 from sqlmodel import Session, select
-from httpx import AsyncClient
-import httpx
+
 from prompt.model.orm import Profile, engine
 from prompt.openai.config import key, url
 
