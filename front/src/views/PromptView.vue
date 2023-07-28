@@ -1,5 +1,5 @@
 <style>
-.scroll-sort {
+.scroll-short {
     height: 300px;
     /* 设置组件容器的固定高度 */
     overflow: auto;
@@ -12,6 +12,12 @@
         <a-row :gutter='12'>
             <a-col class="gutter-row" :span="14">
                 <a-card title="Prompt">
+                    <a-button @click="() => { data.profile.messages.forEach((item) => item.enable = false) }">Disable
+                        All
+                    </a-button>
+                    <a-button @click="() => { data.profile.messages.forEach((item) => item.enable = true) }">Enable
+                        All
+                    </a-button>
                     <div v-for="item in data.profile.messages" :key="item.id" class="card">
                         <!-- <template #extra><a href="#">more</a></template> -->
 
@@ -20,9 +26,14 @@
                                 <a-space direction="vertical">
                                     <!-- role select -->
                                     <a-select ref="select" v-model:value="item.role" style="width: 120px">
-                                        <a-select-option value="user">User</a-select-option>
-                                        <a-select-option value="system">System</a-select-option>
-                                        <a-select-option value="assistant">Assistant</a-select-option>
+                                        <a-select-option value="user">
+                                            <span style="color: red">User</span></a-select-option>
+                                        <a-select-option value="system">
+                                            <span style="color: black">System</span>
+                                        </a-select-option>
+                                        <a-select-option value="assistant">
+                                            <span style="color: blue">Assistant</span>
+                                        </a-select-option>
                                     </a-select>
 
                                     <!-- enable toggle -->
@@ -35,8 +46,9 @@
                             </a-col>
                             <a-col :span="16">
                                 <!-- content edit -->
-                                <a-textarea v-model:value="item.content" placeholder="textarea with clear icon" allow-clear
-                                    :auto-size="{ minRows: 3, maxRows: 5 }" />
+                                <a-textarea v-model:value="item.content" placeholder="textarea with clear icon"
+                                            allow-clear
+                                            :auto-size="{ minRows: 3, maxRows: 5 }"/>
 
                             </a-col>
                             <a-col :span="2">
@@ -44,23 +56,30 @@
                                     <!-- up down the order -->
                                     <a-button type="primary" shape="round" @click="order(item.id, -1)">
                                         <template #icon>
-                                            <UpOutlined />
+                                            <UpOutlined/>
                                         </template>
                                     </a-button>
                                     <a-button type="primary" shape="round" @click="order(item.id, 1)">
                                         <template #icon>
-                                            <DownOutlined />
+                                            <DownOutlined/>
                                         </template>
                                     </a-button>
                                 </a-space>
                             </a-col>
                             <a-col :span="2">
+                                <a-space direction="vertical">
 
-                                <a-button @click="addPrompt(item.id, '')">
-                                    <template #icon>
-                                        <PlusOutlined />
-                                    </template>
-                                </a-button>
+                                    <a-button @click="addPrompt(item.id, '')">
+                                        <template #icon>
+                                            <PlusOutlined/>
+                                        </template>
+                                    </a-button>
+                                    <a-button @click="deletePrompt(item.id)">
+                                        <template #icon>
+                                            <MinusOutlined/>
+                                        </template>
+                                    </a-button>
+                                </a-space>
                             </a-col>
                         </a-row>
 
@@ -94,10 +113,11 @@
 
                 <a-card title="Prompt Preview">
                     <div class="scroll-short">
+                        <PromptPreview :data="data.profile.messages"></PromptPreview>
                         <div v-for="item in data.profile.messages">
                             <a-list-item v-if="item.enable">
                                 <span :style="{ color: 'blue' }">{{ item.role }} </span><span>:&nbsp;</span>
-                                <span>{{ item.content }}</span>
+                                <span style="white-space: pre-line"> {{ item.content }}</span>
                             </a-list-item>
                         </div>
                     </div>
@@ -105,7 +125,7 @@
                 <a-card title="Corresponding Response">
                     <a-button @click="sendToPrompt">Send To Prompt</a-button>
                     <a-textarea v-model:value="data.response" :auto-size="{ minRows: 20 }"
-                        placeholder="textarea with clear icon" allow-clear />
+                                placeholder="textarea with clear icon" allow-clear/>
                 </a-card>
 
             </a-col>
@@ -114,20 +134,22 @@
 </template>
 
 <script lang="ts" setup>
-import { ref } from 'vue';
+import {ref} from 'vue';
 import useClipboard from 'vue-clipboard3';
 
-import { DownOutlined, PlusOutlined, UpOutlined } from '@ant-design/icons-vue';
+import {DownOutlined, MinusOutlined, PlusOutlined, UpOutlined} from '@ant-design/icons-vue';
 
-import { useRoute, useRouter } from 'vue-router';
-import { DefaultApiFactory } from '../../sdk/apis/default-api';
+import {useRoute, useRouter} from 'vue-router';
+import {DefaultApiFactory} from '../../sdk/apis/default-api';
 
-import { useSnapshotStore } from '@/stores/snapshot';
+import {useSnapshotStore} from '@/stores/snapshot';
+
+import PromptPreview from '../components/PromptPreview.vue'
 
 // use
 const store = useSnapshotStore()
 const router = useRouter()
-const { toClipboard } = useClipboard()
+const {toClipboard} = useClipboard()
 
 const api = DefaultApiFactory(undefined, "http://localhost:8000")
 
@@ -136,29 +158,23 @@ const data = ref({
     key: "",
     history: [{
         messages: [
-            { id: 1, role: "角色1", content: "内容1", enable: true, order: 0 },
+            {id: 1, role: "角色1", content: "内容1", enable: true, order: 0},
         ],
         response: ""
     }],
     response: "",
     profile: {
         "messages": [
-            { id: 1, role: "角色1", content: "内容1", enable: true, order: 0, history: [] },
+            {id: 1, role: "角色1", content: "内容1", enable: true, order: 0, history: []},
             // 其他数据项
         ]
     }
 })
 
-// 
-created()
-
-function created() {
-    const route = useRoute();
-    data.value.key = route.params.key.toString();
-    fetchProfile(data.value.key);
-
-}
-
+// created
+const route = useRoute();
+data.value.key = route.params.key.toString();
+fetchProfile(data.value.key);
 
 // methods
 function sendToPrompt() {
@@ -168,6 +184,11 @@ function sendToPrompt() {
 function goToDebug() {
     store.sendToDebug(data.value.profile.messages)
     router.push('/view/debug')
+}
+
+function deletePrompt(id: number) {
+    let index = data.value.profile.messages.findIndex((i) => i.id == id)
+    data.value.profile.messages.splice(index, 1);
 }
 
 function addPrompt(id: number, content: string) {
@@ -183,7 +204,7 @@ function addPrompt(id: number, content: string) {
     data.value.profile.messages.splice(
         index + 1,
         0,
-        { role: "user", id: max_id + 1, enable: true, content: content, order: order, history: [] }
+        {role: "user", id: max_id + 1, enable: true, content: content, order: order, history: []}
     )
 
     var cur = 0
@@ -194,6 +215,7 @@ function addPrompt(id: number, content: string) {
 
     console.log(data.value.profile.messages)
 }
+
 function order(id: number, delta: number) {
     let index = data.value.profile.messages.findIndex((m) => {
         return (m.id == id)
@@ -215,6 +237,7 @@ function order(id: number, delta: number) {
 
     console.log(data.value.profile.messages)
 }
+
 function setContent(id: number, content: string) {
     data.value.profile.messages.forEach((m) => {
         if (m.id == id) {
@@ -222,9 +245,11 @@ function setContent(id: number, content: string) {
         }
     })
 }
+
 async function copy(content: string) {
     await toClipboard(content)
 }
+
 async function fetchProfile(key: string) {
     api.apiProfileKeyGet(key)
         .then(response => {
@@ -235,9 +260,11 @@ async function fetchProfile(key: string) {
             return null;
         });
 }
+
 function reload() {
     fetchProfile(data.value.key);
 }
+
 async function chat() {
     var res = data.value.profile.messages;
     console.log(res);
