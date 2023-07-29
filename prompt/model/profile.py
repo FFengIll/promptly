@@ -1,8 +1,9 @@
-from typing import List
+import json
+from typing import List, Set
+from uuid import uuid1
 
 import loguru
 import pickledb
-import toml
 from path import Path
 from pydantic import BaseModel, Field
 
@@ -11,25 +12,42 @@ from prompt.model.event import UpdateEvent
 log = loguru.logger
 
 
+def generate_id():
+    u = uuid1()
+    return u.int
+
+
 class Message(BaseModel):
     role: str
     content: str
     history: List[str] = Field(default_factory=list)
-    id: int
+    id: int = Field(default_factory=generate_id)
     enable: bool = Field(default=True)
     order: int = Field(default=0)
 
+    def __hash__(self):
+        return self.id
+
 
 class Profile(BaseModel):
-    name: str
+    name: str = Field(default="")
     messages: List[Message]
-    history: List[str] = Field(default_factory=list)
+    history: Set[str] = Field(default_factory=set)
 
     @classmethod
     def generate_demo(cls):
         return Profile(
             name="demo", messages=[Message(id=1, role="user", content="hello")]
         )
+
+    def remove(self, id):
+        found = None
+        for i in self.messages:
+            if i.id == id:
+                found = i
+                break
+        if found:
+            self.messages.remove(found)
 
 
 class ProfileManager:
@@ -41,25 +59,37 @@ class ProfileManager:
 
         self.load()
 
+    def save(self):
+        for k, path in self.file_map.items():
+            with open(path, "w") as fd:
+                profile: Profile = self.index[k]
+                json.dump(profile.dict(), fd)
+
     def load(self):
         path = self.path
         profiles = []
-        file_map = {}
-        for file in Path(path).listdir("*.toml"):
+        location = {}
+        for file in Path(path).listdir("*.json"):
             with open(file) as fd:
-                item = toml.load(fd)
-                item = Profile.parse_obj(item)
-                item.messages.sort(key=lambda x: x.order)
-                profiles.append(item)
-                file_map[item.name] = file
+                obj = json.load(fd)
+                profile = Profile.parse_obj(obj)
+                for idx, m in enumerate(profile.messages):
+                    m.order = idx
 
-        self.file_map = file_map
-        self.profiles = [i for i in profiles]
+                name = file.basename().removesuffix(".json")
+                profile.name = name
 
-        self.index = {i.name: i for i in self.profiles}
+                profiles.append(profile)
+
+                location[profile.name] = file
+
+        profiles.sort(key=lambda p: p.name)
+
+        self.file_map = location
+        self.profiles = profiles
 
     def list_profile(self):
-        return list(self.index.keys())
+        return [p.name for p in self.profiles]
 
     def refresh(self):
         self.save()
@@ -73,7 +103,8 @@ class ProfileManager:
 
     def update_all(self, key: str, ms: List[Message]):
         p: Profile = self.get(key)
-        pending = []
+
+        to_add = []
         for msg in ms:
             found = False
             for m in p.messages:
@@ -84,13 +115,14 @@ class ProfileManager:
                         # FIXME: ignore any none data
                         m.__setattr__(k, v)
 
-                    if msg.content not in m.history:
-                        m.history.append(msg.content)
+                    if msg.content not in p.history:
+                        p.history.add(msg.content)
                     log.info(m)
 
             if not found:
-                pending.append(msg)
-        p.messages.extend(pending)
+                to_add.append(msg)
+
+        p.messages.extend(to_add)
         p.messages.sort(key=lambda x: x.order)
 
     def update_one(self, key: str, msg: Message):
@@ -121,15 +153,9 @@ class ProfileManager:
                     m.content = e.value
                     break
 
-    def save(self):
-        for k, path in self.file_map.items():
-            with open(path, "w") as fd:
-                profile: Profile = self.index[k]
-                toml.dump(profile.dict(), fd)
-
     def history(self, key, history):
         profile: Profile = self.index[key]
-        profile.history.append(history)
+        profile.history.add(history)
 
 
 class PickleProfileManager:
