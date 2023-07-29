@@ -22,12 +22,15 @@
                     <a-collapse>
                         <a-collapse-panel>
                             <div v-for="h in data.profile.history">
-                                <a-space direction="horizontal">
-
+                                <a-space direction="horizontal" align="baseline">
+                                    <a-button @click="copy(h)">
+                                        <template #icon>
+                                            <CopyOutlined />
+                                        </template>
+                                    </a-button>
                                     <p>{{ h }}</p>
                                     <!-- <a-textarea v-bind="h"> </a-textarea> -->
 
-                                    <!-- <button v-on:click="copy(h)">复制到剪贴板</button> -->
 
                                     <!-- <button v-on:click="setContent(item.id, h)">Set</button> -->
 
@@ -102,8 +105,6 @@
                         </a-row>
 
 
-
-
                         <a-divider>
                             <a-space>
                                 <a-button @click="addPrompt(item.id, '')">
@@ -158,7 +159,7 @@
 import { ref } from 'vue';
 import useClipboard from 'vue-clipboard3';
 
-import { CloseOutlined, DownOutlined, PlusOutlined, UpOutlined } from '@ant-design/icons-vue';
+import { CloseOutlined, CopyOutlined, DownOutlined, PlusOutlined, UpOutlined } from '@ant-design/icons-vue';
 
 import { useRoute, useRouter } from 'vue-router';
 import { DefaultApiFactory } from '../../sdk/apis/default-api';
