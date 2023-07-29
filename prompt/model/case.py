@@ -2,7 +2,6 @@ import json
 from typing import List
 
 import loguru
-import toml
 from path import Path
 from pydantic import BaseModel, Field
 
@@ -10,7 +9,7 @@ log = loguru.logger
 
 
 class Case(BaseModel):
-    id: int
+    id: int = Field(default=0)
     name: str
     data: List[str]
     description: str = Field(default="")
@@ -48,7 +47,7 @@ class CaseManager:
         return list(self.index.values())
 
     def refresh(self):
-        # self.save()
+        self.save()
         self.load()
 
     def get(self, key) -> Case:

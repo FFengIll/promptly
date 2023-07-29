@@ -1,5 +1,5 @@
 import json
-from typing import List, Set
+from typing import List
 from uuid import uuid1
 
 import loguru
@@ -32,7 +32,7 @@ class Message(BaseModel):
 class Profile(BaseModel):
     name: str = Field(default="")
     messages: List[Message]
-    history: Set[str] = Field(default_factory=set)
+    history: List[str] = Field(default_factory=set)
 
     @classmethod
     def generate_demo(cls):
@@ -55,15 +55,13 @@ class ProfileManager:
         self.path = path
         self.file_map = {}
         self.profiles = []
-        self.index = {}
 
         self.load()
 
     def save(self):
-        for k, path in self.file_map.items():
+        for path, profile in self.file_map.items():
             with open(path, "w") as fd:
-                profile: Profile = self.index[k]
-                json.dump(profile.dict(), fd)
+                json.dump(profile.dict(), fd, indent=4, ensure_ascii=False)
 
     def load(self):
         path = self.path
@@ -81,7 +79,7 @@ class ProfileManager:
 
                 profiles.append(profile)
 
-                location[profile.name] = file
+                location[file] = profile
 
         profiles.sort(key=lambda p: p.name)
 
@@ -116,7 +114,7 @@ class ProfileManager:
                         m.__setattr__(k, v)
 
                     if msg.content not in p.history:
-                        p.history.add(msg.content)
+                        p.history.append(msg.content)
                     log.info(m)
 
             if not found:
@@ -152,10 +150,6 @@ class ProfileManager:
                         m.history.append(e.value)
                     m.content = e.value
                     break
-
-    def history(self, key, history):
-        profile: Profile = self.index[key]
-        profile.history.add(history)
 
 
 class PickleProfileManager:
