@@ -18,6 +18,25 @@
                     <a-button @click="() => { data.profile.messages.forEach((item) => item.enable = true) }">Enable
                         All
                     </a-button>
+
+                    <a-collapse>
+                        <a-collapse-panel>
+                            <div v-for="h in data.profile.history">
+                                <a-space direction="horizontal">
+
+                                    <p>{{ h }}</p>
+                                    <!-- <a-textarea v-bind="h"> </a-textarea> -->
+
+                                    <!-- <button v-on:click="copy(h)">复制到剪贴板</button> -->
+
+                                    <!-- <button v-on:click="setContent(item.id, h)">Set</button> -->
+
+                                </a-space>
+                            </div>
+                        </a-collapse-panel>
+                    </a-collapse>
+
+
                     <div v-for="item in data.profile.messages" :key="item.id" class="card">
                         <!-- <template #extra><a href="#">more</a></template> -->
 
@@ -27,9 +46,9 @@
                                     <!-- role select -->
                                     <a-select ref="select" v-model:value="item.role" style="width: 120px">
                                         <a-select-option value="user">
-                                            <span style="color: red">User</span></a-select-option>
+                                            <span style="color: black">User</span></a-select-option>
                                         <a-select-option value="system">
-                                            <span style="color: black">System</span>
+                                            <span style="color: red">System</span>
                                         </a-select-option>
                                         <a-select-option value="assistant">
                                             <span style="color: blue">Assistant</span>
@@ -46,9 +65,8 @@
                             </a-col>
                             <a-col :span="16">
                                 <!-- content edit -->
-                                <a-textarea v-model:value="item.content" placeholder="textarea with clear icon"
-                                            allow-clear
-                                            :auto-size="{ minRows: 3, maxRows: 5 }"/>
+                                <a-textarea v-model:value="item.content" placeholder="textarea with clear icon" allow-clear
+                                    :auto-size="{ minRows: 3, maxRows: 5 }" />
 
                             </a-col>
                             <a-col :span="2">
@@ -56,12 +74,12 @@
                                     <!-- up down the order -->
                                     <a-button type="primary" shape="round" @click="order(item.id, -1)">
                                         <template #icon>
-                                            <UpOutlined/>
+                                            <UpOutlined />
                                         </template>
                                     </a-button>
                                     <a-button type="primary" shape="round" @click="order(item.id, 1)">
                                         <template #icon>
-                                            <DownOutlined/>
+                                            <DownOutlined />
                                         </template>
                                     </a-button>
                                 </a-space>
@@ -69,46 +87,45 @@
                             <a-col :span="2">
                                 <a-space direction="vertical">
 
-                                    <a-button @click="addPrompt(item.id, '')">
-                                        <template #icon>
-                                            <PlusOutlined/>
-                                        </template>
-                                    </a-button>
-                                    <a-button @click="deletePrompt(item.id)">
-                                        <template #icon>
-                                            <MinusOutlined/>
-                                        </template>
-                                    </a-button>
+                                    <a-popconfirm title="Are you sure delete this task?" ok-text="Yes" cancel-text="No"
+                                        @confirm="deletePrompt(item.id)">
+                                        <a-button>
+                                            <template #icon>
+                                                <CloseOutlined />
+                                            </template>
+                                        </a-button>
+                                    </a-popconfirm>
+
+
                                 </a-space>
                             </a-col>
                         </a-row>
 
-                        <a-collapse>
-                            <a-collapse-panel>
-                                <div v-for="h in item.history">
-                                    <a-space direction="horizontal">
 
-                                        <p>{{ h }}</p>
-                                        <!-- <a-textarea v-bind="h"> </a-textarea> -->
 
-                                        <!-- <button v-on:click="copy(h)">复制到剪贴板</button> -->
 
-                                        <button v-on:click="setContent(item.id, h)">Set</button>
+                        <a-divider>
+                            <a-space>
+                                <a-button @click="addPrompt(item.id, '')">
+                                    <template #icon>
+                                        <PlusOutlined />
+                                    </template>
+                                </a-button>
+                            </a-space>
 
-                                    </a-space>
-                                </div>
-                            </a-collapse-panel>
-                        </a-collapse>
+                        </a-divider>
+
                     </div>
+
                 </a-card>
             </a-col>
+
             <a-col class="gutter-row" :span="10">
                 <a-card title="Operation">
                     <a-button @click="reload">reload</a-button>
                     <a-button @click="chat">Chat</a-button>
                     <a-button @click="goToDebug">Go To Debug</a-button>
-                    <a-button>Good</a-button>
-                    <a-button>Bad</a-button>
+
                 </a-card>
 
                 <a-card title="Prompt Preview">
@@ -123,9 +140,13 @@
                     </div>
                 </a-card>
                 <a-card title="Corresponding Response">
-                    <a-button @click="sendToPrompt">Send To Prompt</a-button>
+                    <a-space direction="horizontal">
+                        <a-button @click="sendToPrompt">Send To Prompt</a-button>
+                        <a-button>Good</a-button>
+                        <a-button>Bad</a-button>
+                    </a-space>
                     <a-textarea v-model:value="data.response" :auto-size="{ minRows: 20 }"
-                                placeholder="textarea with clear icon" allow-clear/>
+                        placeholder="textarea with clear icon" allow-clear />
                 </a-card>
 
             </a-col>
@@ -134,22 +155,22 @@
 </template>
 
 <script lang="ts" setup>
-import {ref} from 'vue';
+import { ref } from 'vue';
 import useClipboard from 'vue-clipboard3';
 
-import {DownOutlined, MinusOutlined, PlusOutlined, UpOutlined} from '@ant-design/icons-vue';
+import { CloseOutlined, DownOutlined, PlusOutlined, UpOutlined } from '@ant-design/icons-vue';
 
-import {useRoute, useRouter} from 'vue-router';
-import {DefaultApiFactory} from '../../sdk/apis/default-api';
+import { useRoute, useRouter } from 'vue-router';
+import { DefaultApiFactory } from '../../sdk/apis/default-api';
 
-import {useSnapshotStore} from '@/stores/snapshot';
+import { useSnapshotStore } from '@/stores/snapshot';
 
-import PromptPreview from '../components/PromptPreview.vue'
+import PromptPreview from '../components/PromptPreview.vue';
 
 // use
 const store = useSnapshotStore()
 const router = useRouter()
-const {toClipboard} = useClipboard()
+const { toClipboard } = useClipboard()
 
 const api = DefaultApiFactory(undefined, "http://localhost:8000")
 
@@ -158,14 +179,15 @@ const data = ref({
     key: "",
     history: [{
         messages: [
-            {id: 1, role: "角色1", content: "内容1", enable: true, order: 0},
+            { id: 1, role: "角色1", content: "内容1", enable: true, order: 0 },
         ],
         response: ""
     }],
     response: "",
     profile: {
+        "history": ["1"],
         "messages": [
-            {id: 1, role: "角色1", content: "内容1", enable: true, order: 0, history: []},
+            { id: 1, role: "角色1", content: "内容1", enable: true, order: 0, history: [] },
             // 其他数据项
         ]
     }
@@ -187,8 +209,10 @@ function goToDebug() {
 }
 
 function deletePrompt(id: number) {
-    let index = data.value.profile.messages.findIndex((i) => i.id == id)
-    data.value.profile.messages.splice(index, 1);
+    api.apiProfileKeyIdDelete(data.value.key, id).then(response => {
+        data.value.profile = response.data
+    })
+
 }
 
 function addPrompt(id: number, content: string) {
@@ -204,7 +228,7 @@ function addPrompt(id: number, content: string) {
     data.value.profile.messages.splice(
         index + 1,
         0,
-        {role: "user", id: max_id + 1, enable: true, content: content, order: order, history: []}
+        { role: "user", id: max_id + 1, enable: true, content: content, order: order, history: [] }
     )
 
     var cur = 0
@@ -253,7 +277,7 @@ async function copy(content: string) {
 async function fetchProfile(key: string) {
     api.apiProfileKeyGet(key)
         .then(response => {
-            data.value.profile = response.data.profile;
+            data.value.profile = response.data;
         })
         .catch(error => {
             console.error(error);
