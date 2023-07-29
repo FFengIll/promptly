@@ -23,7 +23,7 @@ def load_profile(key: str):
     profile = manager.get(key=key)
     if not profile:
         return fastapi.HTTPException(status_code=404)
-    return dict(profile=profile.dict())
+    return profile.dict()
 
 
 @app.post("/api/profile/{key}")
@@ -45,6 +45,14 @@ async def chat(key: str, update: List[Message]):
     log.info(ms)
     res = await api.chat(ms)
     return res["data"]["choices"][0]["message"]["content"]
+
+
+@app.delete("/api/profile/{key}/{id}")
+def delete_prompt_item(key: str, id: int):
+    p = manager.get(key)
+    p.remove(id)
+
+    return p.dict()
 
 
 @app.get("/api/profile")
