@@ -40,7 +40,7 @@ export interface Message {
      * @type {number}
      * @memberof Message
      */
-    id: number;
+    id?: number;
     /**
      * 
      * @type {boolean}
