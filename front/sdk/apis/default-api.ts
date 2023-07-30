@@ -19,6 +19,7 @@ import { BASE_PATH, COLLECTION_FORMATS, RequestArgs, BaseAPI, RequiredError } fr
 import { EventRequest } from '../models';
 import { HTTPValidationError } from '../models';
 import { Message } from '../models';
+import { SnapshotRequest } from '../models';
 /**
  * DefaultApi - axios parameter creator
  * @export
@@ -298,6 +299,95 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
                 throw new RequiredError('key','Required parameter key was null or undefined when calling apiProfileKeyPost.');
             }
             const localVarPath = `/api/profile/{key}`
+                .replace(`{${"key"}}`, encodeURIComponent(String(key)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, 'https://example.com');
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+            const localVarRequestOptions :AxiosRequestConfig = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            const query = new URLSearchParams(localVarUrlObj.search);
+            for (const key in localVarQueryParameter) {
+                query.set(key, localVarQueryParameter[key]);
+            }
+            for (const key in options.params) {
+                query.set(key, options.params[key]);
+            }
+            localVarUrlObj.search = (new URLSearchParams(query)).toString();
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            const needsSerialization = (typeof body !== "string") || localVarRequestOptions.headers['Content-Type'] === 'application/json';
+            localVarRequestOptions.data =  needsSerialization ? JSON.stringify(body !== undefined ? body : {}) : (body || "");
+
+            return {
+                url: localVarUrlObj.pathname + localVarUrlObj.search + localVarUrlObj.hash,
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @summary Get Snapshot
+         * @param {string} key 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        apiProfileKeySnapshotGet: async (key: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'key' is not null or undefined
+            if (key === null || key === undefined) {
+                throw new RequiredError('key','Required parameter key was null or undefined when calling apiProfileKeySnapshotGet.');
+            }
+            const localVarPath = `/api/profile/{key}/snapshot`
+                .replace(`{${"key"}}`, encodeURIComponent(String(key)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, 'https://example.com');
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+            const localVarRequestOptions :AxiosRequestConfig = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            const query = new URLSearchParams(localVarUrlObj.search);
+            for (const key in localVarQueryParameter) {
+                query.set(key, localVarQueryParameter[key]);
+            }
+            for (const key in options.params) {
+                query.set(key, options.params[key]);
+            }
+            localVarUrlObj.search = (new URLSearchParams(query)).toString();
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: localVarUrlObj.pathname + localVarUrlObj.search + localVarUrlObj.hash,
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @summary Add Snapshot
+         * @param {SnapshotRequest} body 
+         * @param {string} key 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        apiProfileKeySnapshotPost: async (body: SnapshotRequest, key: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'body' is not null or undefined
+            if (body === null || body === undefined) {
+                throw new RequiredError('body','Required parameter body was null or undefined when calling apiProfileKeySnapshotPost.');
+            }
+            // verify required parameter 'key' is not null or undefined
+            if (key === null || key === undefined) {
+                throw new RequiredError('key','Required parameter key was null or undefined when calling apiProfileKeySnapshotPost.');
+            }
+            const localVarPath = `/api/profile/{key}/snapshot`
                 .replace(`{${"key"}}`, encodeURIComponent(String(key)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, 'https://example.com');
@@ -668,6 +758,35 @@ export const DefaultApiFp = function(configuration?: Configuration) {
         },
         /**
          * 
+         * @summary Get Snapshot
+         * @param {string} key 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async apiProfileKeySnapshotGet(key: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => Promise<AxiosResponse<any>>> {
+            const localVarAxiosArgs = await DefaultApiAxiosParamCreator(configuration).apiProfileKeySnapshotGet(key, options);
+            return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
+                const axiosRequestArgs :AxiosRequestConfig = {...localVarAxiosArgs.options, url: basePath + localVarAxiosArgs.url};
+                return axios.request(axiosRequestArgs);
+            };
+        },
+        /**
+         * 
+         * @summary Add Snapshot
+         * @param {SnapshotRequest} body 
+         * @param {string} key 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async apiProfileKeySnapshotPost(body: SnapshotRequest, key: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => Promise<AxiosResponse<any>>> {
+            const localVarAxiosArgs = await DefaultApiAxiosParamCreator(configuration).apiProfileKeySnapshotPost(body, key, options);
+            return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
+                const axiosRequestArgs :AxiosRequestConfig = {...localVarAxiosArgs.options, url: basePath + localVarAxiosArgs.url};
+                return axios.request(axiosRequestArgs);
+            };
+        },
+        /**
+         * 
          * @summary List Case
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -830,6 +949,27 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
         },
         /**
          * 
+         * @summary Get Snapshot
+         * @param {string} key 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async apiProfileKeySnapshotGet(key: string, options?: AxiosRequestConfig): Promise<AxiosResponse<any>> {
+            return DefaultApiFp(configuration).apiProfileKeySnapshotGet(key, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @summary Add Snapshot
+         * @param {SnapshotRequest} body 
+         * @param {string} key 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async apiProfileKeySnapshotPost(body: SnapshotRequest, key: string, options?: AxiosRequestConfig): Promise<AxiosResponse<any>> {
+            return DefaultApiFp(configuration).apiProfileKeySnapshotPost(body, key, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
          * @summary List Case
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -973,6 +1113,29 @@ export class DefaultApi extends BaseAPI {
      */
     public async apiProfileKeyPost(body: Array<Message>, key: string, options?: AxiosRequestConfig) : Promise<AxiosResponse<any>> {
         return DefaultApiFp(this.configuration).apiProfileKeyPost(body, key, options).then((request) => request(this.axios, this.basePath));
+    }
+    /**
+     * 
+     * @summary Get Snapshot
+     * @param {string} key 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApi
+     */
+    public async apiProfileKeySnapshotGet(key: string, options?: AxiosRequestConfig) : Promise<AxiosResponse<any>> {
+        return DefaultApiFp(this.configuration).apiProfileKeySnapshotGet(key, options).then((request) => request(this.axios, this.basePath));
+    }
+    /**
+     * 
+     * @summary Add Snapshot
+     * @param {SnapshotRequest} body 
+     * @param {string} key 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApi
+     */
+    public async apiProfileKeySnapshotPost(body: SnapshotRequest, key: string, options?: AxiosRequestConfig) : Promise<AxiosResponse<any>> {
+        return DefaultApiFp(this.configuration).apiProfileKeySnapshotPost(body, key, options).then((request) => request(this.axios, this.basePath));
     }
     /**
      * 
