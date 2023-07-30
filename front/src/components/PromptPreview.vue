@@ -1,14 +1,11 @@
 <script setup lang="ts">
 import {useRouter} from 'vue-router';
+import type {PromptItem} from "../../sdk";
 
 const router = useRouter()
 
 defineProps<{
-    messages: [{
-        role: string,
-        content: string,
-        enable: boolean,
-    }]
+    messages: PromptItem[]
 }>()
 
 
@@ -16,10 +13,8 @@ defineProps<{
 
 <template>
     <div v-for="item in messages">
-        <a-list-item v-if="item.enable">
-            <span :style="{ color: 'blue' }">{{ item.role }} </span><span>:&nbsp;</span>
-            <span style="white-space: pre-line"> {{ item.content }}</span>
-        </a-list-item>
+        <span :style="{ color: 'blue' }">{{ item.role }} </span><span>:&nbsp;</span>
+        <span style="white-space: pre-line"> {{ item.content }}</span>
     </div>
 </template>
 
