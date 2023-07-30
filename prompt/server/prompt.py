@@ -2,8 +2,9 @@ from typing import List
 
 import fastapi
 import loguru
+from pydantic import BaseModel
 
-from prompt.model.profile import Message, ProfileManager
+from prompt.model.profile import Message, ProfileManager, PromptItem
 from prompt.server import api
 from prompt.server.app import app
 from prompt.server.util import to_message
@@ -16,6 +17,25 @@ manager = ProfileManager("./profile")
 @app.on_event("shutdown")
 def shutdown_event():
     manager.save()
+
+
+class SnapshotRequest(BaseModel):
+    snapshot: List[PromptItem]
+
+
+@app.post("/api/profile/{key}/snapshot")
+def add_snapshot(key: str, request: SnapshotRequest):
+    p = manager.get(key)
+    if p:
+        p.add_snapshot(request.snapshot)
+
+
+@app.get("/api/profile/{key}/snapshot")
+def get_snapshot(key: str):
+    p = manager.get(key)
+    if p:
+        return [s.dict() for s in p.snapshots]
+    return fastapi.HTTPException(status_code=404)
 
 
 @app.get("/api/profile/{key}")

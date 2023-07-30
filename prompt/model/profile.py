@@ -17,9 +17,12 @@ def generate_id():
     return u.int
 
 
-class Message(BaseModel):
+class PromptItem(BaseModel):
     role: str
     content: str
+
+
+class Message(PromptItem):
     history: List[str] = Field(default_factory=list)
     id: int = Field(default_factory=generate_id)
     enable: bool = Field(default=True)
@@ -32,13 +35,17 @@ class Message(BaseModel):
 class Profile(BaseModel):
     name: str = Field(default="")
     messages: List[Message]
-    history: List[str] = Field(default_factory=set)
+    history: List[str] = Field(default_factory=list)
+    snapshots: List[List[PromptItem]] = Field(default_factory=list)
 
     @classmethod
     def generate_demo(cls):
         return Profile(
             name="demo", messages=[Message(id=1, role="user", content="hello")]
         )
+
+    def add_snapshot(self, s: List[PromptItem]):
+        self.snapshots.append(s)
 
     def remove(self, id):
         found = None
@@ -54,7 +61,7 @@ class ProfileManager:
     def __init__(self, path) -> None:
         self.path = path
         self.file_map = {}
-        self.profiles = []
+        self.profiles: List[Profile] = []
 
         self.load()
 
@@ -97,7 +104,10 @@ class ProfileManager:
         self,
         key=None,
     ) -> Profile:
-        return self.index.get(key, None)
+        for p in self.profiles:
+            if p.name == key:
+                return p
+        return None
 
     def update_all(self, key: str, ms: List[Message]):
         p: Profile = self.get(key)
@@ -140,16 +150,16 @@ class ProfileManager:
 
         p.messages.sort(key=lambda x: x.order)
 
-    def update(self, name, events: List[UpdateEvent]):
-        p: Profile = self.index[name]
-
-        for e in events:
-            for m in p.messages:
-                if m.id == e.id:
-                    if e.value not in m.history:
-                        m.history.append(e.value)
-                    m.content = e.value
-                    break
+    # def update(self, name, events: List[UpdateEvent]):
+    #     p: Profile = self.index[name]
+    #
+    #     for e in events:
+    #         for m in p.messages:
+    #             if m.id == e.id:
+    #                 if e.value not in m.history:
+    #                     m.history.append(e.value)
+    #                 m.content = e.value
+    #                 break
 
 
 class PickleProfileManager:
