@@ -11,6 +11,25 @@
     <div>
         <a-row :gutter='12'>
             <a-col class="gutter-row" :span="14">
+                <a-collapse>
+                    <a-collapse-panel header="History">
+                        <div v-for="h in data.profile.history">
+                            <a-space direction="horizontal" align="baseline">
+                                <a-button @click="copy(h)">
+                                    <template #icon>
+                                        <CopyOutlined/>
+                                    </template>
+                                </a-button>
+                                <p>{{ h }}</p>
+                                <!-- <a-textarea v-bind="h"> </a-textarea> -->
+
+
+                                <!-- <button v-on:click="setContent(item.id, h)">Set</button> -->
+
+                            </a-space>
+                        </div>
+                    </a-collapse-panel>
+                </a-collapse>
                 <a-card title="Prompt">
                     <a-button @click="() => { data.profile.messages.forEach((item) => item.enable = false) }">Disable
                         All
@@ -18,26 +37,6 @@
                     <a-button @click="() => { data.profile.messages.forEach((item) => item.enable = true) }">Enable
                         All
                     </a-button>
-
-                    <a-collapse>
-                        <a-collapse-panel>
-                            <div v-for="h in data.profile.history">
-                                <a-space direction="horizontal" align="baseline">
-                                    <a-button @click="copy(h)">
-                                        <template #icon>
-                                            <CopyOutlined />
-                                        </template>
-                                    </a-button>
-                                    <p>{{ h }}</p>
-                                    <!-- <a-textarea v-bind="h"> </a-textarea> -->
-
-
-                                    <!-- <button v-on:click="setContent(item.id, h)">Set</button> -->
-
-                                </a-space>
-                            </div>
-                        </a-collapse-panel>
-                    </a-collapse>
 
 
                     <div v-for="item in data.profile.messages" :key="item.id" class="card">
@@ -68,8 +67,9 @@
                             </a-col>
                             <a-col :span="16">
                                 <!-- content edit -->
-                                <a-textarea v-model:value="item.content" placeholder="textarea with clear icon" allow-clear
-                                    :auto-size="{ minRows: 3, maxRows: 5 }" />
+                                <a-textarea v-model:value="item.content" placeholder="textarea with clear icon"
+                                            allow-clear
+                                            :auto-size="{ minRows: 3, maxRows: 5 }"/>
 
                             </a-col>
                             <a-col :span="2">
@@ -77,12 +77,12 @@
                                     <!-- up down the order -->
                                     <a-button type="primary" shape="round" @click="order(item.id, -1)">
                                         <template #icon>
-                                            <UpOutlined />
+                                            <UpOutlined/>
                                         </template>
                                     </a-button>
                                     <a-button type="primary" shape="round" @click="order(item.id, 1)">
                                         <template #icon>
-                                            <DownOutlined />
+                                            <DownOutlined/>
                                         </template>
                                     </a-button>
                                 </a-space>
@@ -91,10 +91,10 @@
                                 <a-space direction="vertical">
 
                                     <a-popconfirm title="Are you sure delete this task?" ok-text="Yes" cancel-text="No"
-                                        @confirm="deletePrompt(item.id)">
+                                                  @confirm="deletePrompt(item.id)">
                                         <a-button>
                                             <template #icon>
-                                                <CloseOutlined />
+                                                <CloseOutlined/>
                                             </template>
                                         </a-button>
                                     </a-popconfirm>
@@ -109,7 +109,7 @@
                             <a-space>
                                 <a-button @click="addPrompt(item.id, '')">
                                     <template #icon>
-                                        <PlusOutlined />
+                                        <PlusOutlined/>
                                     </template>
                                 </a-button>
                             </a-space>
@@ -122,22 +122,36 @@
             </a-col>
 
             <a-col class="gutter-row" :span="10">
+
+                <a-collapse>
+
+                    <a-collapse-panel header="Snapshot">
+                        <div class="scroll-short">
+
+                            <div v-for="snapshot in data.profile.snapshots">
+                                <a-divider>
+                                    <a-button @click="useSnapshot(snapshot)">
+                                        Use Snapshot
+                                    </a-button>
+                                </a-divider>
+                                <PromptPreview :messages="snapshot"></PromptPreview>
+                            </div>
+                        </div>
+                    </a-collapse-panel>
+                </a-collapse>
+
                 <a-card title="Operation">
-                    <a-button @click="reload">reload</a-button>
                     <a-button @click="chat">Chat</a-button>
+                    <a-button @click="snapshot">Snapshot</a-button>
+                    <a-button @click="reload">Reload</a-button>
                     <a-button @click="goToDebug">Go To Debug</a-button>
 
                 </a-card>
 
+
                 <a-card title="Prompt Preview">
                     <div class="scroll-short">
-                        <PromptPreview :data="data.profile.messages"></PromptPreview>
-                        <div v-for="item in data.profile.messages">
-                            <a-list-item v-if="item.enable">
-                                <span :style="{ color: 'blue' }">{{ item.role }} </span><span>:&nbsp;</span>
-                                <span style="white-space: pre-line"> {{ item.content }}</span>
-                            </a-list-item>
-                        </div>
+                        <PromptPreview :messages="data.profile.messages.filter((i)=>i.enable)"></PromptPreview>
                     </div>
                 </a-card>
                 <a-card title="Corresponding Response">
@@ -147,7 +161,7 @@
                         <a-button>Bad</a-button>
                     </a-space>
                     <a-textarea v-model:value="data.response" :auto-size="{ minRows: 20 }"
-                        placeholder="textarea with clear icon" allow-clear />
+                                placeholder="textarea with clear icon" allow-clear/>
                 </a-card>
 
             </a-col>
@@ -156,22 +170,24 @@
 </template>
 
 <script lang="ts" setup>
-import { ref } from 'vue';
+import {ref} from 'vue';
 import useClipboard from 'vue-clipboard3';
 
-import { CloseOutlined, CopyOutlined, DownOutlined, PlusOutlined, UpOutlined } from '@ant-design/icons-vue';
+import {CloseOutlined, CopyOutlined, DownOutlined, PlusOutlined, UpOutlined} from '@ant-design/icons-vue';
 
-import { useRoute, useRouter } from 'vue-router';
-import { DefaultApiFactory } from '../../sdk/apis/default-api';
+import {useRoute, useRouter} from 'vue-router';
+import {DefaultApiFactory} from '../../sdk/apis/default-api';
 
-import { useSnapshotStore } from '@/stores/snapshot';
+import {useSnapshotStore} from '@/stores/snapshot';
 
 import PromptPreview from '../components/PromptPreview.vue';
+import type {Message, PromptItem} from "../../sdk";
+import {SnapshotRequest} from "../../sdk";
 
 // use
 const store = useSnapshotStore()
 const router = useRouter()
-const { toClipboard } = useClipboard()
+const {toClipboard} = useClipboard()
 
 const api = DefaultApiFactory(undefined, "http://localhost:8000")
 
@@ -180,7 +196,7 @@ const data = ref({
     key: "",
     history: [{
         messages: [
-            { id: 1, role: "角色1", content: "内容1", enable: true, order: 0 },
+            {id: 1, role: "角色1", content: "内容1", enable: true, order: 0},
         ],
         response: ""
     }],
@@ -188,9 +204,10 @@ const data = ref({
     profile: {
         "history": ["1"],
         "messages": [
-            { id: 1, role: "角色1", content: "内容1", enable: true, order: 0, history: [] },
+            {id: 1, role: "角色1", content: "内容1", enable: true, order: 0, history: []},
             // 其他数据项
-        ]
+        ],
+        "snapshots": [[{role: 'user', content: 'snapshot'}]]
     }
 })
 
@@ -216,6 +233,39 @@ function deletePrompt(id: number) {
 
 }
 
+function useSnapshot(snapshot: PromptItem[]) {
+    console.log(snapshot)
+    let target = data.value.profile.messages
+    for (let i = 0; i < target.length; i++) {
+        if (i >= snapshot.length) {
+            target[i].enable = false
+        } else {
+            target[i].enable = true
+            target[i].role = snapshot[i].role
+            target[i].content = snapshot[i].content
+        }
+
+    }
+}
+
+function snapshot() {
+
+    let key = data.value.key
+    let snapshot: PromptItem[] = []
+    data.value.profile.messages.forEach(
+        (item: Message): PromptItem => {
+            if (item.enable) {
+                let res: PromptItem = {role: item.role, content: item.content}
+                snapshot.push(res)
+            }
+        }
+    )
+    let body: SnapshotRequest = {snapshot: snapshot}
+    api.apiProfileKeySnapshotPost(body, key,).then(() => {
+
+    })
+}
+
 function addPrompt(id: number, content: string) {
     let index = data.value.profile.messages.findIndex((item) => item.id == id)
     let order = data.value.profile.messages[index].order
@@ -229,7 +279,7 @@ function addPrompt(id: number, content: string) {
     data.value.profile.messages.splice(
         index + 1,
         0,
-        { role: "user", id: max_id + 1, enable: true, content: content, order: order, history: [] }
+        {role: "user", id: max_id + 1, enable: true, content: content, order: order, history: []}
     )
 
     var cur = 0
