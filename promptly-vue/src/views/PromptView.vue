@@ -182,7 +182,7 @@ import {useSnapshotStore} from '@/stores/snapshot';
 
 import PromptPreview from '../components/PromptPreview.vue';
 import type {Message, PromptItem} from "../../sdk";
-import {SnapshotRequest} from "../../sdk";
+import type {SnapshotRequest} from "../../sdk";
 
 // use
 const store = useSnapshotStore()
@@ -253,11 +253,12 @@ function snapshot() {
     let key = data.value.key
     let snapshot: PromptItem[] = []
     data.value.profile.messages.forEach(
-        (item: Message): PromptItem => {
+        (item: Message): any => {
             if (item.enable) {
                 let res: PromptItem = {role: item.role, content: item.content}
                 snapshot.push(res)
             }
+
         }
     )
     let body: SnapshotRequest = {snapshot: snapshot}
