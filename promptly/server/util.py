@@ -1,6 +1,6 @@
 from typing import List
 
-from prompt.model.profile import Message
+from promptly.model.profile import Message
 
 
 def to_message(ms: List[Message]):

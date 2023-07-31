@@ -4,11 +4,11 @@ from typing import List
 import loguru
 from pydantic import BaseModel
 
-from prompt.model.case import CaseManager, Case
-from prompt.model.profile import Message
-from prompt.server import api
-from prompt.server.app import app
-from prompt.server.util import to_message
+from promptly.model.case import CaseManager, Case
+from promptly.model.profile import Message
+from promptly.server import api
+from promptly.server.app import app
+from promptly.server.util import to_message
 
 log = loguru.logger
 

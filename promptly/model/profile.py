@@ -7,7 +7,7 @@ import pickledb
 from path import Path
 from pydantic import BaseModel, Field
 
-from prompt.model.event import UpdateEvent
+from promptly.model.event import UpdateEvent
 
 log = loguru.logger
 

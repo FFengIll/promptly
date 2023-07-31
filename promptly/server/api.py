@@ -6,8 +6,8 @@ from httpx import AsyncClient
 from sqlalchemy import func
 from sqlmodel import Session, select
 
-from prompt.model.orm import Profile, engine
-from prompt.openai.config import key, url
+from promptly.model.orm import Profile, engine
+from promptly.openai.config import key, url
 
 # create_db_and_tables()
 payload = {

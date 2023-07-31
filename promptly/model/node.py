@@ -31,7 +31,7 @@ class Node:
 
         prev = []
         post = []
-        from prompt.model.graph import Chain
+        from promptly.model.graph import Chain
 
         chain = Chain()
 
