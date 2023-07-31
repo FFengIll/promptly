@@ -7,9 +7,9 @@ import pandas as pd
 import PySimpleGUI as sg
 
 from gui.helper import EventLoop
-from prompt.server import api
-from prompt.model.event import UpdateEvent
-from prompt.model.profile import Profile, ProfileManager
+from promptly.server import api
+from promptly.model.event import UpdateEvent
+from promptly.model.profile import Profile, ProfileManager
 
 log = loguru.logger
 
