@@ -1,10 +1,10 @@
-import { useLocalStorage } from "@vueuse/core"
-import { defineStore } from 'pinia'
-import type { Message } from '../../sdk/models/message.js'
+import {useLocalStorage} from "@vueuse/core"
+import {defineStore} from 'pinia'
+import type {Message} from '../../sdk/models/message.js'
 
 export const useCounterStore = defineStore('counter', {
     state: () => {
-        return { count: 0 }
+        return {count: 0}
     },
     // 也可以这样定义
     // state: () => ({ count: 0 })
@@ -18,62 +18,62 @@ export const useCounterStore = defineStore('counter', {
 export const useSnapshotStore = defineStore('snapshot', {
     state: () => {
         return {
-            snapshot:{
-            messages: [
-                {
-                    id: 1,
-                    role: 'user',
-                    content: "{{}}"
-                }
-            ]
-        },
-        debug:  useLocalStorage('debug', [
+            snapshot: {
+                messages: [
+                    {
+                        id: 1,
+                        role: 'user',
+                        content: "{{}}"
+                    }
+                ]
+            },
+            debug: useLocalStorage('debug', <Message[]>[
                 {
                     id: 1,
                     role: 'user',
                     content: "{{}}"
                 },
-               
+
             ]),
-        compare:{
-            left: [
-                {
-                    id: 1,
-                    role: 'user',
-                    content: "test"
-                }
-            ],
-            right: [
-                {
-                    id: 1,
-                    role: 'user',
-                    content: "test"
-                }
-            ]
-        }
+            compare: {
+                left: <Message[]>[
+                    {
+                        id: 1,
+                        role: 'user',
+                        content: "test"
+                    }
+                ],
+                right: <Message[]>[
+                    {
+                        id: 1,
+                        role: 'user',
+                        content: "test"
+                    }
+                ]
+            }
 
         }
     },
     actions: {
-        sendToDebug(ms:Message[]) {
-            var res  = ms.filter(item => {
+        sendToDebug(ms: Message[]) {
+            var res = ms.filter(item => {
                 return item.enable
             });
-            this.debug =  res
+            this.debug = res
         },
-        sendToCompareLeft(ms:Message[]) {
+        sendToCompareLeft(ms: Message[]) {
             // var res  = ms.filter(item => {
             //     return item.enable
             // });
             var res = ms
-            this.compare.right =  res
+            this.compare.right = res
         },
-        sendToCompareRight(ms:Message[]) {
+        sendToCompareRight(ms: Message[]) {
             // var res  = ms.filter(item => {
             //     return item.enable
             // });
             var res = ms
-            this.compare.right =  res
+            this.compare.right = res
         },
     },
 })
