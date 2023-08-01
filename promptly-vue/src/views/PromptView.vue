@@ -158,6 +158,7 @@
                     <a-button @click="snapshot">Snapshot</a-button>
                     <a-button @click="reload">Reload</a-button>
                     <a-button @click="goToDebug">Go To Debug</a-button>
+                    <a-button @click="openNotification('test','info')">Notice</a-button>
 
                 </a-card>
 
@@ -195,6 +196,10 @@ import {useSnapshotStore} from '@/stores/snapshot';
 
 import PromptPreview from '../components/PromptPreview.vue';
 import type {Message, PromptItem, SnapshotRequest} from "../../sdk";
+import type {NotificationPlacement} from "ant-design-vue";
+import {notification} from 'ant-design-vue';
+
+const [notification_api, contextHolder] = notification.useNotification();
 
 // use
 const store = useSnapshotStore()
@@ -353,6 +358,16 @@ function reload() {
     fetchProfile(data.value.key);
 }
 
+
+function openNotification(message: string, status: string) {
+    let placement: NotificationPlacement = 'bottomRight'
+    notification[status]({
+        message: message,
+        description: message,
+        placement,
+    });
+}
+
 async function chat() {
     var res = data.value.profile.messages;
     console.log(res);
@@ -367,9 +382,15 @@ async function chat() {
                     response: response.data
                 }
             )
+
+            return data.value.response
+        })
+        .then((msg: string) => {
+            openNotification(msg, 'success')
         })
         .catch(error => {
-            console.error(error);
+            openNotification(error, 'error')
+            console.error(error.toString());
             return;
         });
 
