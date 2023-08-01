@@ -1,6 +1,6 @@
 <style>
 .scroll-short {
-    height: 300px;
+    height: 200px;
     /* 设置组件容器的固定高度 */
     overflow: auto;
     /* 设置溢出部分自动滚动 */
@@ -10,7 +10,7 @@
 <template>
     <div>
         <a-row :gutter='12'>
-            <a-col class="gutter-row" :span="14">
+            <a-col class="gutter-row" :span="12">
                 <a-collapse>
                     <a-collapse-panel header="History">
                         <div v-for="h in data.profile.history">
@@ -38,40 +38,53 @@
                         All
                     </a-button>
 
+                    <a-divider></a-divider>
+
 
                     <div v-for="item in data.profile.messages" :key="item.id" class="card">
                         <!-- <template #extra><a href="#">more</a></template> -->
 
+                        <a-row>
+                            <!-- role -->
+                            <a-space direction="vertical">
+
+                                <a-radio-group v-model:value="item.role" option-type="button" button-style="solid">
+                                    <a-radio-button value="user">User</a-radio-button>
+                                    <a-radio-button value="system">System</a-radio-button>
+                                    <a-radio-button value="assistant">Assitant</a-radio-button>
+                                </a-radio-group>
+                            </a-space>
+
+                            <!-- role select -->
+                            <!-- <a-select ref="select" v-model:value="item.role" style="width: 120px">
+                                <a-select-option value="user">
+                                    <span style="color: black">User</span></a-select-option>
+                                <a-select-option value="system">
+                                    <span style="color: red">System</span>
+                                </a-select-option>
+                                <a-select-option value="assistant">
+                                    <span style="color: blue">Assistant</span>
+                                </a-select-option>
+                            </a-select> -->
+
+                            <!-- enable toggle -->
+                            <a-space direction="horizontal">
+                                <span></span>
+                                <a-typography-text>Enable</a-typography-text>
+                                <a-switch v-model:checked="item.enable"></a-switch>
+                            </a-space>
+                        </a-row>
                         <a-row :gutter="12" align="middle">
-                            <a-col :span="4">
-                                <a-space direction="vertical">
-                                    <!-- role select -->
-                                    <a-select ref="select" v-model:value="item.role" style="width: 120px">
-                                        <a-select-option value="user">
-                                            <span style="color: black">User</span></a-select-option>
-                                        <a-select-option value="system">
-                                            <span style="color: red">System</span>
-                                        </a-select-option>
-                                        <a-select-option value="assistant">
-                                            <span style="color: blue">Assistant</span>
-                                        </a-select-option>
-                                    </a-select>
 
-                                    <!-- enable toggle -->
-                                    <a-space direction="horizontal">
-                                        Enable&nbsp;
-                                        <a-switch v-model:checked="item.enable"></a-switch>
-                                    </a-space>
 
-                                </a-space>
-                            </a-col>
-                            <a-col :span="16">
+                            <a-col :span="20">
                                 <!-- content edit -->
                                 <a-textarea v-model:value="item.content" placeholder="textarea with clear icon"
                                             allow-clear
                                             :auto-size="{ minRows: 3, maxRows: 5 }"/>
 
                             </a-col>
+
                             <a-col :span="2">
                                 <a-space direction="vertical">
                                     <!-- up down the order -->
@@ -121,7 +134,7 @@
                 </a-card>
             </a-col>
 
-            <a-col class="gutter-row" :span="10">
+            <a-col class="gutter-row" :span="12">
 
                 <a-collapse>
 
@@ -151,7 +164,7 @@
 
                 <a-card title="Prompt Preview">
                     <div class="scroll-short">
-                        <PromptPreview :messages="data.profile.messages.filter((i)=>i.enable)"></PromptPreview>
+                        <PromptPreview :messages="data.profile.messages.filter((i) => i.enable)"></PromptPreview>
                     </div>
                 </a-card>
                 <a-card title="Corresponding Response">
@@ -181,8 +194,7 @@ import {DefaultApiFactory} from '../../sdk/apis/default-api';
 import {useSnapshotStore} from '@/stores/snapshot';
 
 import PromptPreview from '../components/PromptPreview.vue';
-import type {Message, PromptItem} from "../../sdk";
-import type {SnapshotRequest} from "../../sdk";
+import type {Message, PromptItem, SnapshotRequest} from "../../sdk";
 
 // use
 const store = useSnapshotStore()
