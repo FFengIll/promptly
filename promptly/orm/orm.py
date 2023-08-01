@@ -1,7 +1,7 @@
 from typing import Optional
 
 # One line of FastAPI imports here later 👈
-from sqlmodel import Field, Session, SQLModel, create_engine, select
+from sqlmodel import Field, SQLModel, create_engine
 
 
 class Profile(SQLModel, table=True):
@@ -9,19 +9,31 @@ class Profile(SQLModel, table=True):
     name: str = Field(index=True)
 
 
-class ProfileDetail(SQLModel, table=True):
+class History(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
     profile_id: int
-    key: int = Field(index=True)
+    content: str
+
+
+class Message(SQLModel, table=True):
+    id: Optional[int] = Field(default=None, primary_key=True)
+    profile_id: int
     role: str
     content: str
-    history: str
+    enable: bool
+    order: int
+
+
+class Snapshot(SQLModel, table=True):
+    id: Optional[int] = Field(default=None, primary_key=True)
+    data: str
 
 
 sqlite_file_name = "database.db"
 sqlite_url = f"sqlite:///{sqlite_file_name}"
 
 connect_args = {"check_same_thread": False}
+
 engine = create_engine(sqlite_url, echo=True, connect_args=connect_args)
 
 
