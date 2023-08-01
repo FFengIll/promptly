@@ -5,7 +5,7 @@
             <a-col :span="12">
                 <a-card title="Prompt Snapshot">
                     <a-space direction="vertical" :style="{ width: '100%' }">
-                        <div v-for="item in debug" :key="item.id">
+                        <div v-for="item in store.debug" :key="item.id">
                             <span :style="{ color: 'blue' }">{{ item.role }} </span><span>:&nbsp;</span>
                             <span>
                                 <a-textarea v-model:value="item.content" auto-size></a-textarea>
@@ -16,16 +16,33 @@
             </a-col>
             <a-col :span="12">
 
+                <a-card title="Operation">
+                    <a-space align="middle">
 
+                        <!-- loop -->
+                        <a-input-number title="Loop" id="inputNumber" v-model:value="loopCount" :min="1" :max="10">
+                            <template #upIcon>
+                                <ArrowUpOutlined />
+                            </template>
+                            <template #downIcon>
+                                <ArrowDownOutlined />
+                            </template>
+                        </a-input-number>
 
+                        <!-- click to run -->
+                        <a-button type="primary" @click="run">Run Test</a-button>
 
+                        <a-checkbox v-model:checked="useCase">Use Case</a-checkbox>
+
+                    </a-space>
+                </a-card>
 
                 <!-- show dataset info -->
                 <a-card title="Case List">
                     <!-- case select -->
                     Select Case to Debug:&nbsp;&nbsp;
                     <a-select style="width:300px" @change="getCase">
-                        <div v-for="item in case_list" :key="item.id">
+                        <div v-for="item in data.case_list" :key="item.id">
                             <a-select-option value="item.id">
                                 {{ item.name }}
                             </a-select-option>
@@ -35,119 +52,123 @@
 
                     <!-- case description -->
                     Case Description:&nbsp;&nbsp;
-                    <span>{{ option.case.description }}</span>
+                    <span>{{ data.option.case.description }}</span>
                     <a-divider />
 
-                    <div v-for="item in option.case.data" :key="item">
+                    <div v-for="item in data.option.case.data" :key="item">
                         <a-list-item>{{ item }}</a-list-item>
                     </div>
                 </a-card>
             </a-col>
-
-
         </a-row>
         <a-row>
             <a-col :span="24">
-                <!-- click to run -->
-                <a-button type="primary" @click="run">Run Test</a-button>
 
                 <!-- show result -->
-                <a-table :dataSource="dataSource" :columns="columns" :rowKey="(record:any) => record.id" />
+                <a-table :dataSource="result" :columns="columns" :rowKey="(record: any) => record.id" />
             </a-col>
         </a-row>
     </div>
 </template>
-<script lang="ts">
-import { useSnapshotStore } from '@/stores/snapshot';
-import { mapActions, mapState } from 'pinia';
+<script lang="ts" setup>
+import { ref } from 'vue';
+
+import { useSnapshotStore } from "@/stores/snapshot";
+
+import { ArrowDownOutlined, ArrowUpOutlined } from '@ant-design/icons-vue';
+
 import { DefaultApiFactory } from '../../sdk/apis/default-api';
+
+
+const store = useSnapshotStore()
 
 const api = DefaultApiFactory(undefined, "http://localhost:8000")
 
-export default {
-    data() {
-        return {
-            option: {
-                case: {
-                    id: 1,
-                    data: ["1", "2"],
-                    description: "description"
-                },
+const loopCount = ref<number>(1);
 
-            },
-            case_list: [
-                { id: 1, name: "test", describe: "test", data: [1, 2, 3, 4] },
-                { id: 2, name: "test", describe: "test", data: [1, 3, 4] },
-            ],
-            result: [
-                { id: 1, source: "test", target: "test" },
-                { id: 2, source: "test", target: "test" },
-                { id: 3, source: "test", target: "test" },
-                // 其他数据项
-            ]
-        };
-    },
-    created() {
-        // load test case list
-        // await this.api.getExtensionsExtensionsGet()
-        // load test case data
-        // load profile snapshot
-        this.listCase()
-    },
-    computed: {
-        ...mapState(useSnapshotStore, ['debug']),
-        api() {
-            return api
+const useCase = ref<boolean>(false)
+
+const result = ref(
+    [
+        { id: 1, source: "test", target: "test" },
+        { id: 2, source: "test", target: "test" },
+        { id: 3, source: "test", target: "test" },
+        // 其他数据项
+    ]
+)
+
+const data = ref({
+    option: {
+        case: {
+            id: 1,
+            data: ["1", "2"],
+            description: "description"
         },
-        dataSource() {
-            return this.result
-        },
-        columns() {
-            return [
-                {
-                    title: 'id',
-                    dataIndex: 'id',
-                    key: 'id',
-                },
-                {
-                    title: 'case',
-                    dataIndex: 'source',
-                    key: 'source',
-                },
-                {
-                    title: 'result',
-                    dataIndex: 'target',
-                    key: 'target',
-                },
-            ]
+
+    },
+    case_list: [
+        { id: 1, name: "test", describe: "test", data: [1, 2, 3, 4] },
+        { id: 2, name: "test", describe: "test", data: [1, 3, 4] },
+    ],
+
+}
+)
+
+listCase()
+
+
+const columns = [
+    {
+        title: 'id',
+        dataIndex: 'id',
+        key: 'id',
+    },
+    {
+        title: 'case',
+        dataIndex: 'source',
+        key: 'source',
+    },
+    {
+        title: 'result',
+        dataIndex: 'target',
+        key: 'target',
+    },
+]
+
+
+async function run() {
+
+    if (useCase.value) {
+        var res = store.debug.map(item => item)
+        await api.apiDebugPost(res, data.value.option.case.id,).then(
+            (response) => {
+                result.value = response.data
+            }
+        )
+    } else {
+        var res = store.debug.map(item => item)
+        await api.apiDebugLoopPost(res, loopCount.value).then(
+            (response) => {
+                result.value = response.data
+            }
+        )
+    }
+}
+
+async function listCase() {
+    await api.caseGet().then(
+        (response) => {
+            data.value.case_list = response.data
+            console.log(data.value.case_list)
         }
-    },
+    )
+}
 
-    methods: {
-        ...mapActions(useSnapshotStore, ['sendToDebug']),
-        async run() {
-            var res = this.debug.map(item => item)
+async function getCase(id: number) {
+    await api.caseKeyGet(id).then((response) => {
+        data.value.option.case = response.data
+    })
+}
 
-            await this.api.debugDebugPost(res, this.option.case.id,).then(
-                (response) => {
-                    this.result = response.data
-                }
-            )
-        },
-        async listCase() {
-            await this.api.listCaseCaseGet().then(
-                (response) => {
-                    this.case_list = response.data
-                    console.log(this.case_list)
-                }
-            )
-        },
-        async getCase(id: number) {
-            await this.api.getCaseCaseKeyGet(id).then((response) => {
-                this.option.case = response.data
-            })
-        }
 
-    },
-};
 </script>
