@@ -37,6 +37,19 @@ class CaseResult(BaseModel):
     target: str
 
 
+@app.post("/api/debug/loop")
+async def debug(count: int, messages: List[Message]):
+    res = []
+    for idx in range(count):
+        ms = to_message(messages)
+        response = await api.chat(ms)
+
+        target = response["data"]["choices"][0]["message"]["content"]
+        res.append(CaseResult(source="", target=target, id=idx).dict())
+
+    return res
+
+
 @app.post("/api/debug")
 async def debug(case_id: int, messages: List[Message]):
     case = manager.get(case_id)
