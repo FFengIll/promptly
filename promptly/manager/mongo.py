@@ -1,9 +1,7 @@
-from typing import List
-
 from pymongo import MongoClient
 
-from promptly.manager.base import BaseProfileManager
-from promptly.model.profile import History, Profile, PromptItem
+from promptly.manager.base import BaseProfileManager, BaseCaseManager
+from promptly.model.profile import History, Profile, Snapshot
 
 
 class MongoProfileManger(BaseProfileManager):
@@ -39,10 +37,21 @@ class MongoProfileManger(BaseProfileManager):
             m['id'] = idx
         self.c_profile.update_one({'name':p.name}, {'$set' :{'messages':messages}})
 
-    def update_snapshot(self, p, snapshot:List[PromptItem]):
-        res  =[i.dict() for i in snapshot]
-        self.c_profile.update_one({'name':p.name}, {'$push' :{'snapshots': res }})
+    def update_snapshot(self, p, snapshot:Snapshot):
+        self.c_profile.update_one(
+            {'name':p.name},
+            {
+                '$push' :{'snapshots': snapshot.dict() }
+             }
+        )
 
+    def add_profile(self, p:Profile):
+        self.c_profile.insert_one(p.dict())
+
+
+class MongoCaseManager(BaseCaseManager):
+    def __init__(self):
+        pass
 
 def test_mongo_manager():
     from promptly.orm.mongo import client

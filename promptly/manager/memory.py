@@ -4,7 +4,8 @@ from typing import List
 
 from path import Path
 
-from promptly.manager.base import BaseProfileManager
+from promptly.manager.base import BaseProfileManager, BaseCaseManager
+from promptly.model.case import Case
 from promptly.model.event import UpdateEvent
 from promptly.model.profile import Profile, Message, History
 
@@ -120,6 +121,46 @@ class ProfileManager(BaseProfileManager):
         pass
 
 
+class CaseManager(BaseCaseManager):
+    def __init__(self, path) -> None:
+        self.path = path
+        self.file_map = {}
+        self.profiles = []
+        self.index = {}
+
+        self.load()
+
+    def load(self):
+        path = self.path
+        profiles = []
+        file_map = {}
+        for file in Path(path).listdir("*.json"):
+            with open(file) as fd:
+                obj = json.load(fd)
+                item: Case = Case.parse_obj(obj)
+                profiles.append(item)
+                file_map[item.id] = file
+
+        self.file_map = file_map
+        self.profiles = [i for i in profiles]
+
+        self.index = {i.id: i for i in self.profiles}
+
+    def keys(self):
+        return list(self.index.keys())
+
+    def values(self) -> List[Case]:
+        return list(self.index.values())
+
+    def refresh(self):
+        pass
+        # self.save()
+        # self.load()
+
+    def get(self, key) -> Case:
+        return self.index.get(key, None)
+
+
 def test_update():
     m = ProfileManager("profile")
 
@@ -135,3 +176,4 @@ def test_profile():
 
     for p in m.profiles:
         print(p)
+

@@ -2,6 +2,8 @@ from abc import abstractmethod, ABC
 
 from promptly.model.profile import History
 
+class BaseCaseManager(ABC):
+    pass
 
 class BaseProfileManager(ABC):
     @abstractmethod
