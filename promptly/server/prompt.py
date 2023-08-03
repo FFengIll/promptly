@@ -66,8 +66,16 @@ async def chat(key: str, update: List[Message]):
 
     ms = to_message(profile.messages)
     log.info(ms)
-    res = await api.chat(ms)
-    return res["data"]["choices"][0]["message"]["content"]
+    try:
+        res = await api.chat(ms)
+        content = res["data"]["choices"][0]["message"]["content"]
+
+        manager.push_history(History(prompt=ms, response=content))
+
+        return content
+
+    except Exception as e:
+        return fastapi.HTTPException(500)
 
 
 @app.delete("/api/profile/{key}/{id}")
@@ -79,5 +87,7 @@ def delete_prompt_item(key: str, id: int):
 
 
 @app.get("/api/profile")
-def list_profile():
+def list_profile(refresh: bool = False):
+    if refresh:
+        manager.load()
     return dict(keys=manager.list_profile())
