@@ -38,13 +38,25 @@
                         All
                     </a-button>
 
-                    <a-divider></a-divider>
+                    <a-divider>
+                        <a-space>
+                            <a-button @click="()=>data.profile.messages.unshift({})">
+                                <template #icon>
+                                    <PlusOutlined/>
+                                </template>
+                            </a-button>
+                        </a-space>
+
+                    </a-divider>
 
 
                     <div v-for="item in data.profile.messages" :key="item.id" class="card">
                         <!-- <template #extra><a href="#">more</a></template> -->
 
+
                         <a-row>
+
+
                             <!-- role -->
                             <a-space direction="vertical">
 
@@ -104,7 +116,7 @@
                                 <a-space direction="vertical">
 
                                     <a-popconfirm title="Are you sure delete this task?" ok-text="Yes" cancel-text="No"
-                                                  @confirm="deletePrompt(item.id)">
+                                                  @confirm="deletePrompt(item.order)">
                                         <a-button>
                                             <template #icon>
                                                 <CloseOutlined/>
@@ -116,7 +128,6 @@
                                 </a-space>
                             </a-col>
                         </a-row>
-
 
                         <a-divider>
                             <a-space>
@@ -147,7 +158,10 @@
                                         Use Snapshot
                                     </a-button>
                                 </a-divider>
-                                <PromptPreview :messages="snapshot"></PromptPreview>
+                                <PromptPreview :messages="snapshot.prompt"></PromptPreview>
+                                <a-textarea v-model:value="snapshot.response">
+
+                                </a-textarea>
                             </div>
                         </div>
                     </a-collapse-panel>
@@ -195,7 +209,7 @@ import {DefaultApiFactory} from '../../sdk/apis/default-api';
 import {useSnapshotStore} from '@/stores/snapshot';
 
 import PromptPreview from '../components/PromptPreview.vue';
-import type {Message, PromptItem, SnapshotRequest} from "../../sdk";
+import type {Message, PromptItem, Snapshot} from "../../sdk";
 import type {NotificationPlacement} from "ant-design-vue";
 import {notification} from 'ant-design-vue';
 
@@ -224,7 +238,14 @@ const data = ref({
             {id: 1, role: "角色1", content: "内容1", enable: true, order: 0, history: []},
             // 其他数据项
         ],
-        "snapshots": [[{role: 'user', content: 'snapshot'}]]
+        "snapshots": [
+            {
+                "prompt": [
+                    {role: 'user', content: 'snapshot'}
+                ],
+                "response": ""
+            }
+        ]
     }
 })
 
@@ -238,28 +259,31 @@ function sendToPrompt() {
     addPrompt(data.value.profile.messages[data.value.profile.messages.length - 1].id, data.value.response)
 }
 
+function deletePrompt(order: number) {
+    let ms = data.value.profile.messages
+
+    ms.splice(order, 1); // 删除指定索引的元素
+
+    ms.forEach((elem, index) => elem.order = index)
+}
+
 function goToDebug() {
     store.sendToDebug(data.value.profile.messages)
     router.push('/view/debug')
 }
 
-function deletePrompt(id: number) {
-    api.apiProfileKeyIdDelete(data.value.key, id).then(response => {
-        data.value.profile = response.data
-    })
-
-}
-
-function useSnapshot(snapshot: PromptItem[]) {
+function useSnapshot(snapshot: Snapshot) {
     console.log(snapshot)
     let target = data.value.profile.messages
+    let prompt = snapshot.prompt
+    data.value.response = snapshot.response
     for (let i = 0; i < target.length; i++) {
-        if (i >= snapshot.length) {
+        if (i >= prompt.length) {
             target[i].enable = false
         } else {
             target[i].enable = true
-            target[i].role = snapshot[i].role
-            target[i].content = snapshot[i].content
+            target[i].role = prompt[i].role
+            target[i].content = prompt[i].content
         }
 
     }
@@ -268,18 +292,18 @@ function useSnapshot(snapshot: PromptItem[]) {
 function snapshot() {
 
     let key = data.value.key
-    let snapshot: PromptItem[] = []
+    let prompt: PromptItem[] = []
     data.value.profile.messages.forEach(
         (item: Message): any => {
             if (item.enable) {
                 let res: PromptItem = {role: item.role, content: item.content}
-                snapshot.push(res)
+                prompt.push(res)
             }
 
         }
     )
-    let body: SnapshotRequest = {snapshot: snapshot}
-    api.apiProfileKeySnapshotPost(body, key,).then(() => {
+    let snapshot: Snapshot = {prompt: prompt, response: data.value.response}
+    api.apiProfileKeySnapshotPost(snapshot, key,).then(() => {
 
     })
 }
@@ -300,10 +324,9 @@ function addPrompt(id: number, content: string) {
         {role: "user", id: max_id + 1, enable: true, content: content, order: order, history: []}
     )
 
-    var cur = 0
-    data.value.profile.messages.forEach((item) => {
-        item.order = cur;
-        cur++;
+    data.value.profile.messages.forEach((elem, index) => {
+        elem.order = index;
+        elem.id = index
     })
 
     console.log(data.value.profile.messages)
@@ -362,7 +385,7 @@ function reload() {
 function openNotification(message: string, status: string) {
     let placement: NotificationPlacement = 'bottomRight'
     notification[status]({
-        message: message,
+        message: status,
         description: message,
         placement,
     });
