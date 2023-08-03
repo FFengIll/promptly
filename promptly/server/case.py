@@ -4,7 +4,8 @@ from typing import List
 import loguru
 from pydantic import BaseModel
 
-from promptly.model.case import CaseManager, Case
+from promptly.model.case import Case
+from promptly.manager.memory import CaseManager
 from promptly.model.profile import Message
 from promptly.server import api
 from promptly.server.app import app

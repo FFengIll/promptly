@@ -2,10 +2,9 @@ from typing import List
 
 import fastapi
 import loguru
-from pydantic import BaseModel
 
 from promptly.manager import MongoProfileManger
-from promptly.model.profile import Message, PromptItem, History, Profile
+from promptly.model.profile import Message, History, Profile, Snapshot
 from promptly.orm.mongo import client
 from promptly.server import api
 from promptly.server.app import app
@@ -18,21 +17,27 @@ mongo = MongoProfileManger(client)
 
 @app.on_event("shutdown")
 def shutdown_event():
-    # manager.save()
     pass
 
 
-class SnapshotRequest(BaseModel):
-    snapshot: List[PromptItem]
-
-
 @app.post("/api/profile/{key}/snapshot")
-def add_snapshot(key: str, request: SnapshotRequest):
+def add_snapshot(key: str, snapshot: Snapshot):
     p = mongo.get_profile(key)
 
-    mongo.update_snapshot(p, request.snapshot)
+    mongo.update_snapshot(p, snapshot)
 
     return mongo.get_profile(key).snapshots
+
+
+@app.put("/api/profile/{key}")
+def create_profile(key: str):
+    if mongo.get_profile(key):
+        log.warning("existed profile")
+        return
+
+    p = Profile(name=key)
+    mongo.add_profile(p)
+    return
 
 
 @app.get("/api/profile/{key}/snapshot")
@@ -84,16 +89,6 @@ async def chat(key: str, ms: List[Message]):
 
     except Exception as e:
         return fastapi.HTTPException(500)
-
-
-@app.delete("/api/profile/{key}/{id}")
-def delete_prompt_item(key: str, id: int):
-    p: Profile = mongo.get_profile(key)
-    p.remove(id)
-
-    mongo.update_message(p)
-
-    return mongo.get_profile(key)
 
 
 @app.get("/api/profile")
