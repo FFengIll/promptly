@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Any
 from uuid import uuid1
 
 import loguru
@@ -11,7 +11,14 @@ log = loguru.logger
 
 def generate_id():
     u = uuid1()
-    return u.int
+
+    # 转换为字节对象
+    uuid_bytes = u.bytes
+
+    # 取前8个字节
+    trimmed_bytes = uuid_bytes[:8]
+
+    return int.from_bytes(trimmed_bytes, byteorder="big")
 
 
 class PromptItem(BaseModel):
@@ -21,10 +28,13 @@ class PromptItem(BaseModel):
 
 @autocomplete
 class Message(PromptItem):
-    history: List[str] = Field(default_factory=list)
     id: int = Field(default_factory=generate_id)
     enable: bool = Field(default=True)
     order: int = Field(default=0)
+
+    def __init__(self, **data: Any):
+        super().__init__(**data)
+        self.id = generate_id()
 
     def __hash__(self):
         return self.id
