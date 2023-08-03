@@ -68,14 +68,6 @@
                     <template #bodyCell="{ column, record }">
                         <template v-if="column.key === 'action'">
                             <span>
-                                <a>Invite 一 {{ record.name }}</a>
-                                <a-divider type="vertical" />
-                                <a>Delete</a>
-                                <a-divider type="vertical" />
-                                <a class="ant-dropdown-link">
-                                    More actions
-                                    <down-outlined />
-                                </a>
                                 <a-button @click="do_request(record)">Request</a-button>
                             </span>
                         </template>
