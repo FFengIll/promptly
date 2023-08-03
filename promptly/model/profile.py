@@ -59,7 +59,7 @@ class Profile(BaseModel):
 
     def __init__(self, **data: Any):
         # compatibility
-        snapshots = data["snapshots"]
+        snapshots = data.get("snapshots", None)
         if snapshots:
             res = []
             for s in snapshots:
@@ -71,6 +71,8 @@ class Profile(BaseModel):
                 else:
                     res.append(s)
             data["snapshots"] = res
+        else:
+            data["snapshots"] = []
 
         super().__init__(**data)
 
