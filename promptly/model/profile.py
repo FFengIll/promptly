@@ -27,6 +27,12 @@ class PromptItem(BaseModel):
 
 
 @autocomplete
+class Snapshot(BaseModel):
+    prompt: List[PromptItem] = Field(default_factory=list)
+    response: str = ""
+
+
+@autocomplete
 class Message(PromptItem):
     id: int = Field(default_factory=generate_id)
     enable: bool = Field(default=True)
@@ -47,9 +53,26 @@ class Message(PromptItem):
 @autocomplete
 class Profile(BaseModel):
     name: str = Field(default="")
-    messages: List[Message]
+    messages: List[Message] = Field(default_factory=list)
     history: List[str] = Field(default_factory=list)
-    snapshots: List[List[PromptItem]] = Field(default_factory=list)
+    snapshots: List[Snapshot] = Field(default_factory=list)
+
+    def __init__(self, **data: Any):
+        # compatibility
+        snapshots = data["snapshots"]
+        if snapshots:
+            res = []
+            for s in snapshots:
+                log.info(s)
+                if isinstance(s, List):
+                    tmp = Snapshot()
+                    tmp.prompt = s
+                    res.append(tmp.dict())
+                else:
+                    res.append(s)
+            data["snapshots"] = res
+
+        super().__init__(**data)
 
     @classmethod
     def sample(cls) -> "Profile":
@@ -61,7 +84,7 @@ class Profile(BaseModel):
             name="demo", messages=[Message(id=1, role="user", content="hello")]
         )
 
-    def add_snapshot(self, s: List[PromptItem]):
+    def add_snapshot(self, s: Snapshot):
         self.snapshots.append(s)
 
     def remove(self, id):
