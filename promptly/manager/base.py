@@ -1,5 +1,7 @@
 from abc import abstractmethod, ABC
 
+from promptly.model.profile import History
+
 
 class BaseProfileManager(ABC):
     @abstractmethod
@@ -7,7 +9,7 @@ class BaseProfileManager(ABC):
         pass
 
     @abstractmethod
-    def load(self):
+    def reload(self):
         pass
 
     @abstractmethod
@@ -15,7 +17,7 @@ class BaseProfileManager(ABC):
         pass
 
     @abstractmethod
-    def get(self, key):
+    def get_profile(self, key):
         pass
 
     @abstractmethod

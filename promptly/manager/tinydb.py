@@ -21,14 +21,14 @@ class TinyDBProfileManager(BaseProfileManager):
         self.db = TinyDB(base.joinpath("profile.json"))
         self.history_db = TinyDB(base.joinpath("history.json"))
 
-        self.load()
+        self.reload()
 
     def save(self):
         db = self.db
         self.db = None
         db.close()
 
-    def load(self):
+    def reload(self):
         q: Profile = Query()
         res = self.db.search(q.name != "")
 
@@ -39,12 +39,12 @@ class TinyDBProfileManager(BaseProfileManager):
     def list_profile(self):
         return list(self.index.keys())
 
-    def get(self, key):
+    def get_profile(self, key):
         p = self.index.get(key, None)
         return p
 
     def refresh(self):
-        self.load()
+        self.reload()
 
 
 def test_tinydb():

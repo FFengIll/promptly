@@ -10,13 +10,13 @@ class PickleProfileManager:
     def __init__(self, path):
         self.path = path
         self.db = pickledb.load(path, False)
-        self.index = {k: Profile(**self.db.get(k)) for k in self.db.getall()}
+        self.index = {k: Profile(**self.db.get_profile(k)) for k in self.db.getall()}
 
     def list_profile(self):
         return list(self.index.keys())
 
     def get(self, name) -> Profile:
-        res = self.db.get(name)
+        res = self.db.get_profile(name)
         if res:
             return Profile(**res)
         return None

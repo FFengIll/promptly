@@ -12,20 +12,21 @@ import loguru
 
 log = loguru.logger
 
+
 class ProfileManager(BaseProfileManager):
     def __init__(self, path) -> None:
         self.path = path
         self.file_map = {}
         self.profiles: List[Profile] = []
 
-        self.load()
+        self.reload()
 
     def save(self):
         for path, profile in self.file_map.items():
             with open(path, "w") as fd:
                 json.dump(profile.dict(), fd, indent=4, ensure_ascii=False)
 
-    def load(self):
+    def reload(self):
         path = self.path
         profiles = []
         location = {}
@@ -53,9 +54,9 @@ class ProfileManager(BaseProfileManager):
 
     def refresh(self):
         self.save()
-        self.load()
+        self.reload()
 
-    def get(
+    def get_profile(
         self,
         key=None,
     ) -> Profile:
@@ -65,7 +66,7 @@ class ProfileManager(BaseProfileManager):
         return None
 
     def update_all(self, key: str, ms: List[Message]):
-        p: Profile = self.get(key)
+        p: Profile = self.get_profile(key)
 
         to_add = []
         for msg in ms:
@@ -89,7 +90,7 @@ class ProfileManager(BaseProfileManager):
         p.messages.sort(key=lambda x: x.order)
 
     def update_one(self, key: str, msg: Message):
-        p: Profile = self.get(key)
+        p: Profile = self.get_profile(key)
         found = False
         for m in p.messages:
             if m.id == msg.id:
