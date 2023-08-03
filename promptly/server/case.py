@@ -4,8 +4,8 @@ from typing import List
 import loguru
 from pydantic import BaseModel
 
-from promptly.model.case import Case
 from promptly.manager.memory import CaseManager
+from promptly.model.case import Case
 from promptly.model.profile import Message
 from promptly.server import api
 from promptly.server.app import app
@@ -51,12 +51,9 @@ async def debug(count: int, messages: List[Message]):
     return res
 
 
-@app.post("/api/debug")
-async def debug(case_id: int, messages: List[Message]):
-    case = manager.get(case_id)
-
+async def batch_debug(messages, data):
     res = []
-    for idx, source in enumerate(case.data):
+    for idx, source in enumerate(data):
         replaced_ms = copy.deepcopy(messages)
         for m in replaced_ms:
             m.content = m.content.replace("{{}}", source)
@@ -71,3 +68,25 @@ async def debug(case_id: int, messages: List[Message]):
         res.append(CaseResult(source=source, target=target, id=idx).dict())
 
     return res
+
+
+class DebugRequestBody(BaseModel):
+    source: str
+    messages: List[Message]
+
+
+@app.post("/api/debug/source")
+async def debug(body: DebugRequestBody):
+    source: str = body.source
+    messages: List[Message] = body.messages
+    data = [source]
+
+    return await batch_debug(messages, data)
+
+
+@app.post("/api/debug/case")
+async def debug(case_id: int, messages: List[Message]):
+    case = manager.get(case_id)
+    data = case.data
+
+    return await batch_debug(messages, data)
