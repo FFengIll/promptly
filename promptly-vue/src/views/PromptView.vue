@@ -9,6 +9,7 @@
 
 <template>
     <div>
+        <a-typography-title>{{ data.key }}</a-typography-title>
         <a-row :gutter='12'>
             <a-col class="gutter-row" :span="12">
                 <a-collapse>
@@ -17,7 +18,7 @@
                             <a-space direction="horizontal" align="baseline">
                                 <a-button @click="copy(h)">
                                     <template #icon>
-                                        <CopyOutlined/>
+                                        <CopyOutlined />
                                     </template>
                                 </a-button>
                                 <p>{{ h }}</p>
@@ -40,9 +41,9 @@
 
                     <a-divider>
                         <a-space>
-                            <a-button @click="()=>data.profile.messages.unshift({})">
+                            <a-button @click="() => data.profile.messages.unshift({})">
                                 <template #icon>
-                                    <PlusOutlined/>
+                                    <PlusOutlined />
                                 </template>
                             </a-button>
                         </a-space>
@@ -91,9 +92,8 @@
 
                             <a-col :span="20">
                                 <!-- content edit -->
-                                <a-textarea v-model:value="item.content" placeholder="textarea with clear icon"
-                                            allow-clear
-                                            :auto-size="{ minRows: 3, maxRows: 5 }"/>
+                                <a-textarea v-model:value="item.content" placeholder="textarea with clear icon" allow-clear
+                                    :auto-size="{ minRows: 3, maxRows: 5 }" />
 
                             </a-col>
 
@@ -102,12 +102,12 @@
                                     <!-- up down the order -->
                                     <a-button type="primary" shape="round" @click="order(item.id, -1)">
                                         <template #icon>
-                                            <UpOutlined/>
+                                            <UpOutlined />
                                         </template>
                                     </a-button>
                                     <a-button type="primary" shape="round" @click="order(item.id, 1)">
                                         <template #icon>
-                                            <DownOutlined/>
+                                            <DownOutlined />
                                         </template>
                                     </a-button>
                                 </a-space>
@@ -116,10 +116,10 @@
                                 <a-space direction="vertical">
 
                                     <a-popconfirm title="Are you sure delete this task?" ok-text="Yes" cancel-text="No"
-                                                  @confirm="deletePrompt(item.order)">
+                                        @confirm="deletePrompt(item.order)">
                                         <a-button>
                                             <template #icon>
-                                                <CloseOutlined/>
+                                                <CloseOutlined />
                                             </template>
                                         </a-button>
                                     </a-popconfirm>
@@ -133,7 +133,7 @@
                             <a-space>
                                 <a-button @click="addPrompt(item.id, '')">
                                     <template #icon>
-                                        <PlusOutlined/>
+                                        <PlusOutlined />
                                     </template>
                                 </a-button>
                             </a-space>
@@ -172,7 +172,7 @@
                     <a-button @click="snapshot">Snapshot</a-button>
                     <a-button @click="reload">Reload</a-button>
                     <a-button @click="goToDebug">Go To Debug</a-button>
-                    <a-button @click="openNotification('test','info')">Notice</a-button>
+                    <a-button @click="openNotification('test', 'info')">Notice</a-button>
 
                 </a-card>
 
@@ -189,7 +189,7 @@
                         <a-button>Bad</a-button>
                     </a-space>
                     <a-textarea v-model:value="data.response" :auto-size="{ minRows: 20 }"
-                                placeholder="textarea with clear icon" allow-clear/>
+                        placeholder="textarea with clear icon" allow-clear />
                 </a-card>
 
             </a-col>
@@ -198,27 +198,28 @@
 </template>
 
 <script lang="ts" setup>
-import {ref} from 'vue';
-import useClipboard from 'vue-clipboard3';
+import { useClipboard } from '@vueuse/core';
+import { ref } from 'vue';
 
-import {CloseOutlined, CopyOutlined, DownOutlined, PlusOutlined, UpOutlined} from '@ant-design/icons-vue';
+import { CloseOutlined, CopyOutlined, DownOutlined, PlusOutlined, UpOutlined } from '@ant-design/icons-vue';
 
-import {useRoute, useRouter} from 'vue-router';
-import {DefaultApiFactory} from '../../sdk/apis/default-api';
+import { useRoute, useRouter } from 'vue-router';
+import { DefaultApiFactory } from '../../sdk/apis/default-api';
 
-import {useSnapshotStore} from '@/stores/snapshot';
+import { useSnapshotStore } from '@/stores/snapshot';
 
+import type { NotificationPlacement } from "ant-design-vue";
+import { notification } from 'ant-design-vue';
+import type { Message, PromptItem, Snapshot } from "../../sdk";
 import PromptPreview from '../components/PromptPreview.vue';
-import type {Message, PromptItem, Snapshot} from "../../sdk";
-import type {NotificationPlacement} from "ant-design-vue";
-import {notification} from 'ant-design-vue';
 
 const [notification_api, contextHolder] = notification.useNotification();
 
 // use
 const store = useSnapshotStore()
 const router = useRouter()
-const {toClipboard} = useClipboard()
+const { text, copy, copied, isSupported } = useClipboard({})
+
 
 const api = DefaultApiFactory(undefined, "http://localhost:8000")
 
@@ -227,7 +228,7 @@ const data = ref({
     key: "",
     history: [{
         messages: [
-            {id: 1, role: "角色1", content: "内容1", enable: true, order: 0},
+            { id: 1, role: "角色1", content: "内容1", enable: true, order: 0 },
         ],
         response: ""
     }],
@@ -235,13 +236,13 @@ const data = ref({
     profile: {
         "history": ["1"],
         "messages": [
-            {id: 1, role: "角色1", content: "内容1", enable: true, order: 0, history: []},
+            { id: 1, role: "角色1", content: "内容1", enable: true, order: 0, history: [] },
             // 其他数据项
         ],
         "snapshots": [
             {
                 "prompt": [
-                    {role: 'user', content: 'snapshot'}
+                    { role: 'user', content: 'snapshot' }
                 ],
                 "response": ""
             }
@@ -296,13 +297,13 @@ function snapshot() {
     data.value.profile.messages.forEach(
         (item: Message): any => {
             if (item.enable) {
-                let res: PromptItem = {role: item.role, content: item.content}
+                let res: PromptItem = { role: item.role, content: item.content }
                 prompt.push(res)
             }
 
         }
     )
-    let snapshot: Snapshot = {prompt: prompt, response: data.value.response}
+    let snapshot: Snapshot = { prompt: prompt, response: data.value.response }
     api.apiProfileKeySnapshotPost(snapshot, key,).then(() => {
 
     })
@@ -321,7 +322,7 @@ function addPrompt(id: number, content: string) {
     data.value.profile.messages.splice(
         index + 1,
         0,
-        {role: "user", id: max_id + 1, enable: true, content: content, order: order, history: []}
+        { role: "user", id: max_id + 1, enable: true, content: content, order: order, history: [] }
     )
 
     data.value.profile.messages.forEach((elem, index) => {
@@ -362,10 +363,6 @@ function setContent(id: number, content: string) {
     })
 }
 
-async function copy(content: string) {
-    await toClipboard(content)
-}
-
 async function fetchProfile(key: string) {
     api.apiProfileKeyGet(key)
         .then(response => {
@@ -391,11 +388,13 @@ function openNotification(message: string, status: string) {
     });
 }
 
-async function chat() {
+function chat() {
     var res = data.value.profile.messages;
     console.log(res);
     api.apiChatKeyPost(res, data.value.key)
         .then(response => {
+            console.log(response)
+
             data.value.response = response.data;
             console.log("result", response.data);
             console.log("data.value.response", data.value.response)
@@ -405,11 +404,6 @@ async function chat() {
                     response: response.data
                 }
             )
-
-            return data.value.response
-        })
-        .then((msg: string) => {
-            openNotification(msg, 'success')
         })
         .catch(error => {
             openNotification(error, 'error')
