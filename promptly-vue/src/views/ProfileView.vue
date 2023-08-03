@@ -1,7 +1,22 @@
 <template>
-    <a-button @click="refresh">
-        Refresh
-    </a-button>
+    <a-space direction="horizontal">
+        <a-button @click="refresh">
+            Refresh
+        </a-button>
+
+
+        <a-input-search
+            v-model:value="key"
+            placeholder="input search text"
+            size="large"
+            @search="create_profile"
+        >
+            <template #enterButton>
+                <a-button>Create</a-button>
+            </template>
+        </a-input-search>
+
+    </a-space>
 
     <a-card title="Click to Open Prompt Detail">
         <a-list v-for="item in keys" :key="item" size="small">
@@ -12,11 +27,11 @@
 
     </a-card>
 </template>
-  
-<script lang="ts" setup>
-import { DefaultApiFactory } from "../../sdk/apis/default-api";
 
-import { ref } from 'vue';
+<script lang="ts" setup>
+import {DefaultApiFactory} from "../../sdk/apis/default-api";
+
+import {ref} from 'vue';
 
 const api = DefaultApiFactory(undefined, "http://localhost:8000")
 
@@ -25,12 +40,19 @@ const keys = ref([
     '1', '2', '3'
 ])
 
+const key = ref<string>("")
+
 // created
 fetchList()
 
 function refresh() {
     api.apiCaseRefreshGet()
     fetchList()
+}
+
+function create_profile(name: string) {
+    api.apiProfileKeyPut(name)
+    refresh()
 }
 
 function generateHref(key: string) {
