@@ -70,6 +70,7 @@ async function fetchList() {
         response => {
             console.log(response.data)
             keys.value = response.data.keys
+            keys.value.sort()
             return response.data
         }
     ).catch(
