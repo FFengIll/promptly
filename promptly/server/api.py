@@ -3,10 +3,11 @@ from copy import deepcopy
 import httpx
 import requests
 from httpx import AsyncClient
-from sqlalchemy import func
-from sqlmodel import Session, select
 
-from promptly.model.orm import Profile, engine
+# from sqlalchemy import func
+# from sqlmodel import Session, select
+
+from promptly.orm.sql import Profile, engine
 from promptly.openai.config import key, url
 
 # create_db_and_tables()

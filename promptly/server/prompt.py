@@ -4,22 +4,22 @@ import fastapi
 import loguru
 from pydantic import BaseModel
 
-from promptly.manager import ProfileManager, TinyDBProfileManager
-from promptly.model.profile import Message, PromptItem, History
+from promptly.manager import MongoProfileManger
+from promptly.model.profile import Message, PromptItem, History, Profile
+from promptly.orm.mongo import client
 from promptly.server import api
 from promptly.server.app import app
 from promptly.server.util import to_message
 
 log = loguru.logger
 
-manager = ProfileManager("./profile")
-tinydb = TinyDBProfileManager("./db/tinydb")
+mongo = MongoProfileManger(client)
 
 
 @app.on_event("shutdown")
 def shutdown_event():
-    tinydb.save()
-    manager.save()
+    # manager.save()
+    pass
 
 
 class SnapshotRequest(BaseModel):
@@ -28,14 +28,16 @@ class SnapshotRequest(BaseModel):
 
 @app.post("/api/profile/{key}/snapshot")
 def add_snapshot(key: str, request: SnapshotRequest):
-    p = manager.get(key)
-    if p:
-        p.add_snapshot(request.snapshot)
+    p = mongo.get_profile(key)
+
+    mongo.update_snapshot(p, request.snapshot)
+
+    return mongo.get_profile(key).snapshots
 
 
 @app.get("/api/profile/{key}/snapshot")
 def get_snapshot(key: str):
-    p = manager.get(key)
+    p = mongo.get_profile(key)
     if p:
         return [s.dict() for s in p.snapshots]
     return fastapi.HTTPException(status_code=404)
@@ -43,7 +45,7 @@ def get_snapshot(key: str):
 
 @app.get("/api/profile/{key}")
 def load_profile(key: str):
-    profile = manager.get(key=key)
+    profile = mongo.get_profile(key=key)
     if not profile:
         return fastapi.HTTPException(status_code=404)
     return profile.dict()
@@ -51,26 +53,32 @@ def load_profile(key: str):
 
 @app.post("/api/profile/{key}")
 def update_profile(key: str, update: List[Message]):
-    for m in update:
-        manager.update_one(key, m)
+    p = mongo.get_profile(key)
+    p.messages = update
 
-    p = manager.get(key)
-    return p.dict()
+    mongo.update_message(p)
+
+    p = mongo.get_profile(key)
+    return p
 
 
 @app.post("/api/chat/{key}")
-async def chat(key: str, update: List[Message]):
-    manager.update_all(key, update)
+async def chat(key: str, ms: List[Message]):
+    p: Profile = mongo.get_profile(key)
+    p.messages = ms
 
-    profile = manager.get(key)
+    # update
+    mongo.update_message(p)
 
-    ms = to_message(profile.messages)
+    ms = to_message(p.messages)
     log.info(ms)
     try:
         res = await api.chat(ms)
         content = res["data"]["choices"][0]["message"]["content"]
 
-        manager.push_history(History(prompt=ms, response=content))
+        mongo.push_history(History(prompt=ms, response=content))
+
+        log.info(content)
 
         return content
 
@@ -80,14 +88,16 @@ async def chat(key: str, update: List[Message]):
 
 @app.delete("/api/profile/{key}/{id}")
 def delete_prompt_item(key: str, id: int):
-    p = manager.get(key)
+    p: Profile = mongo.get_profile(key)
     p.remove(id)
 
-    return p.dict()
+    mongo.update_message(p)
+
+    return mongo.get_profile(key)
 
 
 @app.get("/api/profile")
 def list_profile(refresh: bool = False):
     if refresh:
-        manager.load()
-    return dict(keys=manager.list_profile())
+        mongo.reload()
+    return dict(keys=mongo.list_profile())
