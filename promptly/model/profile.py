@@ -99,12 +99,6 @@ class Profile(BaseModel):
             self.messages.remove(found)
 
 
-@autocomplete
-class History(BaseModel):
-    prompt: List[PromptItem] = Field(default_factory=List)
-    response: str = ""
-
-
 def test_model():
     res = Profile.parse_obj(dict(name="", messages=[]))
     print(res)
