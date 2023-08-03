@@ -3,16 +3,13 @@ from typing import List
 import fastapi
 import loguru
 
-from promptly.manager import MongoProfileManger
-from promptly.model.profile import Message, History, Profile, Snapshot
-from promptly.orm.mongo import client
+from promptly.model.profile import Message, Profile, Snapshot
 from promptly.server import api
+from promptly.server.api import mongo
 from promptly.server.app import app
 from promptly.server.util import to_message
 
 log = loguru.logger
-
-mongo = MongoProfileManger(client)
 
 
 @app.on_event("shutdown")
@@ -37,6 +34,7 @@ def create_profile(key: str):
 
     p = Profile(name=key)
     mongo.add_profile(p)
+    mongo.reload()
     return
 
 
@@ -70,6 +68,8 @@ def update_profile(key: str, update: List[Message]):
 @app.post("/api/chat/{key}")
 async def chat(key: str, ms: List[Message]):
     p: Profile = mongo.get_profile(key)
+    if not p:
+        return fastapi.HTTPException(404)
     p.messages = ms
 
     # update
@@ -77,18 +77,15 @@ async def chat(key: str, ms: List[Message]):
 
     ms = to_message(p.messages)
     log.info(ms)
-    try:
-        res = await api.chat(ms)
-        content = res["data"]["choices"][0]["message"]["content"]
 
-        mongo.push_history(History(prompt=ms, response=content))
+    content = api.chat(ms)
+    log.info(content)
 
-        log.info(content)
+    mongo.push_history(Snapshot(prompt=ms, response=content))
 
-        return content
+    log.info(content)
 
-    except Exception as e:
-        return fastapi.HTTPException(500)
+    return content
 
 
 @app.get("/api/profile")
