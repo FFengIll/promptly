@@ -6,8 +6,9 @@ from pydantic import BaseModel
 
 from promptly.manager.memory import CaseManager
 from promptly.model.case import Case
-from promptly.model.profile import Message
+from promptly.model.profile import Message, Snapshot
 from promptly.server import api
+from promptly.server.api import mongo
 from promptly.server.app import app
 from promptly.server.util import to_message
 
@@ -45,7 +46,9 @@ async def debug(count: int, messages: List[Message]):
         ms = to_message(messages)
         response = await api.chat(ms)
 
-        target = response["data"]["choices"][0]["message"]["content"]
+        mongo.push_history(Snapshot(prompt=ms, response=response))
+
+        target = response
         res.append(CaseResult(source="", target=target, id=idx).dict())
 
     return res
@@ -60,10 +63,8 @@ async def batch_debug(messages, data):
 
         ms = to_message(replaced_ms)
 
-        response = await api.chat(ms)
-
-        source = source
-        target = response["data"]["choices"][0]["message"]["content"]
+        target = await api.chat(ms)
+        mongo.push_history(Snapshot(prompt=ms, response=target))
 
         res.append(CaseResult(source=source, target=target, id=idx).dict())
 
