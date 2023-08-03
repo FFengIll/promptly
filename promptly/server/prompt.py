@@ -4,7 +4,8 @@ import fastapi
 import loguru
 from pydantic import BaseModel
 
-from promptly.model.profile import Message, ProfileManager, PromptItem
+from promptly.manager import ProfileManager, TinyDBProfileManager
+from promptly.model.profile import Message, PromptItem, History
 from promptly.server import api
 from promptly.server.app import app
 from promptly.server.util import to_message
@@ -12,10 +13,12 @@ from promptly.server.util import to_message
 log = loguru.logger
 
 manager = ProfileManager("./profile")
+tinydb = TinyDBProfileManager("./db/tinydb")
 
 
 @app.on_event("shutdown")
 def shutdown_event():
+    tinydb.save()
     manager.save()
 
 
