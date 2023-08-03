@@ -8,7 +8,8 @@
                         <div v-for="item in store.debug" :key="item.id">
                             <span :style="{ color: 'blue' }">{{ item.role }} </span><span>:&nbsp;</span>
                             <span>
-                                <a-textarea v-model:value="item.content" auto-size></a-textarea>
+                                <a-textarea v-model:value="item.content" :auto-size="{ maxRows: 3 }">
+                                </a-textarea>
                             </span>
                         </div>
                     </a-space>
@@ -41,23 +42,21 @@
                 <a-card title="Case List">
                     <!-- case select -->
                     Select Case to Debug:&nbsp;&nbsp;
-                    <a-select style="width:300px" @change="getCase">
-                        <div v-for="item in data.case_list" :key="item.id">
-                            <a-select-option value="item.id">
-                                {{ item.name }}
-                            </a-select-option>
-                        </div>
+                    <a-select style="width:300px" @change="getCase" v-model:value="config.id">
+                        <a-select-option v-for="item in caseList" :key="item.id">
+                            {{ item.name }} <a-divider type="vertical" /> {{ item.description }}
+                        </a-select-option>
                     </a-select>
                     <a-divider />
 
                     <!-- case description -->
                     Case Description:&nbsp;&nbsp;
-                    <span>{{ data.option.case.description }}</span>
+                    <span>{{ config.description }}</span>
                     <a-divider />
 
-                    <div v-for="item in data.option.case.data" :key="item">
+                    <!-- <div v-for="item in config.data" :key="item">
                         <a-list-item>{{ item }}</a-list-item>
-                    </div>
+                    </div> -->
                 </a-card>
             </a-col>
         </a-row>
@@ -65,7 +64,24 @@
             <a-col :span="24">
 
                 <!-- show result -->
-                <a-table :dataSource="result" :columns="columns" :rowKey="(record: any) => record.id" />
+                <a-table :dataSource="result" :columns="columns" :rowKey="(record: any) => record.id">
+                    <template #bodyCell="{ column, record }">
+                        <template v-if="column.key === 'action'">
+                            <span>
+                                <a>Invite 一 {{ record.name }}</a>
+                                <a-divider type="vertical" />
+                                <a>Delete</a>
+                                <a-divider type="vertical" />
+                                <a class="ant-dropdown-link">
+                                    More actions
+                                    <down-outlined />
+                                </a>
+                                <a-button @click="do_request(record)">Request</a-button>
+                            </span>
+                        </template>
+                    </template>
+
+                </a-table>
             </a-col>
         </a-row>
     </div>
@@ -75,8 +91,8 @@ import { ref } from 'vue';
 
 import { useSnapshotStore } from "@/stores/snapshot";
 
-import { ArrowDownOutlined, ArrowUpOutlined } from '@ant-design/icons-vue';
 
+import { DebugRequestBody } from '../../sdk';
 import { DefaultApiFactory } from '../../sdk/apis/default-api';
 
 
@@ -97,21 +113,20 @@ const result = ref(
     ]
 )
 
-const data = ref({
-    option: {
-        case: {
-            id: 1,
-            data: ["1", "2"],
-            description: "description"
-        },
+const config = ref({
+    id: 1,
+    data: ["1", "2"],
+    description: "description"
 
-    },
-    case_list: [
-        { id: 1, name: "test", describe: "test", data: [1, 2, 3, 4] },
-        { id: 2, name: "test", describe: "test", data: [1, 3, 4] },
+})
+
+const caseList = ref(
+    [
+        { id: 1, name: "test", description: "test", data: [1, 2, 3, 4] },
+        { id: 2, name: "test", description: "test", data: [1, 3, 4] },
     ],
 
-}
+
 )
 
 listCase()
@@ -133,14 +148,36 @@ const columns = [
         dataIndex: 'target',
         key: 'target',
     },
+    {
+        title: 'action',
+        dataIndex: 'action',
+        key: 'action',
+    },
 ]
+
+async function do_request(params: { id: 1, source: "" }) {
+    console.log(params)
+
+    var res = store.debug.map(item => item)
+    let body: DebugRequestBody = {
+        messages: res,
+        source: params.source
+    }
+    await api.apiDebugSourcePost(body).then(
+        (response) => {
+            response.data.forEach(element => {
+                result.value[params.id] = element
+            });
+        }
+    )
+}
 
 
 async function run() {
 
     if (useCase.value) {
         var res = store.debug.map(item => item)
-        await api.apiDebugPost(res, data.value.option.case.id,).then(
+        await api.apiDebugPost(res, config.value.id,).then(
             (response) => {
                 result.value = response.data
             }
@@ -158,15 +195,23 @@ async function run() {
 async function listCase() {
     await api.caseGet().then(
         (response) => {
-            data.value.case_list = response.data
-            console.log(data.value.case_list)
+            caseList.value = response.data
+            console.log(caseList.value)
         }
     )
 }
 
 async function getCase(id: number) {
     await api.caseKeyGet(id).then((response) => {
-        data.value.option.case = response.data
+        config.value = response.data
+
+        let array: string[] = config.value.data
+
+        result.value = array.map(
+            (elem, index) => {
+                return { id: index, source: elem, target: "" }
+            }
+        )
     })
 }
 
