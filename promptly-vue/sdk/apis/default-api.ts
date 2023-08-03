@@ -19,7 +19,7 @@ import { BASE_PATH, COLLECTION_FORMATS, RequestArgs, BaseAPI, RequiredError } fr
 import { EventRequest } from '../models';
 import { HTTPValidationError } from '../models';
 import { Message } from '../models';
-import { SnapshotRequest } from '../models';
+import { Snapshot } from '../models';
 /**
  * DefaultApi - axios parameter creator
  * @export
@@ -216,10 +216,11 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         /**
          * 
          * @summary List Profile
+         * @param {boolean} [refresh] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        apiProfileGet: async (options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        apiProfileGet: async (refresh?: boolean, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             const localVarPath = `/api/profile`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, 'https://example.com');
@@ -230,6 +231,10 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             const localVarRequestOptions :AxiosRequestConfig = { method: 'GET', ...baseOptions, ...options};
             const localVarHeaderParameter = {} as any;
             const localVarQueryParameter = {} as any;
+
+            if (refresh !== undefined) {
+                localVarQueryParameter['refresh'] = refresh;
+            }
 
             const query = new URLSearchParams(localVarUrlObj.search);
             for (const key in localVarQueryParameter) {
@@ -268,52 +273,6 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
                 baseOptions = configuration.baseOptions;
             }
             const localVarRequestOptions :AxiosRequestConfig = { method: 'GET', ...baseOptions, ...options};
-            const localVarHeaderParameter = {} as any;
-            const localVarQueryParameter = {} as any;
-
-            const query = new URLSearchParams(localVarUrlObj.search);
-            for (const key in localVarQueryParameter) {
-                query.set(key, localVarQueryParameter[key]);
-            }
-            for (const key in options.params) {
-                query.set(key, options.params[key]);
-            }
-            localVarUrlObj.search = (new URLSearchParams(query)).toString();
-            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
-            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
-
-            return {
-                url: localVarUrlObj.pathname + localVarUrlObj.search + localVarUrlObj.hash,
-                options: localVarRequestOptions,
-            };
-        },
-        /**
-         * 
-         * @summary Delete Prompt Item
-         * @param {string} key 
-         * @param {number} id 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        apiProfileKeyIdDelete: async (key: string, id: number, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
-            // verify required parameter 'key' is not null or undefined
-            if (key === null || key === undefined) {
-                throw new RequiredError('key','Required parameter key was null or undefined when calling apiProfileKeyIdDelete.');
-            }
-            // verify required parameter 'id' is not null or undefined
-            if (id === null || id === undefined) {
-                throw new RequiredError('id','Required parameter id was null or undefined when calling apiProfileKeyIdDelete.');
-            }
-            const localVarPath = `/api/profile/{key}/{id}`
-                .replace(`{${"key"}}`, encodeURIComponent(String(key)))
-                .replace(`{${"id"}}`, encodeURIComponent(String(id)));
-            // use dummy base URL string because the URL constructor only accepts absolute URLs.
-            const localVarUrlObj = new URL(localVarPath, 'https://example.com');
-            let baseOptions;
-            if (configuration) {
-                baseOptions = configuration.baseOptions;
-            }
-            const localVarRequestOptions :AxiosRequestConfig = { method: 'DELETE', ...baseOptions, ...options};
             const localVarHeaderParameter = {} as any;
             const localVarQueryParameter = {} as any;
 
@@ -384,6 +343,46 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         },
         /**
          * 
+         * @summary Create Profile
+         * @param {string} key 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        apiProfileKeyPut: async (key: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'key' is not null or undefined
+            if (key === null || key === undefined) {
+                throw new RequiredError('key','Required parameter key was null or undefined when calling apiProfileKeyPut.');
+            }
+            const localVarPath = `/api/profile/{key}`
+                .replace(`{${"key"}}`, encodeURIComponent(String(key)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, 'https://example.com');
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+            const localVarRequestOptions :AxiosRequestConfig = { method: 'PUT', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            const query = new URLSearchParams(localVarUrlObj.search);
+            for (const key in localVarQueryParameter) {
+                query.set(key, localVarQueryParameter[key]);
+            }
+            for (const key in options.params) {
+                query.set(key, options.params[key]);
+            }
+            localVarUrlObj.search = (new URLSearchParams(query)).toString();
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: localVarUrlObj.pathname + localVarUrlObj.search + localVarUrlObj.hash,
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
          * @summary Get Snapshot
          * @param {string} key 
          * @param {*} [options] Override http request option.
@@ -425,12 +424,12 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         /**
          * 
          * @summary Add Snapshot
-         * @param {SnapshotRequest} body 
+         * @param {Snapshot} body 
          * @param {string} key 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        apiProfileKeySnapshotPost: async (body: SnapshotRequest, key: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        apiProfileKeySnapshotPost: async (body: Snapshot, key: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'body' is not null or undefined
             if (body === null || body === undefined) {
                 throw new RequiredError('body','Required parameter body was null or undefined when calling apiProfileKeySnapshotPost.');
@@ -769,11 +768,12 @@ export const DefaultApiFp = function(configuration?: Configuration) {
         /**
          * 
          * @summary List Profile
+         * @param {boolean} [refresh] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async apiProfileGet(options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => Promise<AxiosResponse<any>>> {
-            const localVarAxiosArgs = await DefaultApiAxiosParamCreator(configuration).apiProfileGet(options);
+        async apiProfileGet(refresh?: boolean, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => Promise<AxiosResponse<any>>> {
+            const localVarAxiosArgs = await DefaultApiAxiosParamCreator(configuration).apiProfileGet(refresh, options);
             return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
                 const axiosRequestArgs :AxiosRequestConfig = {...localVarAxiosArgs.options, url: basePath + localVarAxiosArgs.url};
                 return axios.request(axiosRequestArgs);
@@ -788,21 +788,6 @@ export const DefaultApiFp = function(configuration?: Configuration) {
          */
         async apiProfileKeyGet(key: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => Promise<AxiosResponse<any>>> {
             const localVarAxiosArgs = await DefaultApiAxiosParamCreator(configuration).apiProfileKeyGet(key, options);
-            return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
-                const axiosRequestArgs :AxiosRequestConfig = {...localVarAxiosArgs.options, url: basePath + localVarAxiosArgs.url};
-                return axios.request(axiosRequestArgs);
-            };
-        },
-        /**
-         * 
-         * @summary Delete Prompt Item
-         * @param {string} key 
-         * @param {number} id 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        async apiProfileKeyIdDelete(key: string, id: number, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => Promise<AxiosResponse<any>>> {
-            const localVarAxiosArgs = await DefaultApiAxiosParamCreator(configuration).apiProfileKeyIdDelete(key, id, options);
             return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
                 const axiosRequestArgs :AxiosRequestConfig = {...localVarAxiosArgs.options, url: basePath + localVarAxiosArgs.url};
                 return axios.request(axiosRequestArgs);
@@ -825,6 +810,20 @@ export const DefaultApiFp = function(configuration?: Configuration) {
         },
         /**
          * 
+         * @summary Create Profile
+         * @param {string} key 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async apiProfileKeyPut(key: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => Promise<AxiosResponse<any>>> {
+            const localVarAxiosArgs = await DefaultApiAxiosParamCreator(configuration).apiProfileKeyPut(key, options);
+            return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
+                const axiosRequestArgs :AxiosRequestConfig = {...localVarAxiosArgs.options, url: basePath + localVarAxiosArgs.url};
+                return axios.request(axiosRequestArgs);
+            };
+        },
+        /**
+         * 
          * @summary Get Snapshot
          * @param {string} key 
          * @param {*} [options] Override http request option.
@@ -840,12 +839,12 @@ export const DefaultApiFp = function(configuration?: Configuration) {
         /**
          * 
          * @summary Add Snapshot
-         * @param {SnapshotRequest} body 
+         * @param {Snapshot} body 
          * @param {string} key 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async apiProfileKeySnapshotPost(body: SnapshotRequest, key: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => Promise<AxiosResponse<any>>> {
+        async apiProfileKeySnapshotPost(body: Snapshot, key: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => Promise<AxiosResponse<any>>> {
             const localVarAxiosArgs = await DefaultApiAxiosParamCreator(configuration).apiProfileKeySnapshotPost(body, key, options);
             return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
                 const axiosRequestArgs :AxiosRequestConfig = {...localVarAxiosArgs.options, url: basePath + localVarAxiosArgs.url};
@@ -987,11 +986,12 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
         /**
          * 
          * @summary List Profile
+         * @param {boolean} [refresh] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async apiProfileGet(options?: AxiosRequestConfig): Promise<AxiosResponse<any>> {
-            return DefaultApiFp(configuration).apiProfileGet(options).then((request) => request(axios, basePath));
+        async apiProfileGet(refresh?: boolean, options?: AxiosRequestConfig): Promise<AxiosResponse<any>> {
+            return DefaultApiFp(configuration).apiProfileGet(refresh, options).then((request) => request(axios, basePath));
         },
         /**
          * 
@@ -1002,17 +1002,6 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
          */
         async apiProfileKeyGet(key: string, options?: AxiosRequestConfig): Promise<AxiosResponse<any>> {
             return DefaultApiFp(configuration).apiProfileKeyGet(key, options).then((request) => request(axios, basePath));
-        },
-        /**
-         * 
-         * @summary Delete Prompt Item
-         * @param {string} key 
-         * @param {number} id 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        async apiProfileKeyIdDelete(key: string, id: number, options?: AxiosRequestConfig): Promise<AxiosResponse<any>> {
-            return DefaultApiFp(configuration).apiProfileKeyIdDelete(key, id, options).then((request) => request(axios, basePath));
         },
         /**
          * 
@@ -1027,6 +1016,16 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
         },
         /**
          * 
+         * @summary Create Profile
+         * @param {string} key 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async apiProfileKeyPut(key: string, options?: AxiosRequestConfig): Promise<AxiosResponse<any>> {
+            return DefaultApiFp(configuration).apiProfileKeyPut(key, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
          * @summary Get Snapshot
          * @param {string} key 
          * @param {*} [options] Override http request option.
@@ -1038,12 +1037,12 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
         /**
          * 
          * @summary Add Snapshot
-         * @param {SnapshotRequest} body 
+         * @param {Snapshot} body 
          * @param {string} key 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async apiProfileKeySnapshotPost(body: SnapshotRequest, key: string, options?: AxiosRequestConfig): Promise<AxiosResponse<any>> {
+        async apiProfileKeySnapshotPost(body: Snapshot, key: string, options?: AxiosRequestConfig): Promise<AxiosResponse<any>> {
             return DefaultApiFp(configuration).apiProfileKeySnapshotPost(body, key, options).then((request) => request(axios, basePath));
         },
         /**
@@ -1162,12 +1161,13 @@ export class DefaultApi extends BaseAPI {
     /**
      * 
      * @summary List Profile
+     * @param {boolean} [refresh] 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof DefaultApi
      */
-    public async apiProfileGet(options?: AxiosRequestConfig) : Promise<AxiosResponse<any>> {
-        return DefaultApiFp(this.configuration).apiProfileGet(options).then((request) => request(this.axios, this.basePath));
+    public async apiProfileGet(refresh?: boolean, options?: AxiosRequestConfig) : Promise<AxiosResponse<any>> {
+        return DefaultApiFp(this.configuration).apiProfileGet(refresh, options).then((request) => request(this.axios, this.basePath));
     }
     /**
      * 
@@ -1179,18 +1179,6 @@ export class DefaultApi extends BaseAPI {
      */
     public async apiProfileKeyGet(key: string, options?: AxiosRequestConfig) : Promise<AxiosResponse<any>> {
         return DefaultApiFp(this.configuration).apiProfileKeyGet(key, options).then((request) => request(this.axios, this.basePath));
-    }
-    /**
-     * 
-     * @summary Delete Prompt Item
-     * @param {string} key 
-     * @param {number} id 
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     * @memberof DefaultApi
-     */
-    public async apiProfileKeyIdDelete(key: string, id: number, options?: AxiosRequestConfig) : Promise<AxiosResponse<any>> {
-        return DefaultApiFp(this.configuration).apiProfileKeyIdDelete(key, id, options).then((request) => request(this.axios, this.basePath));
     }
     /**
      * 
@@ -1206,6 +1194,17 @@ export class DefaultApi extends BaseAPI {
     }
     /**
      * 
+     * @summary Create Profile
+     * @param {string} key 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApi
+     */
+    public async apiProfileKeyPut(key: string, options?: AxiosRequestConfig) : Promise<AxiosResponse<any>> {
+        return DefaultApiFp(this.configuration).apiProfileKeyPut(key, options).then((request) => request(this.axios, this.basePath));
+    }
+    /**
+     * 
      * @summary Get Snapshot
      * @param {string} key 
      * @param {*} [options] Override http request option.
@@ -1218,13 +1217,13 @@ export class DefaultApi extends BaseAPI {
     /**
      * 
      * @summary Add Snapshot
-     * @param {SnapshotRequest} body 
+     * @param {Snapshot} body 
      * @param {string} key 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof DefaultApi
      */
-    public async apiProfileKeySnapshotPost(body: SnapshotRequest, key: string, options?: AxiosRequestConfig) : Promise<AxiosResponse<any>> {
+    public async apiProfileKeySnapshotPost(body: Snapshot, key: string, options?: AxiosRequestConfig) : Promise<AxiosResponse<any>> {
         return DefaultApiFp(this.configuration).apiProfileKeySnapshotPost(body, key, options).then((request) => request(this.axios, this.basePath));
     }
     /**

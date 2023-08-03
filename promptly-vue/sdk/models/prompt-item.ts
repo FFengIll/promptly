@@ -14,37 +14,19 @@
 /**
  * 
  * @export
- * @interface Message
+ * @interface PromptItem
  */
-export interface Message {
+export interface PromptItem {
     /**
      * 
      * @type {string}
-     * @memberof Message
+     * @memberof PromptItem
      */
     role: string;
     /**
      * 
      * @type {string}
-     * @memberof Message
+     * @memberof PromptItem
      */
     content: string;
-    /**
-     * 
-     * @type {number}
-     * @memberof Message
-     */
-    id?: number;
-    /**
-     * 
-     * @type {boolean}
-     * @memberof Message
-     */
-    enable?: boolean;
-    /**
-     * 
-     * @type {number}
-     * @memberof Message
-     */
-    order?: number;
 }

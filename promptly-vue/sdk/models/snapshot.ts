@@ -11,22 +11,23 @@
  * https://github.com/swagger-api/swagger-codegen.git
  * Do not edit the class manually.
  */
+import { PromptItem } from './prompt-item';
 /**
  * 
  * @export
- * @interface UpdateModel
+ * @interface Snapshot
  */
-export interface UpdateModel {
+export interface Snapshot {
     /**
      * 
-     * @type {number}
-     * @memberof UpdateModel
+     * @type {Array<PromptItem>}
+     * @memberof Snapshot
      */
-    id: number;
+    prompt?: Array<PromptItem>;
     /**
      * 
-     * @type {boolean}
-     * @memberof UpdateModel
+     * @type {string}
+     * @memberof Snapshot
      */
-    enable: boolean;
+    response?: string;
 }
