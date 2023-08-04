@@ -1,6 +1,6 @@
 from abc import abstractmethod, ABC
 
-from promptly.model.profile import History
+from promptly.model.profile import Snapshot
 
 class BaseCaseManager(ABC):
     pass
@@ -23,5 +23,5 @@ class BaseProfileManager(ABC):
         pass
 
     @abstractmethod
-    def push_history(self, item: History):
+    def push_history(self, item: Snapshot):
         pass

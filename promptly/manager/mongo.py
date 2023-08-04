@@ -1,7 +1,7 @@
 from pymongo import MongoClient
 
 from promptly.manager.base import BaseProfileManager, BaseCaseManager
-from promptly.model.profile import History, Profile, Snapshot
+from promptly.model.profile import  Profile, Snapshot
 
 
 class MongoProfileManger(BaseProfileManager):
@@ -9,6 +9,7 @@ class MongoProfileManger(BaseProfileManager):
         self.client = client
         self.db = client["promptly"]
         self.c_profile = self.db["profile"]
+        self.c_history = self.db['history']
 
         self.index = set()
 
@@ -18,6 +19,7 @@ class MongoProfileManger(BaseProfileManager):
         pass
 
     def reload(self):
+        self.index.clear()
         for i in self.c_profile.find({}, {"name": 1}):
             self.index.add(i["name"])
 
@@ -28,8 +30,8 @@ class MongoProfileManger(BaseProfileManager):
         for i in self.c_profile.find({"name": key}):
             return Profile(**i)
 
-    def push_history(self, item: History):
-        pass
+    def push_history(self, item: Snapshot):
+        self.c_history.insert_one(item.dict())
 
     def update_message(self, p:Profile):
         messages = [m.dict() for m in p.messages]
