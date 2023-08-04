@@ -16,6 +16,7 @@ import { Configuration } from '../configuration';
 // Some imports not used depending on template conditions
 // @ts-ignore
 import { BASE_PATH, COLLECTION_FORMATS, RequestArgs, BaseAPI, RequiredError } from '../base';
+import { DebugRequestBody } from '../models';
 import { EventRequest } from '../models';
 import { HTTPValidationError } from '../models';
 import { Message } from '../models';
@@ -113,6 +114,58 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
          * 
          * @summary Debug
          * @param {Array<Message>} body 
+         * @param {number} caseId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        apiDebugCasePost: async (body: Array<Message>, caseId: number, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'body' is not null or undefined
+            if (body === null || body === undefined) {
+                throw new RequiredError('body','Required parameter body was null or undefined when calling apiDebugCasePost.');
+            }
+            // verify required parameter 'caseId' is not null or undefined
+            if (caseId === null || caseId === undefined) {
+                throw new RequiredError('caseId','Required parameter caseId was null or undefined when calling apiDebugCasePost.');
+            }
+            const localVarPath = `/api/debug/case`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, 'https://example.com');
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+            const localVarRequestOptions :AxiosRequestConfig = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            if (caseId !== undefined) {
+                localVarQueryParameter['case_id'] = caseId;
+            }
+
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            const query = new URLSearchParams(localVarUrlObj.search);
+            for (const key in localVarQueryParameter) {
+                query.set(key, localVarQueryParameter[key]);
+            }
+            for (const key in options.params) {
+                query.set(key, options.params[key]);
+            }
+            localVarUrlObj.search = (new URLSearchParams(query)).toString();
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            const needsSerialization = (typeof body !== "string") || localVarRequestOptions.headers['Content-Type'] === 'application/json';
+            localVarRequestOptions.data =  needsSerialization ? JSON.stringify(body !== undefined ? body : {}) : (body || "");
+
+            return {
+                url: localVarUrlObj.pathname + localVarUrlObj.search + localVarUrlObj.hash,
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @summary Debug
+         * @param {Array<Message>} body 
          * @param {number} count 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -164,21 +217,16 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         /**
          * 
          * @summary Debug
-         * @param {Array<Message>} body 
-         * @param {number} caseId 
+         * @param {DebugRequestBody} body 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        apiDebugPost: async (body: Array<Message>, caseId: number, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        apiDebugSourcePost: async (body: DebugRequestBody, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'body' is not null or undefined
             if (body === null || body === undefined) {
-                throw new RequiredError('body','Required parameter body was null or undefined when calling apiDebugPost.');
+                throw new RequiredError('body','Required parameter body was null or undefined when calling apiDebugSourcePost.');
             }
-            // verify required parameter 'caseId' is not null or undefined
-            if (caseId === null || caseId === undefined) {
-                throw new RequiredError('caseId','Required parameter caseId was null or undefined when calling apiDebugPost.');
-            }
-            const localVarPath = `/api/debug`;
+            const localVarPath = `/api/debug/source`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, 'https://example.com');
             let baseOptions;
@@ -188,10 +236,6 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             const localVarRequestOptions :AxiosRequestConfig = { method: 'POST', ...baseOptions, ...options};
             const localVarHeaderParameter = {} as any;
             const localVarQueryParameter = {} as any;
-
-            if (caseId !== undefined) {
-                localVarQueryParameter['case_id'] = caseId;
-            }
 
             localVarHeaderParameter['Content-Type'] = 'application/json';
 
@@ -739,6 +783,21 @@ export const DefaultApiFp = function(configuration?: Configuration) {
          * 
          * @summary Debug
          * @param {Array<Message>} body 
+         * @param {number} caseId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async apiDebugCasePost(body: Array<Message>, caseId: number, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => Promise<AxiosResponse<any>>> {
+            const localVarAxiosArgs = await DefaultApiAxiosParamCreator(configuration).apiDebugCasePost(body, caseId, options);
+            return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
+                const axiosRequestArgs :AxiosRequestConfig = {...localVarAxiosArgs.options, url: basePath + localVarAxiosArgs.url};
+                return axios.request(axiosRequestArgs);
+            };
+        },
+        /**
+         * 
+         * @summary Debug
+         * @param {Array<Message>} body 
          * @param {number} count 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -753,13 +812,12 @@ export const DefaultApiFp = function(configuration?: Configuration) {
         /**
          * 
          * @summary Debug
-         * @param {Array<Message>} body 
-         * @param {number} caseId 
+         * @param {DebugRequestBody} body 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async apiDebugPost(body: Array<Message>, caseId: number, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => Promise<AxiosResponse<any>>> {
-            const localVarAxiosArgs = await DefaultApiAxiosParamCreator(configuration).apiDebugPost(body, caseId, options);
+        async apiDebugSourcePost(body: DebugRequestBody, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => Promise<AxiosResponse<any>>> {
+            const localVarAxiosArgs = await DefaultApiAxiosParamCreator(configuration).apiDebugSourcePost(body, options);
             return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
                 const axiosRequestArgs :AxiosRequestConfig = {...localVarAxiosArgs.options, url: basePath + localVarAxiosArgs.url};
                 return axios.request(axiosRequestArgs);
@@ -965,6 +1023,17 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
          * 
          * @summary Debug
          * @param {Array<Message>} body 
+         * @param {number} caseId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async apiDebugCasePost(body: Array<Message>, caseId: number, options?: AxiosRequestConfig): Promise<AxiosResponse<any>> {
+            return DefaultApiFp(configuration).apiDebugCasePost(body, caseId, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @summary Debug
+         * @param {Array<Message>} body 
          * @param {number} count 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -975,13 +1044,12 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
         /**
          * 
          * @summary Debug
-         * @param {Array<Message>} body 
-         * @param {number} caseId 
+         * @param {DebugRequestBody} body 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async apiDebugPost(body: Array<Message>, caseId: number, options?: AxiosRequestConfig): Promise<AxiosResponse<any>> {
-            return DefaultApiFp(configuration).apiDebugPost(body, caseId, options).then((request) => request(axios, basePath));
+        async apiDebugSourcePost(body: DebugRequestBody, options?: AxiosRequestConfig): Promise<AxiosResponse<any>> {
+            return DefaultApiFp(configuration).apiDebugSourcePost(body, options).then((request) => request(axios, basePath));
         },
         /**
          * 
@@ -1138,6 +1206,18 @@ export class DefaultApi extends BaseAPI {
      * 
      * @summary Debug
      * @param {Array<Message>} body 
+     * @param {number} caseId 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApi
+     */
+    public async apiDebugCasePost(body: Array<Message>, caseId: number, options?: AxiosRequestConfig) : Promise<AxiosResponse<any>> {
+        return DefaultApiFp(this.configuration).apiDebugCasePost(body, caseId, options).then((request) => request(this.axios, this.basePath));
+    }
+    /**
+     * 
+     * @summary Debug
+     * @param {Array<Message>} body 
      * @param {number} count 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
@@ -1149,14 +1229,13 @@ export class DefaultApi extends BaseAPI {
     /**
      * 
      * @summary Debug
-     * @param {Array<Message>} body 
-     * @param {number} caseId 
+     * @param {DebugRequestBody} body 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof DefaultApi
      */
-    public async apiDebugPost(body: Array<Message>, caseId: number, options?: AxiosRequestConfig) : Promise<AxiosResponse<any>> {
-        return DefaultApiFp(this.configuration).apiDebugPost(body, caseId, options).then((request) => request(this.axios, this.basePath));
+    public async apiDebugSourcePost(body: DebugRequestBody, options?: AxiosRequestConfig) : Promise<AxiosResponse<any>> {
+        return DefaultApiFp(this.configuration).apiDebugSourcePost(body, options).then((request) => request(this.axios, this.basePath));
     }
     /**
      * 

@@ -1,4 +1,5 @@
 export * from './action-event';
+export * from './debug-request-body';
 export * from './event-request';
 export * from './httpvalidation-error';
 export * from './message';
