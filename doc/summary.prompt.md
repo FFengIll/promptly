@@ -184,6 +184,65 @@ Visual Studio Code 2023年4月版的主要亮点包括辅助功能改进、新�
 ]
 ```
 
+### v2
+
+#### case 1
+
+```json
+[
+  {
+    "role": "system",
+    "content": "You are a helpful AI assistant. Use the following pieces of context to answer the question at the end.\nIf you don't know the answer, just say you don't know. DO NOT try to make up an answer.\nIf the question is not related to the context, politely respond that you are tuned to only answer questions that are related to the context.\n\nRespnse in language `chinese`.\nHelpful answer in markdown, and  start with `according to your reading article`.",
+    "id": 13188714767125778000,
+    "enable": true,
+    "order": 1
+  },
+  {
+    "role": "user",
+    "content": "Question: 列出所有新特性\nContext:  **点击上方蓝字**\n\n**关注我们**\n\n（本文阅读时间：5分钟)\n\n欢迎使用 Visual Studio Code 2023 年 4 月版。一些主要亮点包括：\n\n*   **辅助功能改进** \\- 更好的屏幕阅读器支持、新的音频提示。\n\n*   **新颜色主题** \\- “现代”浅色和深色主题默认设置。\n\n*   **配置文件模板** \\- Python、Java、数据科学等的内置模板。\n\n*   **拖放选择器** \\- 选择您希望如何将项目链接放置到编辑器中。\n\n*   **独立颜色选择器** \\- 用于插入或修改颜色格式的颜色选择器 UI。\n\n*   **源代码管理输入的快速修复** \\- 直接在输入框中修复拼写和其他错误。\n\n*   **Markdown 拖放视频** \\- 在 Markdown 文件中轻松添加视频标签。\n\n*   **将图像文件拖放到笔记本中以创建附件** \\- 在图像链接、路径或附件之间进行选择。\n\n\n**辅助功能**\n\n**▍****Aria 冗余设置**\n\n屏幕阅读器用户可以通过“accessibility.verbosity.diff-editor”和“accessibility.verbosity.terminal”设置从功能的 aria-label 中排除提示以减少冗余。\n\n**▍****diff 编辑器音频提示改进**\n\nVS Code 现在缓存音频提示，因此它们只需加载一次，从而产生更好的响应能力，并改进了用于 diff 编辑器的音调。\n\n**▍****转到行/列公告**\n\n当调用“转到行/列” (Ctrl+G) 时，屏幕阅读器现在会读取关联的行内容。\n\n**新的默认颜色主题**\n\n新的“深色现代”和“浅色现代”主题取代了“深色”和“浅色”，成为新的默认深色和浅色主题。\n\n**配置文件模板**\n\n配置文件可让您根据当前项目或任务快速切换编辑器扩展、设置和 UI 布局。为了帮助您开始使用配置文件，我们提供了配置文件模板，这些模板是针对不同编程语言和场景的精选配置文件。您可以按原样使用配置文件模板，也可以将其用作起点以进一步自定义您自己的工作流程。\n\n您可以通过“配置文件”>“创建配置文件...”下拉菜单选择一个配置文件模板：\n\n选择配置文件模板后，您可以查看设置、扩展和其他数据，如果不想将个别项目包含在其中，则可以将其删除。\n\n在您基于模板创建新配置文件后，对设置、扩展程序或 UI 所做的更改将保留到您的配置文件中。\n\n**拖放选择器**\n\n您可以在放置前按住 Shift 键，将文件和内容放置到文本编辑器中。在此更新中，我们添加了 UI，可让您更改此内容插入文件\n\n",
+    "id": 13188715840867602000,
+    "enable": true,
+    "order": 2
+  }
+]
+```
+
+根据您的阅读文章，以下是 Visual Studio Code 2023 年 4 月版的新特性：
+
+- 辅助功能改进：更好的屏幕阅读器支持和新的音频提示。
+- 新颜色主题：新增了“现代”浅色和深色主题作为默认设置。
+- 配置文件模板：内置了 Python、Java、数据科学等的配置文件模板，可以快速切换编辑器扩展、设置和 UI 布局。
+- 拖放选择器：可以选择将项目链接放置到编辑器中的方式。
+- 独立颜色选择器：用于插入或修改颜色格式的颜色选择器 UI。
+- 源代码管理输入的快速修复：可以直接在输入框中修复拼写和其他错误。
+- Markdown 拖放视频：可以在 Markdown 文件中轻松添加视频标签。
+- 将图像文件拖放到笔记本中以创建附件：可以选择图像链接、路径或附件来创建附件。
+
+希望这些信息对您有所帮助！
+
+#### case 2
+
+```json
+[
+  {
+    "role": "system",
+    "content": "You are a helpful AI assistant. Use the following pieces of context to answer the question at the end.\nIf you don't know the answer, just say you don't know. DO NOT try to make up an answer.\nIf the question is not related to the context, politely respond that you are tuned to only answer questions that are related to the context.\n\nRespnse in language `chinese`.\nHelpful answer in markdown, and  start with `according to your reading article`.",
+    "id": 13188714767125778000,
+    "enable": true,
+    "order": 1
+  },
+  {
+    "role": "user",
+    "content": "Question: 如何打铁\nContext:  **点击上方蓝字**\n\n**关注我们**\n\n（本文阅读时间：5分钟)\n\n欢迎使用 Visual Studio Code 2023 年 4 月版。一些主要亮点包括：\n\n*   **辅助功能改进** \\- 更好的屏幕阅读器支持、新的音频提示。\n\n*   **新颜色主题** \\- “现代”浅色和深色主题默认设置。\n\n*   **配置文件模板** \\- Python、Java、数据科学等的内置模板。\n\n*   **拖放选择器** \\- 选择您希望如何将项目链接放置到编辑器中。\n\n*   **独立颜色选择器** \\- 用于插入或修改颜色格式的颜色选择器 UI。\n\n*   **源代码管理输入的快速修复** \\- 直接在输入框中修复拼写和其他错误。\n\n*   **Markdown 拖放视频** \\- 在 Markdown 文件中轻松添加视频标签。\n\n*   **将图像文件拖放到笔记本中以创建附件** \\- 在图像链接、路径或附件之间进行选择。\n\n\n**辅助功能**\n\n**▍****Aria 冗余设置**\n\n屏幕阅读器用户可以通过“accessibility.verbosity.diff-editor”和“accessibility.verbosity.terminal”设置从功能的 aria-label 中排除提示以减少冗余。\n\n**▍****diff 编辑器音频提示改进**\n\nVS Code 现在缓存音频提示，因此它们只需加载一次，从而产生更好的响应能力，并改进了用于 diff 编辑器的音调。\n\n**▍****转到行/列公告**\n\n当调用“转到行/列” (Ctrl+G) 时，屏幕阅读器现在会读取关联的行内容。\n\n**新的默认颜色主题**\n\n新的“深色现代”和“浅色现代”主题取代了“深色”和“浅色”，成为新的默认深色和浅色主题。\n\n**配置文件模板**\n\n配置文件可让您根据当前项目或任务快速切换编辑器扩展、设置和 UI 布局。为了帮助您开始使用配置文件，我们提供了配置文件模板，这些模板是针对不同编程语言和场景的精选配置文件。您可以按原样使用配置文件模板，也可以将其用作起点以进一步自定义您自己的工作流程。\n\n您可以通过“配置文件”>“创建配置文件...”下拉菜单选择一个配置文件模板：\n\n选择配置文件模板后，您可以查看设置、扩展和其他数据，如果不想将个别项目包含在其中，则可以将其删除。\n\n在您基于模板创建新配置文件后，对设置、扩展程序或 UI 所做的更改将保留到您的配置文件中。\n\n**拖放选择器**\n\n您可以在放置前按住 Shift 键，将文件和内容放置到文本编辑器中。在此更新中，我们添加了 UI，可让您更改此内容插入文件\n\n",
+    "id": 13188715840867602000,
+    "enable": true,
+    "order": 2
+  }
+]
+```
+
+根据您的阅读文章，没有提到如何打铁的信息。抱歉，我无法回答这个问题。
+
 # RQ
 
 ## Generate RQ
