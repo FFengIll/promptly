@@ -2,7 +2,6 @@ from copy import deepcopy
 
 import loguru
 import requests
-from fastapi import requests
 from httpx import Client
 
 from promptly.manager import MongoProfileManger
