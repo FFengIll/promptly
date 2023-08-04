@@ -23,10 +23,10 @@
                         <!-- loop -->
                         <a-input-number title="Loop" id="inputNumber" v-model:value="loopCount" :min="1" :max="10">
                             <template #upIcon>
-                                <ArrowUpOutlined />
+                                <ArrowUpOutlined/>
                             </template>
                             <template #downIcon>
-                                <ArrowDownOutlined />
+                                <ArrowDownOutlined/>
                             </template>
                         </a-input-number>
 
@@ -44,15 +44,17 @@
                     Select Case to Debug:&nbsp;&nbsp;
                     <a-select style="width:300px" @change="getCase" v-model:value="config.id">
                         <a-select-option v-for="item in caseList" :key="item.id">
-                            {{ item.name }} <a-divider type="vertical" /> {{ item.description }}
+                            {{ item.name }}
+                            <a-divider type="vertical"/>
+                            {{ item.description }}
                         </a-select-option>
                     </a-select>
-                    <a-divider />
+                    <a-divider/>
 
                     <!-- case description -->
                     Case Description:&nbsp;&nbsp;
                     <span>{{ config.description }}</span>
-                    <a-divider />
+                    <a-divider/>
 
                     <!-- <div v-for="item in config.data" :key="item">
                         <a-list-item>{{ item }}</a-list-item>
@@ -79,13 +81,13 @@
     </div>
 </template>
 <script lang="ts" setup>
-import { ref } from 'vue';
+import {ref} from 'vue';
 
-import { useSnapshotStore } from "@/stores/snapshot";
+import {useSnapshotStore} from "@/stores/snapshot";
 
 
-import { DebugRequestBody } from '../../sdk';
-import { DefaultApiFactory } from '../../sdk/apis/default-api';
+import type {DebugRequestBody} from '../../sdk/models';
+import {DefaultApiFactory} from '../../sdk/apis/default-api';
 
 
 const store = useSnapshotStore()
@@ -98,9 +100,9 @@ const useCase = ref<boolean>(false)
 
 const result = ref(
     [
-        { id: 1, source: "test", target: "test" },
-        { id: 2, source: "test", target: "test" },
-        { id: 3, source: "test", target: "test" },
+        {id: 1, source: "test", target: "test"},
+        {id: 2, source: "test", target: "test"},
+        {id: 3, source: "test", target: "test"},
         // 其他数据项
     ]
 )
@@ -114,11 +116,9 @@ const config = ref({
 
 const caseList = ref(
     [
-        { id: 1, name: "test", description: "test", data: [1, 2, 3, 4] },
-        { id: 2, name: "test", description: "test", data: [1, 3, 4] },
+        {id: 1, name: "test", description: "test", data: [1, 2, 3, 4]},
+        {id: 2, name: "test", description: "test", data: [1, 3, 4]},
     ],
-
-
 )
 
 listCase()
@@ -201,7 +201,7 @@ async function getCase(id: number) {
 
         result.value = array.map(
             (elem, index) => {
-                return { id: index, source: elem, target: "" }
+                return {id: index, source: elem, target: ""}
             }
         )
     })
