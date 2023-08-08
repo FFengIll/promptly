@@ -9,5 +9,14 @@ log = loguru.logger
 class Case(BaseModel):
     id: int = Field(default=0)
     name: str
-    data: List[str]
+    data: List[str] = Field(default_factory=list)
     description: str = Field(default="")
+
+    def __hash__(self):
+        return self.name.__hash__()
+
+
+class CaseResult(BaseModel):
+    id: int
+    source: str
+    target: str
