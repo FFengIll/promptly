@@ -13,6 +13,16 @@ const props = defineProps<{
 }>()
 
 
+function copyRaw() {
+    let res: string[] = []
+    props.messages.forEach((m) => {
+        res.push(m.role + ":\n" + m.content)
+    })
+    let whole = res.join('\n')
+    copy(whole)
+
+}
+
 function copyJson() {
     let payload = JSON.stringify(props.messages)
     copy(payload)
@@ -22,13 +32,16 @@ function copyJson() {
 </script>
 
 <template>
-    <a-space direction="vertical">
-        <a-button @click="copyJson" class="right">Copy to JSON</a-button>
+    <a-space direction="horizontal">
         <a-space class="scroll-short" direction="vertical">
             <div v-for="item in messages">
                 <span :style="{ color: 'blue' }">{{ item.role }} </span><span>:&nbsp;</span>
                 <span style="white-space: pre-line"> {{ item.content }}</span>
             </div>
+        </a-space>
+        <a-space direction="vertical">
+            <a-button @click="copyJson" class="right">Copy to JSON</a-button>
+            <a-button @click="copyRaw" class="right">Copy to RAW</a-button>
         </a-space>
     </a-space>
 </template>
