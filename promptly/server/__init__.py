@@ -1,4 +1,5 @@
 from . import case
+from . import debug
 from . import view
 from . import prompt
 
