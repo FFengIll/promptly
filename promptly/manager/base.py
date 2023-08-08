@@ -15,13 +15,11 @@ class BaseProfileManager(ABC):
         pass
 
     @abstractmethod
-    def list_profile(self):
+    def keys(self):
         pass
 
     @abstractmethod
-    def get_profile(self, key):
+    def get(self, key):
         pass
 
-    @abstractmethod
-    def push_history(self, item: Snapshot):
-        pass
+  

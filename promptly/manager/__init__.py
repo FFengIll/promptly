@@ -1,2 +1,2 @@
 from .memory import ProfileManager
-from .mongo import MongoProfileManger
+from .mongo import MongoManager

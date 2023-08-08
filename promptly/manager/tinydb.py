@@ -36,10 +36,10 @@ class TinyDBProfileManager(BaseProfileManager):
             profile = Profile(**data)
             self.index[profile.name] = profile
 
-    def list_profile(self):
+    def keys(self):
         return list(self.index.keys())
 
-    def get_profile(self, key):
+    def get(self, key):
         p = self.index.get(key, None)
         return p
 

@@ -50,14 +50,14 @@ class ProfileManager(BaseProfileManager):
         self.file_map = location
         self.profiles = profiles
 
-    def list_profile(self):
+    def keys(self):
         return [p.name for p in self.profiles]
 
     def refresh(self):
         self.save()
         self.reload()
 
-    def get_profile(
+    def get(
         self,
         key=None,
     ) -> Profile:
@@ -67,7 +67,7 @@ class ProfileManager(BaseProfileManager):
         return None
 
     def update_all(self, key: str, ms: List[Message]):
-        p: Profile = self.get_profile(key)
+        p: Profile = self.get(key)
 
         to_add = []
         for msg in ms:
@@ -91,7 +91,7 @@ class ProfileManager(BaseProfileManager):
         p.messages.sort(key=lambda x: x.order)
 
     def update_one(self, key: str, msg: Message):
-        p: Profile = self.get_profile(key)
+        p: Profile = self.get(key)
         found = False
         for m in p.messages:
             if m.id == msg.id:
@@ -172,7 +172,7 @@ def test_update():
 
 def test_profile():
     m = ProfileManager("profile")
-    print(m.list_profile())
+    print(m.keys())
 
     for p in m.profiles:
         print(p)
