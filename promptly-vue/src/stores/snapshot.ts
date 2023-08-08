@@ -1,6 +1,6 @@
 import {useLocalStorage} from "@vueuse/core"
 import {defineStore} from 'pinia'
-import type {Message} from '../../sdk/models/message.js'
+import type {Message} from '../../sdk/models'
 
 export const useCounterStore = defineStore('counter', {
     state: () => {
@@ -27,14 +27,17 @@ export const useSnapshotStore = defineStore('snapshot', {
                     }
                 ]
             },
-            debug: useLocalStorage('debug', <Message[]>[
-                {
-                    id: 1,
-                    role: 'user',
-                    content: "{{}}"
-                },
+            debugSource: <string>"",
+            debug: useLocalStorage('debug',
 
-            ]),
+                <Message[]>[
+                    {
+                        id: 1,
+                        role: 'user',
+                        content: "{{}}"
+                    },
+                ]
+            ),
             compare: {
                 left: <Message[]>[
                     {
@@ -55,11 +58,12 @@ export const useSnapshotStore = defineStore('snapshot', {
         }
     },
     actions: {
-        sendToDebug(ms: Message[]) {
+        sendToDebug(ms: Message[], source: string) {
             var res = ms.filter(item => {
                 return item.enable
             });
             this.debug = res
+            this.debugSource = source
         },
         sendToCompareLeft(ms: Message[]) {
             // var res  = ms.filter(item => {
