@@ -1,15 +1,13 @@
 from copy import deepcopy
+from typing import List
 
 import loguru
-import requests
-from httpx import Client
+from httpx import AsyncClient
 
-from promptly.manager import MongoProfileManger
+from promptly.model.profile import Message
 from promptly.openai.config import key, url
-from promptly.orm.mongo import client
 
 log = loguru.logger
-mongo = MongoProfileManger(client)
 
 
 payload = {
@@ -19,21 +17,29 @@ payload = {
 }
 
 
+def to_message(ms: List[Message]):
+    res = []
+    for i in ms:
+        if i.enable:
+            res.append(dict(role=i.role, content=i.content))
+    return res
+
+
 def simple_chat(content):
     messages = [dict(role="user", content=content)]
     return chat(messages)
 
 
-client = Client()
+client = AsyncClient()
 
 
-def chat(messages):
+async def chat(messages):
     headers = {}
 
     data = deepcopy(payload)
     data["messages"] = messages
 
-    response = requests.post(url=url, headers=headers, json=data, timeout=30)
+    response = await client.post(url=url, headers=headers, json=data, timeout=30)
     log.info(response)
     response.raise_for_status()
 
