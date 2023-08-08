@@ -1,9 +1,24 @@
+<style scoped>
+.tooltip {
+    width: 300px;
+}
+</style>
+
 <template>
     <div>
         <!-- prompt view -->
         <a-row :gutter="12">
             <a-col :span="12">
                 <a-card title="Prompt Snapshot">
+                    <a-typography-text>
+                        Source: {{ store.debugSource }}
+                    </a-typography-text>
+                    <a-button @click="gotoSource(store.debugSource)"> Go To Source</a-button>
+                    <a-divider></a-divider>
+                    <a-space>
+                        <a-button @click="sendBack('')">Write Back</a-button>
+                    </a-space>
+                    <a-divider></a-divider>
                     <a-space direction="vertical" :style="{ width: '100%' }">
                         <div v-for="item in store.debug" :key="item.id">
                             <span :style="{ color: 'blue' }">{{ item.role }} </span><span>:&nbsp;</span>
@@ -31,7 +46,7 @@
                         </a-input-number>
 
                         <!-- click to run -->
-                        <a-button type="primary" @click="run">Run Test</a-button>
+                        <a-button type="primary" @click="debugAll">Run Test</a-button>
 
                         <a-checkbox v-model:checked="useCase">Use Case</a-checkbox>
 
@@ -40,10 +55,12 @@
 
                 <!-- show dataset info -->
                 <a-card title="Case List">
+                    <a-button @click="listCase(True)">Refresh</a-button>
+
                     <!-- case select -->
                     Select Case to Debug:&nbsp;&nbsp;
-                    <a-select style="width:300px" @change="getCase" v-model:value="config.id">
-                        <a-select-option v-for="item in caseList" :key="item.id">
+                    <a-select style="width:300px" @change="getCase">
+                        <a-select-option v-for="item in caseList" :key="item.name">
                             {{ item.name }}
                             <a-divider type="vertical"/>
                             {{ item.description }}
@@ -70,9 +87,31 @@
                     <template #bodyCell="{ column, record }">
                         <template v-if="column.key === 'action'">
                             <span>
-                                <a-button @click="do_request(record)">Request</a-button>
+                                <a-button @click="debugOne(record)">Request</a-button>
+                                <a-button @click="sendBack(record.source)">Send Back</a-button>
+                                <a-button @click="gotoSource(store.debugSource)"> Go To Source</a-button>
+
                             </span>
                         </template>
+                        <template v-else-if="column.key === 'source'">
+                            <a-tooltip placement="topLeft" :overlay-inner-style="{width:'500px'}">
+                                <template #title>
+                                    {{ JSON.stringify(record.source) }}
+                                </template>
+                                {{ JSON.stringify(record.source) }}
+
+                            </a-tooltip>
+                        </template>
+                        <template v-else-if="column.key === 'target'">
+                            <a-tooltip placement="topLeft" :overlay-inner-style="{width:'500px'}">
+                                <template #title>
+                                    {{ JSON.stringify(record.target) }}
+                                </template>
+                                {{ JSON.stringify(record.target) }}
+                            </a-tooltip>
+
+                        </template>
+
                     </template>
 
                 </a-table>
@@ -83,11 +122,14 @@
 <script lang="ts" setup>
 import {ref} from 'vue';
 
+import type {TableColumnType} from 'ant-design-vue';
+
 import {useSnapshotStore} from "@/stores/snapshot";
 
 
-import type {DebugRequestBody} from '../../sdk/models';
+import type {DebugRequestBody} from '../../sdk';
 import {DefaultApiFactory} from '../../sdk/apis/default-api';
+import router from "@/router";
 
 
 const store = useSnapshotStore()
@@ -98,13 +140,14 @@ const loopCount = ref<number>(1);
 
 const useCase = ref<boolean>(false)
 
+interface ResultItem {
+    id: number,
+    source: string,
+    target: string
+}
+
 const result = ref(
-    [
-        {id: 1, source: "test", target: "test"},
-        {id: 2, source: "test", target: "test"},
-        {id: 3, source: "test", target: "test"},
-        // 其他数据项
-    ]
+    <ResultItem[]>[]
 )
 
 const config = ref({
@@ -117,26 +160,26 @@ const config = ref({
 const caseList = ref(
     [
         {id: 1, name: "test", description: "test", data: [1, 2, 3, 4]},
-        {id: 2, name: "test", description: "test", data: [1, 3, 4]},
     ],
 )
 
-listCase()
+listCase(false)
 
 
-const columns = [
+const columns: TableColumnType[] = [
     {
         title: 'id',
         dataIndex: 'id',
         key: 'id',
     },
     {
-        title: 'case',
+        title: 'source',
         dataIndex: 'source',
         key: 'source',
+        ellipsis: {showTitle: false},
     },
     {
-        title: 'result',
+        title: 'target',
         dataIndex: 'target',
         key: 'target',
     },
@@ -147,45 +190,75 @@ const columns = [
     },
 ]
 
-async function do_request(params: { id: 1, source: "" }) {
+interface Params {
+    id: number,
+    source: string
+}
+
+function sendBack(source: string) {
+
+    let res = store.debug.map(item => {
+        let copied = {...item};
+        copied.content = copied.content.replace('{{}}', source)
+        console.log(copied)
+        return copied
+    })
+
+    api.apiProfileKeyPost(res, store.debugSource)
+        .then(
+            response => {
+                console.log(response)
+            }
+        )
+        .catch(error => {
+            console.error(error)
+        })
+}
+
+function gotoSource(source: string) {
+    router.push(`/view/prompt/${source}`)
+}
+
+async function debugOne(params: Params) {
     console.log(params)
 
-    var res = store.debug.map(item => item)
+    var res = store.debug.filter(item => {
+        return item.enable == true
+    })
     let body: DebugRequestBody = {
         messages: res,
         source: params.source
     }
     await api.apiDebugSourcePost(body).then(
         (response) => {
-            response.data.forEach(element => {
-                result.value[params.id] = element
-            });
+            let element = response.data[0]
+            element.id = params.id
+            result.value.push(element)
         }
     )
 }
 
 
-async function run() {
+async function debugAll() {
+    var res = store.debug.map(item => item)
 
     if (useCase.value) {
-        var res = store.debug.map(item => item)
-        await api.apiDebugPost(res, config.value.id,).then(
+        await api.apiDebugCasePost(res, config.value.id,).then(
             (response) => {
-                result.value = response.data
+                result.value = result.value.concat(response.data)
             }
         )
     } else {
-        var res = store.debug.map(item => item)
         await api.apiDebugLoopPost(res, loopCount.value).then(
             (response) => {
-                result.value = response.data
+                result.value = result.value.concat(response.data)
             }
         )
     }
 }
 
-async function listCase() {
-    await api.caseGet().then(
+async function listCase(refresh: boolean) {
+    await api.apiCaseGet(refresh).then(
         (response) => {
             caseList.value = response.data
             console.log(caseList.value)
@@ -194,10 +267,12 @@ async function listCase() {
 }
 
 async function getCase(id: number) {
-    await api.caseKeyGet(id).then((response) => {
+    await api.apiCaseKeyGet(id).then((response) => {
         config.value = response.data
 
         let array: string[] = config.value.data
+
+        console.log(response.data)
 
         result.value = array.map(
             (elem, index) => {
