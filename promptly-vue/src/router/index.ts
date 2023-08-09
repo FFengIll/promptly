@@ -1,4 +1,4 @@
-import {createRouter, createWebHistory} from 'vue-router';
+import { createRouter, createWebHistory } from 'vue-router';
 
 const router = createRouter({
     history: createWebHistory(import.meta.env.BASE_URL),
@@ -18,7 +18,7 @@ const router = createRouter({
             path: '/view/prompt/:key/advance',
             name: 'prompt (advance)',
             component: () => import('../views/AdvanceView.vue'),
-            props: route => ({key: route.query.key}),
+            props: route => ({ key: route.params.key }),
 
         },
         {
@@ -31,7 +31,7 @@ const router = createRouter({
             path: '/view/prompt/:key',
             name: 'prompt dev',
             component: () => import('../views/CommitView.vue'),
-            props: route => ({key: route.query.key})
+            props: route => ({ key: route.params.key })
         },
         {
             path: '/about',
