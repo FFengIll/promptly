@@ -3,10 +3,16 @@ from typing import List
 import fastapi
 import loguru
 
-from promptly.model.profile import Message, Profile, Snapshot
+from promptly.model.profile import (
+    Message,
+    Profile,
+    Snapshot,
+    Iteration,
+    IterationProject,
+)
 from promptly.server import llm
-from promptly.server.app import mongo
 from promptly.server.app import app
+from promptly.server.app import mongo
 from promptly.server.llm import to_message
 
 log = loguru.logger
@@ -68,7 +74,7 @@ def update_profile(key: str, update: List[Message]):
 
 
 @app.post("/api/chat/{key}")
-async def chat(key: str, ms: List[Message]):
+async def chat_key(key: str, ms: List[Message]):
     p: Profile = manager.get(key)
     if not p:
         raise fastapi.HTTPException(404)
@@ -95,8 +101,37 @@ async def chat(key: str, ms: List[Message]):
     return content
 
 
+@app.post("/api/chat/")
+async def chat(ms: List[Message]):
+    ms = to_message(ms)
+    log.info(ms)
+
+    content = await llm.chat(ms)
+    log.info(content)
+
+    mongo.history.push(Snapshot(prompt=ms, response=content))
+    return content
+
+
 @app.get("/api/profile")
 def list_profile(refresh: bool = False):
     if refresh:
         manager.reload()
     return dict(keys=manager.keys())
+
+
+@app.post("/api/iteration")
+def get_iteration(
+    iters: List[Iteration],
+    name: str,
+):
+    project = IterationProject(name=name, iters=iters)
+    mongo.iteration.push(project)
+
+
+@app.get("/api/iteration")
+def get_iteration(name: str):
+    res = mongo.iteration.get(name)
+    if not res:
+        raise fastapi.HTTPException(404)
+    return res

@@ -2,11 +2,12 @@ import fastapi
 import loguru
 
 from promptly.manager.memory import CaseManager
+from promptly.manager.mongo import MongoCaseManager
 from promptly.model.case import Case
 from promptly.server.app import app, mongo
 
 log = loguru.logger
-manager = mongo.case
+manager: MongoCaseManager = mongo.case
 
 
 @app.get("/api/case")
