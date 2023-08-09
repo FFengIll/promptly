@@ -11,16 +11,16 @@
             <a-col :span="12">
                 <a-card title="Prompt Snapshot">
                     <a-typography-text>
-                        Source: {{ store.debugSource }}
+                        Source: {{ store.source.name }}
                     </a-typography-text>
-                    <a-button @click="gotoSource(store.debugSource)"> Go To Source</a-button>
+                    <a-button @click="gotoSource(store.source.name)"> Go To Source</a-button>
                     <a-divider></a-divider>
                     <a-space>
                         <a-button @click="sendBack('')">Write Back</a-button>
                     </a-space>
                     <a-divider></a-divider>
                     <a-space direction="vertical" :style="{ width: '100%' }">
-                        <div v-for="item in store.debug" :key="item.id">
+                        <div v-for="item in store.source.messages" :key="item.id">
                             <span :style="{ color: 'blue' }">{{ item.role }} </span><span>:&nbsp;</span>
                             <span>
                                 <a-textarea v-model:value="item.content" :auto-size="{ maxRows: 3 }">
@@ -55,7 +55,7 @@
 
                 <!-- show dataset info -->
                 <a-card title="Case List">
-                    <a-button @click="listCase(True)">Refresh</a-button>
+                    <a-button @click="listCase(true)">Refresh</a-button>
 
                     <!-- case select -->
                     Select Case to Debug:&nbsp;&nbsp;
@@ -89,7 +89,7 @@
                             <span>
                                 <a-button @click="debugOne(record)">Request</a-button>
                                 <a-button @click="sendBack(record.source)">Send Back</a-button>
-                                <a-button @click="gotoSource(store.debugSource)"> Go To Source</a-button>
+                                <a-button @click="gotoSource(store.source.name)"> Go To Source</a-button>
 
                             </span>
                         </template>
@@ -151,7 +151,7 @@ const result = ref(
 )
 
 const config = ref({
-    id: 1,
+    id: "",
     data: ["1", "2"],
     description: "description"
 
@@ -197,14 +197,14 @@ interface Params {
 
 function sendBack(source: string) {
 
-    let res = store.debug.map(item => {
+    let res = store.source.messages.map(item => {
         let copied = {...item};
         copied.content = copied.content.replace('{{}}', source)
         console.log(copied)
         return copied
     })
 
-    api.apiProfileKeyPost(res, store.debugSource)
+    api.apiProfileKeyPost(res, store.source.name)
         .then(
             response => {
                 console.log(response)
@@ -222,7 +222,7 @@ function gotoSource(source: string) {
 async function debugOne(params: Params) {
     console.log(params)
 
-    var res = store.debug.filter(item => {
+    var res = store.source.messages.filter(item => {
         return item.enable == true
     })
     let body: DebugRequestBody = {
@@ -240,7 +240,7 @@ async function debugOne(params: Params) {
 
 
 async function debugAll() {
-    var res = store.debug.map(item => item)
+    var res = store.source.messages.map(item => item)
 
     if (useCase.value) {
         await api.apiDebugCasePost(res, config.value.id,).then(
@@ -266,7 +266,7 @@ async function listCase(refresh: boolean) {
     )
 }
 
-async function getCase(id: number) {
+async function getCase(id: string) {
     await api.apiCaseKeyGet(id).then((response) => {
         config.value = response.data
 
