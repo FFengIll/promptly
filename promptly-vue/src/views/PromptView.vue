@@ -38,16 +38,6 @@
             All
           </a-button>
 
-          <a-divider>
-            <a-space>
-              <a-button @click="() => data.profile.messages.unshift({})">
-                <template #icon>
-                  <PlusOutlined/>
-                </template>
-              </a-button>
-            </a-space>
-
-          </a-divider>
 
           <div>
             <PromptInput :messages="data.profile.messages"
@@ -59,6 +49,17 @@
 
             </PromptInput>
           </div>
+
+          <a-divider>
+            <a-space>
+              <a-button @click="() => data.profile.messages.push({})">
+                <template #icon>
+                  <PlusOutlined/>
+                </template>
+              </a-button>
+            </a-space>
+
+          </a-divider>
 
         </a-card>
 
@@ -99,7 +100,8 @@
               <a-button @click="chat">Chat</a-button>
               <a-button @click="snapshot">Snapshot</a-button>
               <a-button @click="reload">Reload</a-button>
-              <a-button @click="goToDebug">Go To Debug</a-button>
+              <a-button @click="gotoDebug">Goto Debug</a-button>
+              <a-button @click="gotoIteration">Goto Iteration</a-button>
               <a-button @click="openNotification('test', 'info')">Notice</a-button>
             </a-space>
 
@@ -138,6 +140,7 @@ import {notification} from 'ant-design-vue';
 import type {Message, PromptItem, Snapshot} from "../../sdk";
 import PromptCard from '../components/PromptCard.vue';
 import PromptInput from "@/components/PromptInput.vue";
+import {ApiFactory} from "@/scripts/api";
 
 const [notification_api, contextHolder] = notification.useNotification();
 
@@ -145,10 +148,7 @@ const [notification_api, contextHolder] = notification.useNotification();
 const store = useSnapshotStore()
 const router = useRouter()
 const {text, copy, copied, isSupported} = useClipboard({})
-
-
-const api = DefaultApiFactory(undefined, "http://localhost:8000")
-
+const api = ApiFactory()
 
 // field
 
@@ -198,7 +198,12 @@ function deletePrompt(order: number) {
   ms.forEach((elem, index) => elem.order = index)
 }
 
-function goToDebug() {
+function gotoIteration() {
+  store.sendToIteration(data.value.profile.messages, key.value,)
+  router.push('/view/iteration')
+}
+
+function gotoDebug() {
   store.sendToDebug(data.value.profile.messages, key.value,)
   router.push('/view/debug')
 }
@@ -249,7 +254,7 @@ function addPrompt(id: number, content: string) {
   })
 
   data.value.profile.messages.splice(
-      index + 1,
+      index,
       0,
       {role: "user", id: max_id + 1, enable: true, content: content, order: order, history: []}
   )
