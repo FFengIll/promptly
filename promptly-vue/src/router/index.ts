@@ -1,7 +1,4 @@
-import PromptViewVue from '@/views/PromptView.vue'
-import {createRouter, createWebHistory} from 'vue-router'
-import DebugView from "@/views/DebugView.vue";
-import IterationView from "@/views/IterationView.vue";
+import {createRouter, createWebHistory} from 'vue-router';
 
 const router = createRouter({
     history: createWebHistory(import.meta.env.BASE_URL),
@@ -9,33 +6,32 @@ const router = createRouter({
         {
             path: '/',
             name: 'index',
-            redirect: '/view/profile',
+            redirect: '/view/index',
         },
         {
-            path: '/view/profile',
-            name: 'profile',
+            path: '/view/index',
+            name: 'prompt index',
             props: true,
-            component: () => import('../views/ProfileView.vue')
+            component: () => import('../views/IndexView.vue')
         },
         {
-            path: '/view/prompt/:key',
-            name: 'prompt',
-            component: PromptViewVue,
-            // props: route => ({ key: route.query.key }),
-            props: true
+            path: '/view/prompt/:key/advance',
+            name: 'prompt (advance)',
+            component: () => import('../views/AdvanceView.vue'),
+            props: route => ({key: route.query.key}),
 
         },
         {
-            path: '/view/debug',
-            name: 'debug',
-            component: DebugView,
+            path: '/view/test',
+            name: 'prompt test',
+            component: () => import('../views/TestingView.vue'),
             props: true,
         },
         {
-            path: '/view/iteration',
-            name: 'iteration',
-            component: IterationView,
-            // props: true,
+            path: '/view/prompt/:key',
+            name: 'prompt dev',
+            component: () => import('../views/CommitView.vue'),
+            props: route => ({key: route.query.key})
         },
         {
             path: '/about',
