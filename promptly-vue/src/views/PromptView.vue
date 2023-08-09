@@ -17,7 +17,7 @@
                         <a-space direction="horizontal" align="baseline" v-for="h in data.profile.history">
                             <a-button @click="copy(h)">
                                 <template #icon>
-                                    <CopyOutlined/>
+                                    <CopyOutlined />
                                 </template>
                             </a-button>
                             <p>{{ h }}</p>
@@ -40,12 +40,9 @@
 
 
                     <div>
-                        <PromptInput :messages="data.profile.messages"
-                                     @order-up="id =>order(id,-1)"
-                                     @order-down="id =>order(id,1)"
-                                     @remove="id =>deletePrompt(id)"
-                                     @add="id =>addPrompt(id,'')"
-                        >
+                        <PromptInput :messages="data.profile.messages" @order-up="id => order(id, -1)"
+                            @order-down="id => order(id, 1)" @remove="id => deletePrompt(id)"
+                            @add="id => addPrompt(id, '')">
 
                         </PromptInput>
                     </div>
@@ -54,7 +51,7 @@
                         <a-space>
                             <a-button @click="() => data.profile.messages.push({})">
                                 <template #icon>
-                                    <PlusOutlined/>
+                                    <PlusOutlined />
                                 </template>
                             </a-button>
                         </a-space>
@@ -90,33 +87,45 @@
                 </a-collapse>
 
 
-                <a-card title="Prompt Preview">
-                    <PromptCard :messages="data.profile.messages.filter((i) => i.enable)"></PromptCard>
-                </a-card>
+                <a-collapse>
+
+                    <a-collapse-panel header="Prompt Preview">
+                        <PromptCard :messages="data.profile.messages.filter((i) => i.enable)"></PromptCard>
+                    </a-collapse-panel>
+                </a-collapse>
+
 
                 <a-card title="Operation">
                     <a-space direction="vertical">
                         <a-space direction="horizontal">
-                            <a-button @click="chat">Chat</a-button>
+                            <a-button @click="chat">Request</a-button>
                             <a-button @click="snapshot">Snapshot</a-button>
                             <a-button @click="reload">Reload</a-button>
                             <a-button @click="gotoDebug">Goto Debug</a-button>
                             <a-button @click="gotoIteration">Goto Iteration</a-button>
-                            <a-button @click="openNotification('test', 'info')">Notice</a-button>
                         </a-space>
 
-                        <a-space direction="horizontal">
-                            <a-button @click="sendToPrompt">Send To Prompt</a-button>
-                            <a-button>Good</a-button>
-                            <a-button>Bad</a-button>
-                        </a-space>
+
                     </a-space>
                 </a-card>
 
                 <a-card title="Corresponding Response">
 
+                    <a-space direction="horizontal">
+                        <a-button>Good</a-button>
+                        <a-button>Bad</a-button>
+                    </a-space>
+
+                    <a-divider type="vertical"></a-divider>
+
+                    <a-space>
+                        <a-button @click="sendToPrompt">Append to prompt</a-button>
+                    </a-space>
+
+                    <a-divider></a-divider>
+
                     <a-textarea v-model:value="data.response" :auto-size="{ minRows: 20 }"
-                                placeholder="textarea with clear icon" allow-clear/>
+                        placeholder="textarea with clear icon" allow-clear />
                 </a-card>
 
             </a-col>
@@ -125,29 +134,28 @@
 </template>
 
 <script lang="ts" setup>
-import {useClipboard} from '@vueuse/core';
-import {ref} from 'vue';
+import { useClipboard } from '@vueuse/core';
+import { ref } from 'vue';
 
-import {CopyOutlined, PlusOutlined} from '@ant-design/icons-vue';
+import { CopyOutlined, PlusOutlined } from '@ant-design/icons-vue';
 
-import {useRoute, useRouter} from 'vue-router';
-import {DefaultApiFactory} from '../../sdk/apis/default-api';
+import { useRoute, useRouter } from 'vue-router';
 
-import {useSnapshotStore} from '@/stores/snapshot';
+import { useSnapshotStore } from '@/stores/snapshot';
 
-import type {NotificationPlacement} from "ant-design-vue";
-import {notification} from 'ant-design-vue';
-import type {Message, PromptItem, Snapshot} from "../../sdk";
-import PromptCard from '../components/PromptCard.vue';
 import PromptInput from "@/components/PromptInput.vue";
-import {ApiFactory} from "@/scripts/api";
+import { ApiFactory } from "@/scripts/api";
+import type { NotificationPlacement } from "ant-design-vue";
+import { notification } from 'ant-design-vue';
+import type { Message, PromptItem, Snapshot } from "../../sdk";
+import PromptCard from '../components/PromptCard.vue';
 
 const [notification_api, contextHolder] = notification.useNotification();
 
 // use
 const store = useSnapshotStore()
 const router = useRouter()
-const {text, copy, copied, isSupported} = useClipboard({})
+const { text, copy, copied, isSupported } = useClipboard({})
 const api = ApiFactory()
 
 // field
@@ -155,7 +163,7 @@ const api = ApiFactory()
 const key = ref<string>("")
 const history = ref<any>([{
     messages: [
-        {id: 1, role: "角色1", content: "内容1", enable: true, order: 0},
+        { id: 1, role: "角色1", content: "内容1", enable: true, order: 0 },
     ],
     response: ""
 }])
@@ -166,13 +174,13 @@ const data = ref({
         payload: "",
         "history": ["1"],
         "messages": [
-            {id: 1, role: "角色1", content: "内容1", enable: true, order: 0, history: []},
+            { id: 1, role: "角色1", content: "内容1", enable: true, order: 0, history: [] },
             // 其他数据项
         ],
         "snapshots": [
             {
                 "prompt": [
-                    {role: 'user', content: 'snapshot'}
+                    { role: 'user', content: 'snapshot' }
                 ],
                 "response": ""
             }
@@ -231,13 +239,13 @@ function snapshot() {
     data.value.profile.messages.forEach(
         (item: Message): any => {
             if (item.enable) {
-                let res: PromptItem = {role: item.role, content: item.content}
+                let res: PromptItem = { role: item.role, content: item.content }
                 prompt.push(res)
             }
 
         }
     )
-    let snapshot: Snapshot = {prompt: prompt, response: data.value.response}
+    let snapshot: Snapshot = { prompt: prompt, response: data.value.response }
     api.apiProfileKeySnapshotPost(snapshot, key.value,).then(() => {
 
     })
@@ -256,7 +264,7 @@ function addPrompt(id: number, content: string) {
     data.value.profile.messages.splice(
         index,
         0,
-        {role: "user", id: max_id + 1, enable: true, content: content, order: order, history: []}
+        { role: "user", id: max_id + 1, enable: true, content: content, order: order, history: [] }
     )
 
     data.value.profile.messages.forEach((elem, index) => {

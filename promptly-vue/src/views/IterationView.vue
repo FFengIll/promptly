@@ -1,37 +1,32 @@
 <script setup lang="ts">
-import {ref} from "vue";
-import type {Iteration, Message} from "../../sdk";
 import PromptInput from "@/components/PromptInput.vue";
-import {ApiFactory} from "@/scripts/api";
-import {useSnapshotStore} from "@/stores/snapshot";
 import router from "@/router";
+import { ApiFactory } from "@/scripts/api";
+import { useSnapshotStore } from "@/stores/snapshot";
+import { storeToRefs } from "pinia";
+import { ref } from "vue";
+import type { Iteration } from "../../sdk";
 
 const api = ApiFactory()
 const store = useSnapshotStore()
 
 const autoSave = ref<boolean>(true)
-const key = ref<string>(store.source.name.toString())
+const { source } = storeToRefs(store)
+const key = ref(source.value.name)
+
 const data = ref<Iteration[]>(
     [
-        {
-            response: "Hi!",
-            messages: <Message[]>[
-                {
-                    role: 'user',
-                    content: "hello",
-                    enable: true
-                }
-            ]
-        }
+
     ]
 )
 
-getIteration(key.value)
+console.log("store source", source.value)
 
-function getIteration(name: string) {
-    api.apiIterationGet(name).then(
+getIteration(source.value.name)
+
+async function getIteration(name: string) {
+    await api.apiIterationGet(name).then(
         response => {
-            key.value = response.data.name
             data.value = response.data.iters.filter(item => item.messages.length > 0)
             console.log(data.value)
 
@@ -40,9 +35,11 @@ function getIteration(name: string) {
         console.log(error)
     })
 
-    // if (store.source.messages.length > 0) {
-    //     data.value.push(store.source)
-    // }
+    console.log(store.source)
+
+    if (store.source.messages.length > 0) {
+        data.value.unshift(store.source)
+    }
 
 }
 
@@ -88,41 +85,57 @@ function dropIteration(index: number) {
     data.value.splice(index, 1)
 }
 
+async function writeSource(iter: Iteration) {
+    let res = iter.messages.map(item => {
+        let copied = { ...item };
+        return copied
+    })
+
+    await api.apiProfileKeyPost(res, store.source.name)
+        .then(
+            response => {
+                console.log(response)
+            }
+        )
+        .catch(error => {
+            console.error(error)
+        })
+}
+
 </script>
 
 <template>
-    <a-row :gutter="[16,16]">
+    <a-row :gutter="[16, 16]">
         <a-col :span="24" class="gutter-row">
             <a-space direction="horizontal">
                 <a-input-group compact>
-                    <a-input v-model:value="key" style="width: 100px"/>
+                    <a-input v-model:value="key" style="width: 100px" />
                     <a-button type="primary" @click="getIteration(key)">Get</a-button>
                     <a-button type="primary" @click="saveIteration(key, data)">Save</a-button>
                 </a-input-group>
                 <a-checkbox v-model:checked="autoSave">Auto Save</a-checkbox>
-                <a-button @click="nextIteration( data[0])">Next</a-button>
+                <a-button @click="router.push(`/view/prompt/${key}`)">Goto Source</a-button>
             </a-space>
         </a-col>
     </a-row>
-    <a-row :gutter="[16,16]">
-        <a-col :span="8" v-for="(prompt,index) in data" align="center" :key="index">
+    <a-row :gutter="[16, 16]">
+        <a-col :span="8" v-for="(prompt, index) in data" align="center" :key="index">
             <a-card>
                 <!--        response-->
-                <a-textarea v-model:value="prompt.response"
-                            :auto-size="{ minRows: 5 ,maxRows:10 }"
-                >
+                <a-textarea v-model:value="prompt.response" :auto-size="{ minRows: 5, maxRows: 10 }">
 
                 </a-textarea>
 
                 <!--        button-->
                 <a-button @click="doChat(prompt)">Request</a-button>
-                <a-button @click="gotoDebug(prompt)">Go To Debug</a-button>
+                <a-button @click="gotoDebug(prompt)">Goto Debug</a-button>
+                <a-button @click="writeSource(prompt)">Write Source</a-button>
                 <a-button @click="nextIteration(prompt)">Next</a-button>
                 <a-button @click="dropIteration(index)">Drop</a-button>
 
 
                 <!--        prompt-->
-                <PromptInput :messages="prompt.messages" mode="simple">
+                <PromptInput :messages="prompt.messages" mode="simple" with-copy>
 
                 </PromptInput>
 
@@ -133,6 +146,4 @@ function dropIteration(index: number) {
     </a-row>
 </template>
 
-<style>
-
-</style>
+<style></style>
