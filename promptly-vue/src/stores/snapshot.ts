@@ -1,24 +1,21 @@
-import { useLocalStorage } from '@vueuse/core';
-import { defineStore } from 'pinia';
-import type { Message } from '../../sdk/models';
+import {useLocalStorage} from '@vueuse/core';
+import {defineStore} from 'pinia';
+import type {Argument, Message} from '../../sdk/models';
 
 export const useSnapshotStore = defineStore('snapshot', {
-    getters: {
-
-    },
+    getters: {},
 
     state: () => ({
         source: useLocalStorage('source',
             {
                 name: "",
-                messages: <Message[]>[
-
-                ]
+                messages: <Message[]>[],
+                args: <Argument[]>[]
             }),
     })
     ,
     actions: {
-        sendSource(ms: Message[], source: string) {
+        sendSource(source: string, ms: Message[], args: Argument[]) {
             var res = ms.filter(item => {
                 return item.enable
             });
@@ -31,20 +28,5 @@ export const useSnapshotStore = defineStore('snapshot', {
                 }
             )
         },
-
-        // sendToCompareLeft(ms: Message[]) {
-        //     // var res  = ms.filter(item => {
-        //     //     return item.enable
-        //     // });
-        //     var res = ms
-        //     this.compare.right.messages = res
-        // },
-        // sendToCompareRight(ms: Message[]) {
-        //     // var res  = ms.filter(item => {
-        //     //     return item.enable
-        //     // });
-        //     var res = ms
-        //     this.compare.right.messages = res
-        // },
     },
 })
