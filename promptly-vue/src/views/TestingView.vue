@@ -204,7 +204,7 @@ function sendBack(source: string) {
         return copied
     })
 
-    api.apiProfileKeyPost(res, store.source.name)
+    api.apiPromptKeyPost(res, store.source.name)
         .then(
             response => {
                 console.log(response)
@@ -229,7 +229,7 @@ async function debugOne(params: Params) {
         messages: res,
         source: params.source
     }
-    await api.apiDebugSourcePost(body).then(
+    await api.apiTestingSourcePost(body).then(
         (response) => {
             let element = response.data[0]
             element.id = params.id
@@ -243,13 +243,13 @@ async function debugAll() {
     var res = store.source.messages.map(item => item)
 
     if (useCase.value) {
-        await api.apiDebugCasePost(res, config.value.id,).then(
+        await api.apiTestingCasePost(res, config.value.id,).then(
             (response) => {
                 result.value = result.value.concat(response.data)
             }
         )
     } else {
-        await api.apiDebugLoopPost(res, loopCount.value).then(
+        await api.apiTestingLoopPost(res, loopCount.value).then(
             (response) => {
                 result.value = result.value.concat(response.data)
             }
