@@ -3,7 +3,7 @@ from pymongo.collection import Collection
 
 from promptly.manager.base import BaseProfileManager, BaseCaseManager
 from promptly.model.case import Case
-from promptly.model.profile import Profile, Snapshot
+from promptly.model.profile import Profile, Snapshot, IterationProject
 
 
 class MongoManager():
@@ -11,13 +11,38 @@ class MongoManager():
         self.client = client
         self.db = client["promptly"]
 
-        self.profile = MongoProfileManger(self.db["profile"])
-        self.case = MongoCaseManager(self.db["case"])
-        self.history = MongoHistoryManager(self.db['history'])
+        self.profile:MongoProfileManger = MongoProfileManger(self.db["profile"])
+        self.case:MongoCaseManager = MongoCaseManager(self.db["case"])
+        self.history :MongoHistoryManager= MongoHistoryManager(self.db['history'])
+        self.iteration:MongoIterationManager = MongoIterationManager(self.db['iteration'])
 
     def reload(self):
         self.case.reload()
         self.profile.reload()
+
+class MongoIterationManager:
+    def __init__(self,col: Collection):
+
+        self.collection = col
+
+        self.index = set()
+
+    def push (self, project:IterationProject):
+        for it in project.iters:
+            for m in it.messages:
+                m.id = 0
+        
+        self.collection.update_one(
+            dict(name=project.name),
+            {'$set':project.dict()},
+            upsert=True
+        )
+
+    def get(self,name:str):
+        res = self.collection.find_one(dict(name= name))
+        if res:
+            return IterationProject(**res)
+        return None
 
 class MongoCaseManager(BaseCaseManager):
     def __init__(self, col: Collection):
