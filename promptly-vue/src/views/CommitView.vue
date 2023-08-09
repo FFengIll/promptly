@@ -1,28 +1,29 @@
 <script setup lang="ts">
 import PromptInput from "@/components/PromptInput.vue";
 import router from "@/router";
-import {ApiFactory} from "@/scripts/api";
-import {RouteHelper} from "@/scripts/router";
-import {format} from "@/scripts/template";
-import {useSnapshotStore} from "@/stores/snapshot";
-import {PlusOutlined, SyncOutlined} from "@ant-design/icons-vue";
-import {storeToRefs} from "pinia";
-import type {Argument, CommitRequest, Message} from "sdk/models";
-import {ref} from "vue";
-import type {Commit} from "../../sdk";
+import { ApiFactory } from "@/scripts/api";
+import { RouteHelper } from "@/scripts/router";
+import { format } from "@/scripts/template";
+import { useSnapshotStore } from "@/stores/snapshot";
+import { PlusOutlined, SyncOutlined } from "@ant-design/icons-vue";
+import { storeToRefs } from "pinia";
+import type { Argument, CommitRequest, Message } from "sdk/models";
+import { ref } from "vue";
+import { useRoute } from 'vue-router';
+import type { Commit } from "../../sdk";
 
 //
 const api = ApiFactory()
 const store = useSnapshotStore()
 
-//
-const props = defineProps<{
-    key: string,
-}>()
+// 
+const route = useRoute()
+console.log(route)
+const key = ref<string>(route.params.key.toString())
 
 //
 const autoSave = ref<boolean>(true)
-const {source} = storeToRefs(store)
+const { source } = storeToRefs(store)
 
 const commits = ref<Commit[]>(
     []
@@ -37,6 +38,8 @@ console.log("store source", source.value)
 getCommit(source.value.name)
 
 async function getCommit(name: string) {
+
+
     await api.apiCommitGet(name).then(
         response => {
             console.log('request', response.data)
@@ -54,17 +57,28 @@ async function getCommit(name: string) {
 
     console.log(store.source)
 
-    if (store.source.messages.length > 0) {
-        commits.value.unshift(store.source)
-    }
+    if (commits.value.length <= 0) {
+        await api.apiPromptKeyGet(name).then(
+            response => {
+                console.log('request', response.data)
 
+                commits.value = [
+                    {
+                        messages: response.data.messages
+                    }
+                ]
+            }
+        ).catch(error => {
+            console.log(error)
+        })
+    }
 }
 
 async function doCommit(ref) {
     let another = JSON.parse(JSON.stringify(ref))
     another.response = ""
 
-    await saveCommit(props.key, commits.value)
+    await saveCommit(key.value, commits.value)
 
     commits.value.unshift(another)
 }
@@ -72,10 +86,6 @@ async function doCommit(ref) {
 
 async function doChat(it: Commit) {
     commits.value[0].response = ""
-
-    // if (autoSave) {
-    //     await saveIteration(props.key, commits.value, args.value)
-    // }
 
     console.log(it.messages)
 
@@ -102,8 +112,21 @@ function gotoTest(it: Commit, args: Argument[]) {
 
 async function saveCommit(key: string, data: Commit[],) {
     let req: CommitRequest = {
-        iters: data,
+        commits: data,
         args: []
+    }
+
+    await api.apiCommitPost(req, key).then(
+        response => {
+            console.log("success")
+        }
+    )
+}
+
+async function saveArgument(key: string, args: Argument[]) {
+    let req: CommitRequest = {
+        commits: [],
+        args: args
     }
 
     await api.apiCommitPost(req, key).then(
@@ -132,7 +155,7 @@ function dropCommit(index: number) {
 }
 
 function newArg() {
-    args.value.push({key: '', value: ''})
+    args.value.push({ key: '', value: '' })
 }
 
 function cleanArgs() {
@@ -142,11 +165,13 @@ function cleanArgs() {
 
 async function gotoAdvance(iter: Commit) {
     let res = iter.messages.map(item => {
-        let copied = {...item};
+        let copied = { ...item };
         return copied
     })
 
-    await api.apiPromptKeyPost(res, store.source.name)
+    let name = key.value
+
+    await api.apiPromptKeyPost(res, name)
         .then(
             response => {
                 console.log(response)
@@ -156,7 +181,7 @@ async function gotoAdvance(iter: Commit) {
             console.error(error)
         })
 
-    RouteHelper.toAdvance(store.source.name)
+    RouteHelper.toAdvance(name)
 }
 
 </script>
@@ -193,12 +218,12 @@ async function gotoAdvance(iter: Commit) {
         <a-col>
             <a-button @click="newArg()">
                 <template #icon>
-                    <PlusOutlined/>
+                    <PlusOutlined />
                 </template>
             </a-button>
             <a-button @click="cleanArgs()">
                 <template #icon>
-                    <SyncOutlined/>
+                    <SyncOutlined />
                 </template>
             </a-button>
         </a-col>
@@ -207,12 +232,12 @@ async function gotoAdvance(iter: Commit) {
         <a-col :span="24" class="gutter-row">
             <a-space direction="horizontal">
                 <a-input-group compact>
-                    <a-input v-model:value="props.key" style="width: 100px"/>
+                    <a-input v-model:value="key" style="width: 100px" />
                     <a-button type="primary" @click="getCommit(key)">Get</a-button>
                     <a-button type="primary" @click="saveIteration(key, commits, args)">Save</a-button>
                 </a-input-group>
                 <a-checkbox v-model:checked="autoSave">Auto Save</a-checkbox>
-                <a-button @click="gotoAdvance(props.key)">Goto Advance</a-button>
+                <a-button @click="gotoAdvance(key)">Goto Advance</a-button>
             </a-space>
         </a-col>
     </a-row>
