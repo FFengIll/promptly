@@ -1,6 +1,7 @@
 import PromptViewVue from '@/views/PromptView.vue'
 import {createRouter, createWebHistory} from 'vue-router'
 import DebugView from "@/views/DebugView.vue";
+import IterationView from "@/views/IterationView.vue";
 
 const router = createRouter({
     history: createWebHistory(import.meta.env.BASE_URL),
@@ -29,6 +30,12 @@ const router = createRouter({
             name: 'debug',
             component: DebugView,
             props: true,
+        },
+        {
+            path: '/view/iteration',
+            name: 'iteration',
+            component: IterationView,
+            // props: true,
         },
         {
             path: '/about',
