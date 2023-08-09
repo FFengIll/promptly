@@ -2,8 +2,10 @@ from typing import List
 
 import fastapi
 import loguru
+from pydantic import BaseModel, Field
 
 from promptly.model.profile import (
+    ArgItem,
     Iteration,
     IterationProject,
     Message,
@@ -119,12 +121,17 @@ def list_profile(refresh: bool = False):
     return dict(keys=manager.keys())
 
 
+class IterationRequest(BaseModel):
+    iters: List[Iteration]
+    args: List[ArgItem]
+
+
 @app.post("/api/iteration")
 def get_iteration(
-    iters: List[Iteration],
+    req: IterationRequest,
     name: str,
 ):
-    project = IterationProject(name=name, iters=iters)
+    project = IterationProject(name=name, iters=req.iters, args=req.args)
     mongo.iteration.push(project)
 
 

@@ -56,10 +56,18 @@ class Iteration(BaseModel):
     response: str = ""
 
 
+
+class ArgItem(BaseModel):
+    key: str
+    value: str
+
+
+
 @autocomplete
 class IterationProject(BaseModel):
     name: str
     iters: List[Iteration] = Field(default_factory=list)
+    args: List[ArgItem] = Field(default_factory=list)
 
 
 @autocomplete
