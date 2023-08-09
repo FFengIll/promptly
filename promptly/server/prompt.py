@@ -122,7 +122,7 @@ def list_prompt(refresh: bool = False):
 
 
 class CommitRequest(BaseModel):
-    iters: List[Commit]
+    commits: List[Commit]
     args: List[Argument]
 
 
@@ -131,7 +131,7 @@ def do_commit(
     req: CommitRequest,
     name: str,
 ):
-    project = Project(name=name, iters=req.iters, args=req.args)
+    project = Project(name=name, iters=req.commits, args=req.args)
     mongo.commit.push(project)
 
 
