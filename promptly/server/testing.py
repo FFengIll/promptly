@@ -3,20 +3,25 @@ from typing import List
 
 import fastapi
 import loguru
-from promptly.server.llm import to_message
 from pydantic import BaseModel
 
 from promptly.model.case import CaseResult
-from promptly.model.profile import Message, Snapshot
+from promptly.model.prompt import Message, Snapshot
 from promptly.server import llm
 from promptly.server.app import app
 from promptly.server.app import mongo
+from promptly.server.llm import to_message
 
 log = loguru.logger
 
 
-@app.post("/api/debug/loop")
-async def debug(count: int, messages: List[Message]):
+class DebugRequestBody(BaseModel):
+    source: str
+    messages: List[Message]
+
+
+@app.post("/api/testing/loop")
+async def do_test(count: int, messages: List[Message]):
     res = []
     for idx in range(count):
         ms = to_message(messages)
@@ -30,7 +35,7 @@ async def debug(count: int, messages: List[Message]):
     return res
 
 
-async def batch_debug(messages, data):
+async def batch_test(messages, data):
     res = []
     for idx, source in enumerate(data):
         replaced_ms = copy.deepcopy(messages)
@@ -50,25 +55,20 @@ async def batch_debug(messages, data):
     return res
 
 
-class DebugRequestBody(BaseModel):
-    source: str
-    messages: List[Message]
-
-
-@app.post("/api/debug/source")
-async def debug(body: DebugRequestBody):
+@app.post("/api/testing/source")
+async def run_test_with_source(body: DebugRequestBody):
     source: str = body.source
     messages: List[Message] = body.messages
     data = [source]
 
-    return await batch_debug(messages, data)
+    return await batch_test(messages, data)
 
 
-@app.post("/api/debug/case")
-async def debug(name: str, messages: List[Message]):
+@app.post("/api/testing/case")
+async def run_test_with_case(name: str, messages: List[Message]):
     case = mongo.case.get(name)
     if not case:
         raise fastapi.HTTPException(404)
     data = case.data
 
-    return await batch_debug(messages, data)
+    return await batch_test(messages, data)

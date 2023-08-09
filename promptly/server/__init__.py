@@ -1,6 +1,5 @@
 from . import case
-from . import debug
-from . import view
+from . import testing
 from . import prompt
 
 # keep it at last

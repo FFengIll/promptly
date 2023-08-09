@@ -4,7 +4,7 @@ from typing import List
 import loguru
 from httpx import AsyncClient
 
-from promptly.model.profile import Message
+from promptly.model.prompt import Message
 from promptly.openai.config import key, url
 
 log = loguru.logger

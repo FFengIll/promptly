@@ -4,10 +4,10 @@ import fastapi
 import loguru
 from pydantic import BaseModel, Field
 
-from promptly.model.profile import (
-    ArgItem,
-    Iteration,
-    IterationProject,
+from promptly.model.prompt import (
+    Argument,
+    Commit,
+    Project,
     Message,
     Profile,
     Snapshot,
@@ -18,7 +18,7 @@ from promptly.server.llm import to_message
 
 log = loguru.logger
 
-manager = mongo.profile
+manager = mongo.prompt
 
 
 @app.on_event("shutdown")
@@ -26,7 +26,7 @@ def shutdown_event():
     pass
 
 
-@app.post("/api/profile/{key}/snapshot")
+@app.post("/api/prompt/{key}/snapshot")
 def add_snapshot(key: str, snapshot: Snapshot):
     p = manager.get(key)
 
@@ -35,8 +35,8 @@ def add_snapshot(key: str, snapshot: Snapshot):
     return manager.get(key).snapshots
 
 
-@app.put("/api/profile/{key}")
-def create_profile(key: str):
+@app.put("/api/prompt/{key}")
+def create_prompt(key: str):
     if manager.get(key):
         log.warning("existed profile")
         return
@@ -47,7 +47,7 @@ def create_profile(key: str):
     return
 
 
-@app.get("/api/profile/{key}/snapshot")
+@app.get("/api/prompt/{key}/snapshot")
 def get_snapshot(key: str):
     p = manager.get(key)
     if p:
@@ -55,7 +55,7 @@ def get_snapshot(key: str):
     raise fastapi.HTTPException(status_code=404)
 
 
-@app.get("/api/profile/{key}")
+@app.get("/api/prompt/{key}")
 def load_profile(key: str):
     profile = manager.get(key=key)
     if not profile:
@@ -63,7 +63,7 @@ def load_profile(key: str):
     return profile.dict()
 
 
-@app.post("/api/profile/{key}")
+@app.post("/api/prompt/{key}")
 def update_profile(key: str, update: List[Message]):
     p = manager.get(key)
     p.messages = update
@@ -75,7 +75,7 @@ def update_profile(key: str, update: List[Message]):
 
 
 @app.post("/api/chat/{key}")
-async def chat_key(key: str, ms: List[Message]):
+async def chat_with_key(key: str, ms: List[Message]):
     p: Profile = manager.get(key)
     if not p:
         raise fastapi.HTTPException(404)
@@ -114,30 +114,30 @@ async def chat(ms: List[Message]):
     return content
 
 
-@app.get("/api/profile")
-def list_profile(refresh: bool = False):
+@app.get("/api/prompt")
+def list_prompt(refresh: bool = False):
     if refresh:
         manager.reload()
     return dict(keys=manager.keys())
 
 
-class IterationRequest(BaseModel):
-    iters: List[Iteration]
-    args: List[ArgItem]
+class CommitRequest(BaseModel):
+    iters: List[Commit]
+    args: List[Argument]
 
 
-@app.post("/api/iteration")
-def get_iteration(
-    req: IterationRequest,
+@app.post("/api/commit")
+def do_commit(
+    req: CommitRequest,
     name: str,
 ):
-    project = IterationProject(name=name, iters=req.iters, args=req.args)
-    mongo.iteration.push(project)
+    project = Project(name=name, iters=req.iters, args=req.args)
+    mongo.commit.push(project)
 
 
-@app.get("/api/iteration")
-def get_iteration(name: str):
-    res = mongo.iteration.get(name)
+@app.get("/api/commit")
+def get_commit(name: str):
+    res = mongo.commit.get(name)
     if not res:
         raise fastapi.HTTPException(404)
     return res
