@@ -51,6 +51,18 @@ class Message(PromptItem):
 
 
 @autocomplete
+class Iteration(BaseModel):
+    messages: List[Message] = Field(default_factory=list)
+    response: str = ""
+
+
+@autocomplete
+class IterationProject(BaseModel):
+    name: str
+    iters: List[Iteration] = Field(default_factory=list)
+
+
+@autocomplete
 class Profile(BaseModel):
     name: str = Field(default="")
     messages: List[Message] = Field(default_factory=list)
