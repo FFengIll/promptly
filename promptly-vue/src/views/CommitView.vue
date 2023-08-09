@@ -1,45 +1,48 @@
 <script setup lang="ts">
 import PromptInput from "@/components/PromptInput.vue";
 import router from "@/router";
-import { ApiFactory } from "@/scripts/api";
-import { format } from "@/scripts/template";
-import { useSnapshotStore } from "@/stores/snapshot";
-import { PlusOutlined, SyncOutlined } from "@ant-design/icons-vue";
-import { storeToRefs } from "pinia";
-import type { ArgItem, IterationRequest, Message } from "sdk/models";
-import { ref } from "vue";
-import type { Iteration } from "../../sdk";
+import {ApiFactory} from "@/scripts/api";
+import {RouteHelper} from "@/scripts/router";
+import {format} from "@/scripts/template";
+import {useSnapshotStore} from "@/stores/snapshot";
+import {PlusOutlined, SyncOutlined} from "@ant-design/icons-vue";
+import {storeToRefs} from "pinia";
+import type {Argument, CommitRequest, Message} from "sdk/models";
+import {ref} from "vue";
+import type {Commit} from "../../sdk";
 
+//
 const api = ApiFactory()
 const store = useSnapshotStore()
 
+//
+const props = defineProps<{
+    key: string,
+}>()
+
+//
 const autoSave = ref<boolean>(true)
-const { source } = storeToRefs(store)
-const key = ref(source.value.name)
+const {source} = storeToRefs(store)
 
-const data = ref<Iteration[]>(
-    [
-
-    ]
+const commits = ref<Commit[]>(
+    []
 )
 
-const args = ref<ArgItem[]>(
-    [
-
-    ]
+const args = ref<Argument[]>(
+    []
 )
 
 console.log("store source", source.value)
 
-getIteration(source.value.name)
+getCommit(source.value.name)
 
-async function getIteration(name: string) {
-    await api.apiIterationGet(name).then(
+async function getCommit(name: string) {
+    await api.apiCommitGet(name).then(
         response => {
             console.log('request', response.data)
 
-            data.value = response.data.iters.filter(item => item.messages.length > 0)
-            console.log('data', data.value)
+            commits.value = response.data.commits.filter(item => item.messages.length > 0)
+            console.log('data', commits.value)
 
             args.value = response.data.args
             console.log('args', args.value)
@@ -52,25 +55,27 @@ async function getIteration(name: string) {
     console.log(store.source)
 
     if (store.source.messages.length > 0) {
-        data.value.unshift(store.source)
+        commits.value.unshift(store.source)
     }
 
 }
 
-function nextIteration(ref) {
+async function doCommit(ref) {
     let another = JSON.parse(JSON.stringify(ref))
     another.response = ""
 
-    data.value.unshift(another)
+    await saveCommit(props.key, commits.value)
+
+    commits.value.unshift(another)
 }
 
 
-async function doChat(it: Iteration) {
-    data.value[0].response = ""
+async function doChat(it: Commit) {
+    commits.value[0].response = ""
 
-    if (autoSave) {
-        await saveIteration(key.value, data.value, args.value)
-    }
+    // if (autoSave) {
+    //     await saveIteration(props.key, commits.value, args.value)
+    // }
 
     console.log(it.messages)
 
@@ -90,36 +95,58 @@ async function doChat(it: Iteration) {
     // await api.api
 }
 
-function gotoDebug(it: Iteration) {
-    store.sendSource(it.messages, store.source.name)
+function gotoTest(it: Commit, args: Argument[]) {
+    store.sendSource(store.source.name, it.messages, args)
     router.push('/view/debug')
 }
 
-async function saveIteration(key: string, data: Iteration[], args: ArgItem[]) {
-    let req: IterationRequest = {
+async function saveCommit(key: string, data: Commit[],) {
+    let req: CommitRequest = {
         iters: data,
-        args: args
+        args: []
     }
 
-    await api.apiIterationPost(req, key).then(
+    await api.apiCommitPost(req, key).then(
         response => {
             console.log("success")
         }
     )
 }
 
-function dropIteration(index: number) {
-    console.log(index)
-    data.value.splice(index, 1)
+async function saveIteration(key: string, data: Commit[], args: Argument[]) {
+    let req: CommitRequest = {
+        iters: data,
+        args: args
+    }
+
+    await api.apiCommitPost(req, key).then(
+        response => {
+            console.log("success")
+        }
+    )
 }
 
-async function writeSource(iter: Iteration) {
+function dropCommit(index: number) {
+    console.log(index)
+    commits.value.splice(index, 1)
+}
+
+function newArg() {
+    args.value.push({key: '', value: ''})
+}
+
+function cleanArgs() {
+    args.value = args.value.filter(item => item.key != '' && item.value != '')
+    console.log(args.value)
+}
+
+async function gotoAdvance(iter: Commit) {
     let res = iter.messages.map(item => {
-        let copied = { ...item };
+        let copied = {...item};
         return copied
     })
 
-    await api.apiProfileKeyPost(res, store.source.name)
+    await api.apiPromptKeyPost(res, store.source.name)
         .then(
             response => {
                 console.log(response)
@@ -128,11 +155,8 @@ async function writeSource(iter: Iteration) {
         .catch(error => {
             console.error(error)
         })
-}
 
-function clean() {
-    args.value = args.value.filter(item => item.key != '' && item.value != '')
-    console.log(args.value)
+    RouteHelper.toAdvance(store.source.name)
 }
 
 </script>
@@ -167,16 +191,14 @@ function clean() {
             </a-list>
         </a-col>
         <a-col>
-            <a-button @click="() => {
-                args.push({ key: '', value: '' })
-            }">
+            <a-button @click="newArg()">
                 <template #icon>
-                    <PlusOutlined />
+                    <PlusOutlined/>
                 </template>
             </a-button>
-            <a-button @click="clean()">
+            <a-button @click="cleanArgs()">
                 <template #icon>
-                    <SyncOutlined />
+                    <SyncOutlined/>
                 </template>
             </a-button>
         </a-col>
@@ -185,17 +207,17 @@ function clean() {
         <a-col :span="24" class="gutter-row">
             <a-space direction="horizontal">
                 <a-input-group compact>
-                    <a-input v-model:value="key" style="width: 100px" />
-                    <a-button type="primary" @click="getIteration(key)">Get</a-button>
-                    <a-button type="primary" @click="saveIteration(key, data, args)">Save</a-button>
+                    <a-input v-model:value="props.key" style="width: 100px"/>
+                    <a-button type="primary" @click="getCommit(key)">Get</a-button>
+                    <a-button type="primary" @click="saveIteration(key, commits, args)">Save</a-button>
                 </a-input-group>
                 <a-checkbox v-model:checked="autoSave">Auto Save</a-checkbox>
-                <a-button @click="router.push(`/view/prompt/${key}`)">Goto Source</a-button>
+                <a-button @click="gotoAdvance(props.key)">Goto Advance</a-button>
             </a-space>
         </a-col>
     </a-row>
     <a-row :gutter="[16, 16]">
-        <a-col :span="8" v-for="(  prompt, index  ) in   data  " align="center" :key="index">
+        <a-col :span="8" v-for="(  prompt, index  ) in   commits  " align="center" :key="index">
             <a-card>
                 <!--        response-->
                 <a-textarea v-model:value="prompt.response" :auto-size="{ minRows: 5, maxRows: 10 }">
@@ -204,10 +226,10 @@ function clean() {
 
                 <!--        button-->
                 <a-button @click="doChat(prompt)">Request</a-button>
-                <a-button @click="gotoDebug(prompt)">Goto Debug</a-button>
-                <a-button @click="writeSource(prompt)">Write Source</a-button>
-                <a-button @click="nextIteration(prompt)">Next</a-button>
-                <a-button @click="dropIteration(index)">Drop</a-button>
+                <a-button @click="gotoTest(prompt, args)">Goto Test</a-button>
+                <a-button @click="gotoAdvance(prompt)">Goto Advance</a-button>
+                <a-button @click="doCommit(prompt)">Commit</a-button>
+                <a-button @click="dropCommit(index)">Drop</a-button>
 
 
                 <!--        prompt-->

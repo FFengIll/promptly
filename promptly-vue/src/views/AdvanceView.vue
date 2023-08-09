@@ -158,8 +158,12 @@ const router = useRouter()
 const { text, copy, copied, isSupported } = useClipboard({})
 const api = ApiFactory()
 
-// field
+// props
+const props = defineProps<{
+    key: string
+}>()
 
+// field
 const key = ref<string>("")
 const history = ref<any>([{
     messages: [
@@ -207,12 +211,12 @@ function deletePrompt(order: number) {
 }
 
 function gotoIteration() {
-    store.sendSource(data.value.profile.messages, key.value,)
+    store.sendSource(key.value, data.value.profile.messages, [])
     router.push('/view/iteration')
 }
 
 function gotoDebug() {
-    store.sendSource(data.value.profile.messages, key.value,)
+    store.sendSource(key.value, data.value.profile.messages, [])
     router.push('/view/debug')
 }
 
@@ -246,7 +250,7 @@ function snapshot() {
         }
     )
     let snapshot: Snapshot = { prompt: prompt, response: data.value.response }
-    api.apiProfileKeySnapshotPost(snapshot, key.value,).then(() => {
+    api.apiPromptKeySnapshotPost(snapshot, key.value,).then(() => {
 
     })
 }
@@ -306,7 +310,7 @@ function setContent(id: number, content: string) {
 }
 
 async function fetchProfile(key: string) {
-    api.apiProfileKeyGet(key)
+    api.apiPromptKeyGet(key)
         .then(response => {
             data.value.profile = response.data;
         })
