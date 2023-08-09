@@ -21,7 +21,8 @@ const emit = defineEmits<{
 
 
 const props = defineProps<{
-  messages: Message[]
+  messages: Message[],
+  mode?: string,
 }>()
 
 
@@ -45,10 +46,50 @@ function remove(id) {
 
 <template>
 
-  <a-card v-for="item in messages" :key="item.id" class="card">
+  <a-card v-for="item in messages" :key="item.id">
     <!-- <template #extra><a href="#">more</a></template> -->
 
     <a-row>
+      <a-divider v-if="mode!='simple'">
+        <a-space>
+          <a-button @click="add(item.id)">
+            <template #icon>
+              <PlusOutlined/>
+            </template>
+          </a-button>
+
+          <a-divider type="vertical"></a-divider>
+
+          <!-- up down the order -->
+          <a-button type="primary" shape="round" @click="orderUp  (item.id, )">
+            <template #icon>
+              <UpOutlined/>
+            </template>
+          </a-button>
+          <a-button type="primary" shape="round" @click="orderDown(item.id, )">
+            <template #icon>
+              <DownOutlined/>
+            </template>
+          </a-button>
+
+          <a-divider type="vertical"></a-divider>
+
+          <a-popconfirm title="Are you sure delete this task?" ok-text="Yes" cancel-text="No"
+                        @confirm="remove(item.order)">
+            <a-button>
+              <template #icon>
+                <CloseOutlined/>
+              </template>
+            </a-button>
+          </a-popconfirm>
+
+        </a-space>
+
+      </a-divider>
+
+    </a-row>
+    <a-row>
+
       <!-- role -->
       <a-space direction="vertical">
 
@@ -80,56 +121,16 @@ function remove(id) {
     </a-row>
     <a-row :gutter="12" align="middle">
 
-      <a-col :span="20">
+      <a-col :span='24'>
         <!-- content edit -->
-        <a-textarea v-model:value="item.content" placeholder="textarea with clear icon"
-                    allow-clear
+        <a-textarea v-model:value="item.content"
+                    :auto-size="{ minRows: 3, maxRows: 5 }"
+                    placeholder="textarea with clear icon"
         />
-
       </a-col>
 
-      <a-col :span="2">
-        <a-space direction="vertical">
-          <!-- up down the order -->
-          <a-button type="primary" shape="round" @click="orderUp  (item.id, )">
-            <template #icon>
-              <UpOutlined/>
-            </template>
-          </a-button>
-          <a-button type="primary" shape="round" @click="orderDown(item.id, )">
-            <template #icon>
-              <DownOutlined/>
-            </template>
-          </a-button>
-        </a-space>
-      </a-col>
-      <a-col :span="2">
-        <a-space direction="vertical">
-
-          <a-popconfirm title="Are you sure delete this task?" ok-text="Yes" cancel-text="No"
-                        @confirm="remove(item.order)">
-            <a-button>
-              <template #icon>
-                <CloseOutlined/>
-              </template>
-            </a-button>
-          </a-popconfirm>
-
-
-        </a-space>
-      </a-col>
     </a-row>
 
-    <a-divider>
-      <a-space>
-        <a-button @click="add(item.id)">
-          <template #icon>
-            <PlusOutlined/>
-          </template>
-        </a-button>
-      </a-space>
-
-    </a-divider>
 
   </a-card>
 </template>
