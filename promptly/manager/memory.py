@@ -1,15 +1,13 @@
 import json
-from abc import ABC, abstractmethod
 from typing import List
 
+import loguru
 from path import Path
 
 from promptly.manager.base import BaseProfileManager, BaseCaseManager
 from promptly.model.case import Case
 from promptly.model.event import UpdateEvent
-from promptly.model.profile import Profile, Message, Snapshot
-
-import loguru
+from promptly.model.prompt import Profile, Message, Snapshot
 
 log = loguru.logger
 
@@ -176,4 +174,3 @@ def test_profile():
 
     for p in m.profiles:
         print(p)
-

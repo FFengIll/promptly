@@ -3,7 +3,7 @@ from typing import List
 import pickledb
 
 from promptly.model.event import UpdateEvent
-from promptly.model.profile import Profile, Message
+from promptly.model.prompt import Profile, Message
 
 
 class PickleProfileManager:

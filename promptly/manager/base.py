@@ -1,9 +1,9 @@
 from abc import abstractmethod, ABC
 
-from promptly.model.profile import Snapshot
 
 class BaseCaseManager(ABC):
     pass
+
 
 class BaseProfileManager(ABC):
     @abstractmethod
@@ -21,5 +21,3 @@ class BaseProfileManager(ABC):
     @abstractmethod
     def get(self, key):
         pass
-
-  

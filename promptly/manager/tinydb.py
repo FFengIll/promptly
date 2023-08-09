@@ -4,7 +4,7 @@ from path import Path
 from tinydb import TinyDB, Query
 
 from promptly.manager.base import BaseProfileManager
-from promptly.model.profile import Profile, History
+from promptly.model.prompt import Profile, History
 
 
 class TinyDBProfileManager(BaseProfileManager):
