@@ -2,6 +2,7 @@ export * from './action-event';
 export * from './debug-request-body';
 export * from './event-request';
 export * from './httpvalidation-error';
+export * from './iteration';
 export * from './message';
 export * from './prompt-item';
 export * from './snapshot';
