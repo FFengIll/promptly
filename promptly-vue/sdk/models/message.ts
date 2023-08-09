@@ -31,12 +31,6 @@ export interface Message {
     content: string;
     /**
      * 
-     * @type {number}
-     * @memberof Message
-     */
-    id?: number;
-    /**
-     * 
      * @type {boolean}
      * @memberof Message
      */
