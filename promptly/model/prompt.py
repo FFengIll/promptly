@@ -34,13 +34,11 @@ class Snapshot(BaseModel):
 
 @autocomplete
 class Message(PromptItem):
-    id: int = Field(default_factory=generate_id)
     enable: bool = Field(default=True)
     order: int = Field(default=0)
 
     def __init__(self, **data: Any):
         super().__init__(**data)
-        self.id = generate_id()
 
     def __hash__(self):
         return self.id
@@ -51,23 +49,21 @@ class Message(PromptItem):
 
 
 @autocomplete
-class Iteration(BaseModel):
+class Commit(BaseModel):
     messages: List[Message] = Field(default_factory=list)
     response: str = ""
 
 
-
-class ArgItem(BaseModel):
+class Argument(BaseModel):
     key: str
     value: str
 
 
-
 @autocomplete
-class IterationProject(BaseModel):
+class Project(BaseModel):
     name: str
-    iters: List[Iteration] = Field(default_factory=list)
-    args: List[ArgItem] = Field(default_factory=list)
+    commits: List[Commit] = Field(default_factory=list)
+    args: List[Argument] = Field(default_factory=list)
 
 
 @autocomplete
