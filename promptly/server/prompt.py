@@ -4,15 +4,14 @@ import fastapi
 import loguru
 
 from promptly.model.profile import (
+    Iteration,
+    IterationProject,
     Message,
     Profile,
     Snapshot,
-    Iteration,
-    IterationProject,
 )
 from promptly.server import llm
-from promptly.server.app import app
-from promptly.server.app import mongo
+from promptly.server.app import app, mongo
 from promptly.server.llm import to_message
 
 log = loguru.logger
@@ -69,7 +68,7 @@ def update_profile(key: str, update: List[Message]):
 
     manager.update_message(p)
 
-    p = manager.pro.get(key)
+    p = manager.get(key)
     return p
 
 
