@@ -127,6 +127,22 @@ class CommitRequest(BaseModel):
 
 
 @app.post("/api/commit")
+def commit_one(commit: Commit, name: str):
+    mongo.commit.add_commit(
+        name,
+        commit,
+    )
+
+
+@app.post("/api/commit/args")
+def commit_one(args: List[Argument], name: str):
+    mongo.commit.update_args(
+        name,
+        args,
+    )
+
+
+@app.post("/api/commit/all")
 def do_commit(
     req: CommitRequest,
     name: str,
