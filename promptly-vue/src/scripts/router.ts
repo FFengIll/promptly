@@ -1,12 +1,17 @@
 import router from "@/router";
 
 export class RouteHelper {
-    static toAdvance(key: string) {
-        router.push(`/view/prompt/${key}/advance`)
+    static toPrompt(key: string) {
+        console.log('to prompt', key)
+        router.push(`/view/prompt/${key}`)
     }
 
-    static toDev(key: string) {
-        router.push(`/view/prompt/${key}`)
+    static toCommit(key: string) {
+        router.push(`/view/commit/${key}`)
+    }
+
+    static toDebug(key: string) {
+        router.push('/view/debug')
     }
 }
 
