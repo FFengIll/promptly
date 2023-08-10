@@ -1,9 +1,11 @@
+from typing import List
+
 from pymongo import MongoClient
 from pymongo.collection import Collection
 
 from promptly.manager.base import BaseProfileManager, BaseCaseManager
 from promptly.model.case import Case
-from promptly.model.prompt import Profile, Snapshot, Project
+from promptly.model.prompt import Profile, Snapshot, Project, Commit, Argument
 
 
 class MongoManager:
@@ -14,18 +16,40 @@ class MongoManager:
         self.prompt: MongoPromptManger = MongoPromptManger(self.db["prompt"])
         self.case: MongoCaseManager = MongoCaseManager(self.db["case"])
         self.history: MongoHistoryManager = MongoHistoryManager(self.db["history"])
-        self.commit: MongoIterationManager = MongoIterationManager(self.db["commit"])
+        self.commit: MongoCommitManager = MongoCommitManager(self.db["commit"])
 
     def reload(self):
         self.case.reload()
         self.prompt.reload()
 
 
-class MongoIterationManager:
+class MongoCommitManager:
     def __init__(self, col: Collection):
         self.collection = col
 
         self.index = set()
+
+    def add_commit(self, name, commit: Commit):
+        res = self.collection.update_one(
+            {"name":name},
+            {"$push": {"commits": commit.dict()}},
+        )
+        return  res.acknowledged
+
+    def add_args(self, name, args:List[Argument]):
+        res = self.collection.update_one(
+            {"name":name},
+            {"$push": {"cases": [a.dict() for a in args]}},
+        )
+
+        return  res.acknowledged
+    def update_args(self, name, args:List[Argument]):
+        res = self.collection.update_one(
+            {"name":name},
+            {"$set": {"args": [a.dict() for a in args]}},
+        )
+        return  res.acknowledged
+
 
     def push(self, project: Project):
         data = dict(name=project.name)
