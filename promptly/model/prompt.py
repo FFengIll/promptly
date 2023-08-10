@@ -1,5 +1,5 @@
 from hashlib import md5
-from typing import List, Any
+from typing import Any, List
 from uuid import uuid1
 
 import loguru
@@ -22,21 +22,11 @@ def generate_id():
     return int.from_bytes(trimmed_bytes, byteorder="big")
 
 
-class PromptItem(BaseModel):
+@autocomplete
+class Message(BaseModel):
     role: str
     content: str
-
-
-@autocomplete
-class Snapshot(BaseModel):
-    prompt: List[PromptItem] = Field(default_factory=list)
-    response: str = ""
-
-
-@autocomplete
-class Message(PromptItem):
     enable: bool = Field(default=True)
-    order: int = Field(default=0)
 
     def __init__(self, **data: Any):
         super().__init__(**data)
@@ -85,25 +75,8 @@ class Profile(BaseModel):
     name: str = Field(default="")
     messages: List[Message] = Field(default_factory=list)
     history: List[str] = Field(default_factory=list)
-    snapshots: List[Snapshot] = Field(default_factory=list)
 
     def __init__(self, **data: Any):
-        # compatibility
-        snapshots = data.get("snapshots", None)
-        if snapshots:
-            res = []
-            for s in snapshots:
-                log.info(s)
-                if isinstance(s, List):
-                    tmp = Snapshot()
-                    tmp.prompt = s
-                    res.append(tmp.dict())
-                else:
-                    res.append(s)
-            data["snapshots"] = res
-        else:
-            data["snapshots"] = []
-
         super().__init__(**data)
 
     @classmethod
@@ -115,9 +88,6 @@ class Profile(BaseModel):
         return Profile(
             name="demo", messages=[Message(id=1, role="user", content="hello")]
         )
-
-    def add_snapshot(self, s: Snapshot):
-        self.snapshots.append(s)
 
     def remove(self, id):
         found = None
