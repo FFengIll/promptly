@@ -30,4 +30,10 @@ export interface Commit {
      * @memberof Commit
      */
     response?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof Commit
+     */
+    md5?: string;
 }
