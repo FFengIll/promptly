@@ -4,6 +4,4 @@ export * from './commit-request';
 export * from './debug-request-body';
 export * from './httpvalidation-error';
 export * from './message';
-export * from './prompt-item';
-export * from './snapshot';
 export * from './validation-error';

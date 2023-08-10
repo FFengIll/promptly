@@ -35,10 +35,4 @@ export interface Message {
      * @memberof Message
      */
     enable?: boolean;
-    /**
-     * 
-     * @type {number}
-     * @memberof Message
-     */
-    order?: number;
 }
