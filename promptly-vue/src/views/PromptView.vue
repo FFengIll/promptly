@@ -12,6 +12,7 @@
         <a-typography-title>{{ key }}</a-typography-title>
         <a-row :gutter='12'>
             <a-col class="gutter-row" :span="12">
+
                 <a-collapse>
                     <a-collapse-panel header="History">
                         <a-space direction="horizontal" align="baseline" v-for="h in data.profile.history">
@@ -30,6 +31,41 @@
                     </a-collapse-panel>
                 </a-collapse>
 
+
+                <a-collapse>
+                    <a-collapse-panel header="Prompt Args">
+
+                        <a-list item-layout="horizontal" :data-source="args">
+                            <template #renderItem="{ item }">
+                                <a-list-item>
+                                    <!-- <template #actions>
+                            <a key="list-loadmore-edit">edit</a>
+                            <a key="list-loadmore-more">more</a>
+                        </template> -->
+                                    <a-input-group>
+                                        <a-space direction="horizontal">
+                                            <a-typography-text>
+                                                Key
+                                            </a-typography-text>
+                                            <a-input v-model:value="item.key"></a-input>
+
+                                            <a-typography-text>
+                                                Value
+                                            </a-typography-text>
+                                            <a-input v-model:value="item.value"></a-input>
+
+                                        </a-space>
+
+                                    </a-input-group>
+                                </a-list-item>
+                            </template>
+                        </a-list>
+                    </a-collapse-panel>
+                </a-collapse>
+
+                <a-divider></a-divider>
+
+
                 <a-card title="Prompt">
                     <a-button @click="() => { data.profile.messages.forEach((item) => item.enable = false) }">Disable
                         All
@@ -40,9 +76,9 @@
 
 
                     <div>
-                        <PromptInput :messages="data.profile.messages" @order-up="id => order(id, -1)"
-                            @order-down="id => order(id, 1)" @remove="id => deletePrompt(id)"
-                            @add="id => addPrompt(id, '')">
+                        <PromptInput :messages="data.profile.messages" with-copy with-control
+                            @order-up="id => order(id, -1)" @order-down="id => order(id, 1)"
+                            @remove="id => deletePrompt(id)" @add="id => addPrompt(id, '')">
 
                         </PromptInput>
                     </div>
@@ -60,31 +96,10 @@
 
                 </a-card>
 
-
             </a-col>
 
 
             <a-col class="gutter-row" :span="12">
-
-                <a-collapse>
-
-                    <a-collapse-panel header="Snapshot">
-                        <div class="scroll-short">
-
-                            <div v-for="snapshot in data.profile.snapshots">
-                                <a-divider>
-                                    <a-button @click="useSnapshot(snapshot)">
-                                        Use Snapshot
-                                    </a-button>
-                                </a-divider>
-                                <PromptCard :messages="snapshot.prompt"></PromptCard>
-                                <a-textarea v-model:value="snapshot.response">
-
-                                </a-textarea>
-                            </div>
-                        </div>
-                    </a-collapse-panel>
-                </a-collapse>
 
 
                 <a-collapse>
@@ -99,10 +114,10 @@
                     <a-space direction="vertical">
                         <a-space direction="horizontal">
                             <a-button @click="chat">Request</a-button>
-                            <a-button @click="snapshot">Snapshot</a-button>
+                            <a-button @click="commit">Commit</a-button>
                             <a-button @click="reload">Reload</a-button>
                             <a-button @click="gotoDebug">Goto Debug</a-button>
-                            <a-button @click="gotoIteration">Goto Iteration</a-button>
+                            <a-button @click="gotoCommit">Goto Commit</a-button>
                         </a-space>
 
 
@@ -139,24 +154,27 @@ import { ref } from 'vue';
 
 import { CopyOutlined, PlusOutlined } from '@ant-design/icons-vue';
 
-import { useRoute, useRouter } from 'vue-router';
+import { useRoute } from 'vue-router';
 
 import { useSnapshotStore } from '@/stores/snapshot';
 
 import PromptInput from "@/components/PromptInput.vue";
-import { ApiFactory } from "@/scripts/api";
+import { ApiFactory, ApiHelper } from "@/scripts/api";
+import { RouteHelper } from '@/scripts/router';
 import type { NotificationPlacement } from "ant-design-vue";
 import { notification } from 'ant-design-vue';
-import type { Message, PromptItem, Snapshot } from "../../sdk";
+import type { Commit } from 'sdk/models';
+import type { Snapshot } from "../../sdk";
 import PromptCard from '../components/PromptCard.vue';
 
 const [notification_api, contextHolder] = notification.useNotification();
 
 // use
 const store = useSnapshotStore()
-const router = useRouter()
+const r = useRoute()
 const { text, copy, copied, isSupported } = useClipboard({})
 const api = ApiFactory()
+const key = r.params.key.toString()
 
 // props
 const props = defineProps<{
@@ -164,10 +182,12 @@ const props = defineProps<{
 }>()
 
 // field
-const key = ref<string>("")
+console.log(store.source.args)
+const args = ref(store.source.args)
+
 const history = ref<any>([{
     messages: [
-        { id: 1, role: "角色1", content: "内容1", enable: true, order: 0 },
+        { id: 1, role: "user", content: "content", enable: true, order: 0 },
     ],
     response: ""
 }])
@@ -181,21 +201,12 @@ const data = ref({
             { id: 1, role: "角色1", content: "内容1", enable: true, order: 0, history: [] },
             // 其他数据项
         ],
-        "snapshots": [
-            {
-                "prompt": [
-                    { role: 'user', content: 'snapshot' }
-                ],
-                "response": ""
-            }
-        ]
+
     }
 })
 
 // created
-const route = useRoute();
-key.value = route.params.key.toString();
-fetchProfile(key.value);
+fetchProfile(key);
 
 // methods
 function sendToPrompt() {
@@ -210,14 +221,16 @@ function deletePrompt(order: number) {
     ms.forEach((elem, index) => elem.order = index)
 }
 
-function gotoIteration() {
-    store.sendSource(key.value, data.value.profile.messages, [])
-    router.push('/view/iteration')
+function gotoCommit() {
+    console.log(key)
+
+    store.sendSource(key, data.value.profile.messages, [])
+    RouteHelper.toCommit(key)
 }
 
 function gotoDebug() {
-    store.sendSource(key.value, data.value.profile.messages, [])
-    router.push('/view/debug')
+    store.sendSource(key, data.value.profile.messages, [])
+    RouteHelper.toDebug(key)
 }
 
 function useSnapshot(snapshot: Snapshot) {
@@ -237,20 +250,23 @@ function useSnapshot(snapshot: Snapshot) {
     }
 }
 
-function snapshot() {
+function commit() {
 
-    let prompt: PromptItem[] = []
-    data.value.profile.messages.forEach(
-        (item: Message): any => {
-            if (item.enable) {
-                let res: PromptItem = { role: item.role, content: item.content }
-                prompt.push(res)
-            }
+    // let prompt: PromptItem[] = []
+    // data.value.profile.messages.forEach(
+    //     (item: Message): any => {
+    //         if (item.enable) {
+    //             let res: PromptItem = { role: item.role, content: item.content }
+    //             prompt.push(res)
+    //         }
 
-        }
-    )
-    let snapshot: Snapshot = { prompt: prompt, response: data.value.response }
-    api.apiPromptKeySnapshotPost(snapshot, key.value,).then(() => {
+    //     }
+    // )
+    let commit: Commit = {
+        messages: data.value.profile.messages,
+        response: data.value.response
+    }
+    api.apiCommitPost(commit, key,).then(() => {
 
     })
 }
@@ -321,7 +337,7 @@ async function fetchProfile(key: string) {
 }
 
 function reload() {
-    fetchProfile(key.value);
+    fetchProfile(key);
 }
 
 
@@ -334,42 +350,9 @@ function openNotification(message: string, status: string) {
     });
 }
 
-function chat() {
-    // console.log(data.value.payload)
-
-    // let res = data.value.profile.messages.map(item => {
-    //     let copied = {...item};
-    //     copied.content = copied.content.replace('{{}}', data.value.payload)
-    //     console.log(copied)
-    //     return copied
-    // })
-    //
-    // data.value.current = res
-
-    let res = data.value.profile.messages
-
-
-    console.log(res);
-    api.apiChatKeyPost(res, key.value)
-        .then(response => {
-            console.log(response)
-
-            data.value.response = response.data;
-            console.log("result", response.data);
-            console.log("data.value.response", data.value.response)
-            history.value.push(
-                {
-                    messages: data.value.profile.messages,
-                    response: response.data
-                }
-            )
-        })
-        .catch(error => {
-            openNotification(error, 'error')
-            console.error(error.toString());
-            return;
-        });
-
+async function chat() {
+    let response = await ApiHelper.doChat(key, data.value.profile.messages, args.value)
+    data.value.response = response.data;
 }
 </script>
   

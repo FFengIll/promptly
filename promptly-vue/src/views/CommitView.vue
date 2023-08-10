@@ -1,16 +1,14 @@
 <script setup lang="ts">
 import PromptInput from "@/components/PromptInput.vue";
 import router from "@/router";
-import { ApiFactory } from "@/scripts/api";
+import { ApiFactory, ApiHelper } from "@/scripts/api";
 import { RouteHelper } from "@/scripts/router";
-import { format } from "@/scripts/template";
 import { useSnapshotStore } from "@/stores/snapshot";
 import { PlusOutlined, SyncOutlined } from "@ant-design/icons-vue";
 import { storeToRefs } from "pinia";
-import type { Argument, CommitRequest, Message } from "sdk/models";
+import type { Argument, Commit, CommitRequest } from "sdk/models";
 import { ref } from "vue";
 import { useRoute } from 'vue-router';
-import type { Commit } from "../../sdk";
 
 //
 const api = ApiFactory()
@@ -38,7 +36,6 @@ console.log("store source", source.value)
 getCommit(source.value.name)
 
 async function getCommit(name: string) {
-
 
     await api.apiCommitGet(name).then(
         response => {
@@ -74,40 +71,31 @@ async function getCommit(name: string) {
     }
 }
 
-async function doCommit(ref) {
-    let another = JSON.parse(JSON.stringify(ref))
-    another.response = ""
 
-    await saveCommit(key.value, commits.value)
-
-    commits.value.unshift(another)
-}
-
-
-async function doChat(it: Commit) {
-    commits.value[0].response = ""
-
-    console.log(it.messages)
-
-    let ms = it.messages?.filter((item: Message) => item.enable)
-    ms = JSON.parse(JSON.stringify(ms))
-    ms.forEach((item) => {
-        item.content = format(item.content, args.value)
-    })
-    console.log("will chat with messages", ms)
-
-    await api.apiChatPost(ms).then(
-        (response) => {
-            it.response = response.data
-        }
-    )
-
-    // await api.api
-}
 
 function gotoTest(it: Commit, args: Argument[]) {
     store.sendSource(store.source.name, it.messages, args)
     router.push('/view/debug')
+}
+
+async function doCommit(key: string, commit: Commit) {
+    // commit current
+    await api.apiCommitPost(commit, key).then(
+        response => {
+            console.log(response)
+        }
+    ).catch(
+        error => {
+            console.log(error)
+        }
+    )
+
+    // then copy to create a new one
+    let another = JSON.parse(JSON.stringify(commit))
+    another.response = ""
+
+    // add to head
+    commits.value.unshift(another)
 }
 
 async function saveCommit(key: string, data: Commit[],) {
@@ -116,7 +104,7 @@ async function saveCommit(key: string, data: Commit[],) {
         args: []
     }
 
-    await api.apiCommitPost(req, key).then(
+    await api.apiCommitAllPost(req, key).then(
         response => {
             console.log("success")
         }
@@ -129,20 +117,23 @@ async function saveArgument(key: string, args: Argument[]) {
         args: args
     }
 
-    await api.apiCommitPost(req, key).then(
+    await api.apiCommitAllPost(req, key).then(
         response => {
             console.log("success")
         }
     )
 }
 
-async function saveIteration(key: string, data: Commit[], args: Argument[]) {
+async function saveCommits(key: string, data: Commit[], args: Argument[]) {
+
     let req: CommitRequest = {
-        iters: data,
+        commits: data,
         args: args
     }
 
-    await api.apiCommitPost(req, key).then(
+    console.log('request', req)
+
+    await api.apiCommitAllPost(req, key).then(
         response => {
             console.log("success")
         }
@@ -163,26 +154,46 @@ function cleanArgs() {
     console.log(args.value)
 }
 
-async function gotoAdvance(iter: Commit) {
-    let res = iter.messages.map(item => {
+async function doChat(key: string, commit: Commit, args: Argument[]) {
+    commit.response = ""
+    let response = await ApiHelper.doChat(key, commit.messages!!, args)
+    console.log('response', response)
+    commit.response = response.data
+
+    console.log(commits.value)
+}
+
+async function gotoPrompt(commit: Commit) {
+    let res = commit.messages!!.map(item => {
         let copied = { ...item };
         return copied
     })
 
     let name = key.value
 
-    await api.apiPromptKeyPost(res, name)
-        .then(
-            response => {
-                console.log(response)
-            }
-        )
-        .catch(error => {
-            console.error(error)
-        })
+    console.log("args", args.value)
 
-    RouteHelper.toAdvance(name)
+    await store.sendSource(name, commit.messages!!, args.value)
+
+    // await api.apiPromptKeyPost(res, name)
+    //     .then(
+    //         response => {
+    //             console.log(response)
+    //         }
+    //     )
+    //     .catch(error => {
+    //         console.error(error)
+    //     })
+
+    RouteHelper.toPrompt(name)
 }
+
+const pagination = {
+    onChange: (page: number) => {
+        console.log(page);
+    },
+    pageSize: 3,
+};
 
 </script>
 
@@ -193,9 +204,9 @@ async function gotoAdvance(iter: Commit) {
                 <template #renderItem="{ item }">
                     <a-list-item>
                         <!-- <template #actions>
-            <a key="list-loadmore-edit">edit</a>
-            <a key="list-loadmore-more">more</a>
-        </template> -->
+                            <a key="list-loadmore-edit">edit</a>
+                            <a key="list-loadmore-more">more</a>
+                        </template> -->
                         <a-input-group>
                             <a-space direction="horizontal">
                                 <a-typography-text>
@@ -234,38 +245,36 @@ async function gotoAdvance(iter: Commit) {
                 <a-input-group compact>
                     <a-input v-model:value="key" style="width: 100px" />
                     <a-button type="primary" @click="getCommit(key)">Get</a-button>
-                    <a-button type="primary" @click="saveIteration(key, commits, args)">Save</a-button>
+                    <a-button type="primary" @click="saveCommits(key, commits, args)">Save</a-button>
                 </a-input-group>
                 <a-checkbox v-model:checked="autoSave">Auto Save</a-checkbox>
-                <a-button @click="gotoAdvance(key)">Goto Advance</a-button>
             </a-space>
         </a-col>
     </a-row>
     <a-row :gutter="[16, 16]">
-        <a-col :span="8" v-for="(  prompt, index  ) in   commits  " align="center" :key="index">
-            <a-card>
-                <!--        response-->
-                <a-textarea v-model:value="prompt.response" :auto-size="{ minRows: 5, maxRows: 10 }">
 
-                </a-textarea>
+            <a-col :span="8" v-for="(  commit, index  ) in   commits  " align="center" :key="index">
+                <a-card>
+                    <!--        response-->
+                    <a-textarea v-model:value="commit.response" :auto-size="{ minRows: 6, maxRows: 6 }">
 
-                <!--        button-->
-                <a-button @click="doChat(prompt)">Request</a-button>
-                <a-button @click="gotoTest(prompt, args)">Goto Test</a-button>
-                <a-button @click="gotoAdvance(prompt)">Goto Advance</a-button>
-                <a-button @click="doCommit(prompt)">Commit</a-button>
-                <a-button @click="dropCommit(index)">Drop</a-button>
+                    </a-textarea>
 
-
-                <!--        prompt-->
-                <PromptInput :messages="prompt.messages" mode="simple" with-copy>
-
-                </PromptInput>
-
-            </a-card>
+                    <!--        button-->
+                    <a-button @click="doChat(key, commit, args)">Request</a-button>
+                    <a-button @click="gotoTest(commit, args)">Goto Test</a-button>
+                    <a-button @click="gotoPrompt(commit)">Goto Advance</a-button>
+                    <a-button @click="doCommit(key, commit)">Commit</a-button>
+                    <a-button @click="dropCommit(index)">Drop</a-button>
 
 
-        </a-col>
+                    <!--        prompt-->
+                    <PromptInput :messages="commit.messages"  with-copy with-sidebar>
+
+                    </PromptInput>
+
+                </a-card>
+            </a-col>
     </a-row>
 </template>
 
