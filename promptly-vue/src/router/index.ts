@@ -15,9 +15,9 @@ const router = createRouter({
             component: () => import('../views/IndexView.vue')
         },
         {
-            path: '/view/prompt/:key/advance',
-            name: 'prompt (advance)',
-            component: () => import('../views/AdvanceView.vue'),
+            path: '/view/prompt/:key',
+            name: 'prompt',
+            component: () => import('../views/PromptView.vue'),
             props: route => ({ key: route.params.key }),
 
         },
@@ -28,8 +28,8 @@ const router = createRouter({
             props: true,
         },
         {
-            path: '/view/prompt/:key',
-            name: 'prompt dev',
+            path: '/view/commit/:key',
+            name: 'prompt commit',
             component: () => import('../views/CommitView.vue'),
             props: route => ({ key: route.params.key })
         },
