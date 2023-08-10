@@ -4,7 +4,7 @@ import fastapi
 import loguru
 from pydantic import BaseModel
 
-from promptly.model.prompt import Argument, Commit, Message, Profile, Project, Snapshot
+from promptly.model.prompt import Argument, Commit, Message, Profile, Project
 from promptly.server import llm
 from promptly.server.app import app, mongo
 from promptly.server.llm import to_message
@@ -17,15 +17,6 @@ manager = mongo.prompt
 @app.on_event("shutdown")
 def shutdown_event():
     pass
-
-
-@app.post("/api/prompt/{key}/snapshot")
-def add_snapshot(key: str, snapshot: Snapshot):
-    p = manager.get(key)
-
-    manager.update_snapshot(p, snapshot)
-
-    return manager.get(key).snapshots
 
 
 @app.put("/api/prompt/{key}")

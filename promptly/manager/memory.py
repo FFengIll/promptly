@@ -7,7 +7,7 @@ from path import Path
 from promptly.manager.base import BaseProfileManager, BaseCaseManager
 from promptly.model.case import Case
 from promptly.model.event import UpdateEvent
-from promptly.model.prompt import Profile, Message,Commit
+from promptly.model.prompt import Profile, Message, Commit
 
 log = loguru.logger
 
@@ -115,7 +115,7 @@ class ProfileManager(BaseProfileManager):
     #                     m.history.append(e.value)
     #                 m.content = e.value
     #                 break
-    def push_history(self, item:Commit):
+    def push_history(self, item: Commit):
         pass
 
 

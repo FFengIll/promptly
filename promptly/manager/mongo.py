@@ -146,8 +146,6 @@ class MongoPromptManger(BaseProfileManager):
             m["id"] = idx
         self.collection.update_one({"name": p.name}, {"$set": {"messages": messages}})
 
-
-
     def add_profile(self, p: Profile):
         self.collection.insert_one(p.dict())
 
