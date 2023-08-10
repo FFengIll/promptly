@@ -1,6 +1,6 @@
-import {useLocalStorage} from '@vueuse/core';
-import {defineStore} from 'pinia';
-import type {Argument, Message} from '../../sdk/models';
+import { useLocalStorage } from '@vueuse/core';
+import { defineStore } from 'pinia';
+import type { Argument, Message } from '../../sdk/models';
 
 export const useSnapshotStore = defineStore('snapshot', {
     getters: {},
@@ -15,15 +15,13 @@ export const useSnapshotStore = defineStore('snapshot', {
     })
     ,
     actions: {
-        sendSource(source: string, ms: Message[], args: Argument[]) {
-            var res = ms.filter(item => {
-                return item.enable
-            });
+        async sendSource(source: string, ms: Message[], args: Argument[]) {
             this.$patch(
                 {
                     source: {
-                        messages: res,
-                        name: source
+                        messages: ms,
+                        name: source,
+                        args: args,
                     }
                 }
             )
