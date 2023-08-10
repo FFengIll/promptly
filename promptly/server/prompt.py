@@ -94,7 +94,7 @@ async def chat(ms: List[Message]):
     content = await llm.chat(ms)
     log.info(content)
 
-    mongo.history.push(Snapshot(prompt=ms, response=content))
+    mongo.history.push(Commit(messages=ms, response=content))
     return content
 
 
