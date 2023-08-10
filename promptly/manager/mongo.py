@@ -3,9 +3,9 @@ from typing import List
 from pymongo import MongoClient
 from pymongo.collection import Collection
 
-from promptly.manager.base import BaseProfileManager, BaseCaseManager
+from promptly.manager.base import BaseCaseManager, BaseProfileManager
 from promptly.model.case import Case
-from promptly.model.prompt import Profile, Snapshot, Project, Commit, Argument
+from promptly.model.prompt import Argument, Commit, Profile, Project
 
 
 class MongoManager:
@@ -29,27 +29,40 @@ class MongoCommitManager:
 
         self.index = set()
 
+    def append_commit(self, name, commit: Commit):
+        res = self.collection.update_one(
+            {"name": name}, {"$push": {"commits": commit.dict()}}, upsert=True
+        )
+        return res.acknowledged
+
     def add_commit(self, name, commit: Commit):
         res = self.collection.update_one(
-            {"name":name},
-            {"$push": {"commits": commit.dict()}},
+            {"name": name},
+            {
+                "$push": {
+                    "commits": {
+                        "$each": [commit.dict()],
+                        "$position": 0,
+                    }
+                }
+            },
         )
-        return  res.acknowledged
+        return res.acknowledged
 
-    def add_args(self, name, args:List[Argument]):
+    def add_args(self, name, args: List[Argument]):
         res = self.collection.update_one(
-            {"name":name},
+            {"name": name},
             {"$push": {"cases": [a.dict() for a in args]}},
         )
 
-        return  res.acknowledged
-    def update_args(self, name, args:List[Argument]):
+        return res.acknowledged
+
+    def update_args(self, name, args: List[Argument]):
         res = self.collection.update_one(
-            {"name":name},
+            {"name": name},
             {"$set": {"args": [a.dict() for a in args]}},
         )
-        return  res.acknowledged
-
+        return res.acknowledged
 
     def push(self, project: Project):
         data = dict(name=project.name)
@@ -58,7 +71,11 @@ class MongoCommitManager:
         if project.args:
             data["args"] = [a.dict() for a in project.args]
 
-        self.collection.update_one(dict(name=project.name), {"$set": data}, upsert=True)
+        res = self.collection.update_one(
+            dict(name=project.name), {"$set": data}, upsert=True
+        )
+
+        return res.acknowledged
 
     def get(self, name: str):
         res = self.collection.find_one(dict(name=name))
@@ -93,7 +110,7 @@ class MongoHistoryManager:
     def __init__(self, col: Collection):
         self.collection = col
 
-    def push(self, item: Snapshot):
+    def push(self, item: Commit):
         self.collection.insert_one(item.dict())
 
 
@@ -129,10 +146,7 @@ class MongoPromptManger(BaseProfileManager):
             m["id"] = idx
         self.collection.update_one({"name": p.name}, {"$set": {"messages": messages}})
 
-    def update_snapshot(self, p, snapshot: Snapshot):
-        self.collection.update_one(
-            {"name": p.name}, {"$push": {"snapshots": snapshot.dict()}}
-        )
+
 
     def add_profile(self, p: Profile):
         self.collection.insert_one(p.dict())

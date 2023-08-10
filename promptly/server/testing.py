@@ -6,7 +6,7 @@ import loguru
 from pydantic import BaseModel
 
 from promptly.model.case import CaseResult
-from promptly.model.prompt import Message, Snapshot
+from promptly.model.prompt import Message
 from promptly.server import llm
 from promptly.server.app import app
 from promptly.server.app import mongo

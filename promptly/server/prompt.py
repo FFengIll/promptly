@@ -2,16 +2,9 @@ from typing import List
 
 import fastapi
 import loguru
-from pydantic import BaseModel, Field
+from pydantic import BaseModel
 
-from promptly.model.prompt import (
-    Argument,
-    Commit,
-    Project,
-    Message,
-    Profile,
-    Snapshot,
-)
+from promptly.model.prompt import Argument, Commit, Message, Profile, Project, Snapshot
 from promptly.server import llm
 from promptly.server.app import app, mongo
 from promptly.server.llm import to_message
@@ -148,7 +141,7 @@ def do_commit(
     name: str,
 ):
     project = Project(name=name, iters=req.commits, args=req.args)
-    mongo.commit.push(project)
+    return mongo.commit.push(project)
 
 
 @app.get("/api/commit")
