@@ -11,30 +11,22 @@
  * https://github.com/swagger-api/swagger-codegen.git
  * Do not edit the class manually.
  */
-import { ActionEvent } from './action-event';
-import { UpdateEvent } from './update-event';
 /**
  * 
  * @export
- * @interface EventRequest
+ * @interface Argument
  */
-export interface EventRequest {
+export interface Argument {
     /**
      * 
      * @type {string}
-     * @memberof EventRequest
+     * @memberof Argument
      */
-    name: string;
+    key: string;
     /**
      * 
-     * @type {Array<UpdateEvent>}
-     * @memberof EventRequest
+     * @type {string}
+     * @memberof Argument
      */
-    updates: Array<UpdateEvent>;
-    /**
-     * 
-     * @type {Array<ActionEvent>}
-     * @memberof EventRequest
-     */
-    actions: Array<ActionEvent>;
+    value: string;
 }
