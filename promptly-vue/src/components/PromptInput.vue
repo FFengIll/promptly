@@ -13,10 +13,10 @@ const { text, copy, copied, isSupported } = useClipboard({})
 const router = useRouter()
 
 const emit = defineEmits<{
-    (e: 'orderUp', id: number): void
-    (e: 'orderDown', id: number): void
-    (e: 'remove', id: number): void
-    (e: 'add', id: number): void
+    (e: 'orderUp', index: number): void
+    (e: 'orderDown', index: number): void
+    (e: 'remove', index: number): void
+    (e: 'add', index: number): void
 }>()
 
 
@@ -30,20 +30,20 @@ const props = defineProps<{
 )
 
 
-function orderUp(id,) {
-    emit('orderUp', id,)
+function orderUp(index,) {
+    emit('orderUp', index,)
 }
 
-function orderDown(id,) {
-    emit('orderDown', id,)
+function orderDown(index,) {
+    emit('orderDown', index,)
 }
 
-function add(id) {
-    emit('add', id)
+function add(index) {
+    emit('add', index)
 }
 
-function remove(id) {
-    emit('remove', id)
+function remove(index) {
+    emit('remove', index)
 }
 
 function color(role: string) {
@@ -66,13 +66,13 @@ function color(role: string) {
 </script>
 
 <template>
-    <a-card v-for="item in messages" :key="item.id">
+    <a-card v-for="(item, index) in messages" :key="index">
         <!-- <template #extra><a href="#">more</a></template> -->
 
         <a-row v-if="withControl">
             <a-divider>
                 <a-space>
-                    <a-button @click="add(item.id)">
+                    <a-button @click="add(index)">
                         <template #icon>
                             <PlusOutlined />
                         </template>
@@ -81,12 +81,12 @@ function color(role: string) {
                     <a-divider type="vertical"></a-divider>
 
                     <!-- up down the order -->
-                    <a-button type="primary" shape="round" @click="orderUp(item.id,)">
+                    <a-button type="primary" shape="round" @click="orderUp(index,)">
                         <template #icon>
                             <UpOutlined />
                         </template>
                     </a-button>
-                    <a-button type="primary" shape="round" @click="orderDown(item.id,)">
+                    <a-button type="primary" shape="round" @click="orderDown(index)">
                         <template #icon>
                             <DownOutlined />
                         </template>
@@ -95,7 +95,7 @@ function color(role: string) {
                     <a-divider type="vertical"></a-divider>
 
                     <a-popconfirm title="Are you sure delete this task?" ok-text="Yes" cancel-text="No"
-                        @confirm="remove(item.order)">
+                        @confirm="remove(index)">
                         <a-button>
                             <template #icon>
                                 <CloseOutlined />
@@ -119,18 +119,6 @@ function color(role: string) {
                 </a-radio-group>
             </a-space>
             <a-divider type="vertical"></a-divider>
-
-            <!-- role select -->
-            <!-- <a-select ref="select" v-model:value="item.role" style="width: 120px">
-                <a-select-option value="user">
-                    <span style="color: black">User</span></a-select-option>
-                <a-select-option value="system">
-                    <span style="color: red">System</span>
-                </a-select-option>
-                <a-select-option value="assistant">
-                    <span style="color: blue">Assistant</span>
-                </a-select-option>
-            </a-select> -->
 
             <!-- enable toggle -->
             <a-space direction="horizontal">
