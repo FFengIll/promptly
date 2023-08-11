@@ -1,4 +1,10 @@
 
+# prompt experiment
+## order
+system prompt的顺序尽管没有在文档上说明`影响和效果`，
+但实测下来，放在靠后的system prompt的影响力更大（特别在于没有正确答案对应时），猜测是user无答案时，会兜底回退到system级别。
+因此，将system act放在最后是必要的。
+
 # prompt design
 ## principle
 - 使用尽可能简短但显著有效的prompt
