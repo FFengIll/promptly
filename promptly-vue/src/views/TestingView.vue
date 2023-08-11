@@ -32,50 +32,62 @@
             </a-col>
             <a-col :span="12">
 
-                <a-card title="Operation">
-                    <a-space align="middle">
 
-                        <!-- loop -->
-                        <a-input-number title="Loop" id="inputNumber" v-model:value="loopCount" :min="1" :max="10">
-                            <template #upIcon>
-                                <ArrowUpOutlined/>
-                            </template>
-                            <template #downIcon>
-                                <ArrowDownOutlined/>
-                            </template>
-                        </a-input-number>
-
-                        <!-- click to run -->
-                        <a-button type="primary" @click="debugAll">Run Test</a-button>
-
-                        <a-checkbox v-model:checked="useCase">Use Case</a-checkbox>
-
-                    </a-space>
-                </a-card>
 
                 <!-- show dataset info -->
                 <a-card title="Case List">
-                    <a-button @click="listCase(true)">Refresh</a-button>
+                    <a-checkbox v-model:checked="useCase">Use Case</a-checkbox>
 
+                    <a-divider></a-divider>
                     <!-- case select -->
                     Select Case to Debug:&nbsp;&nbsp;
                     <a-select style="width:300px" @change="getCase">
                         <a-select-option v-for="item in caseList" :key="item.name">
                             {{ item.name }}
-                            <a-divider type="vertical"/>
+                            <a-divider type="vertical" />
                             {{ item.description }}
                         </a-select-option>
                     </a-select>
-                    <a-divider/>
+
+                    <a-button @click="listCase(true)">Refresh</a-button>
+
+                    <a-divider />
+
 
                     <!-- case description -->
                     Case Description:&nbsp;&nbsp;
                     <span>{{ config.description }}</span>
-                    <a-divider/>
+                    <a-divider />
 
                     <!-- <div v-for="item in config.data" :key="item">
                         <a-list-item>{{ item }}</a-list-item>
                     </div> -->
+                </a-card>
+
+                <a-card title="Operation">
+                    <a-space align="middle">
+
+                        <!-- loop -->
+                        <a-input-group>
+                            <a-space align="middle">
+                                <a-typography-text>Repeat</a-typography-text>
+                                <a-input-number id="inputNumber" v-model:value="repeat" :min="1" :max="10">
+                                    <template #upIcon>
+                                        <ArrowUpOutlined />
+                                    </template>
+                                    <template #downIcon>
+                                        <ArrowDownOutlined />
+                                    </template>
+                                </a-input-number>
+                            </a-space>
+                        </a-input-group>
+
+
+                        <!-- click to run -->
+                        <a-button type="primary" @click="debugAll">Run Test</a-button>
+
+
+                    </a-space>
                 </a-card>
             </a-col>
         </a-row>
@@ -94,7 +106,7 @@
                             </span>
                         </template>
                         <template v-else-if="column.key === 'source'">
-                            <a-tooltip placement="topLeft" :overlay-inner-style="{width:'500px'}">
+                            <a-tooltip placement="topLeft" :overlay-inner-style="{ width: '500px' }">
                                 <template #title>
                                     {{ JSON.stringify(record.source) }}
                                 </template>
@@ -103,7 +115,7 @@
                             </a-tooltip>
                         </template>
                         <template v-else-if="column.key === 'target'">
-                            <a-tooltip placement="topLeft" :overlay-inner-style="{width:'500px'}">
+                            <a-tooltip placement="topLeft" :overlay-inner-style="{ width: '500px' }">
                                 <template #title>
                                     {{ JSON.stringify(record.target) }}
                                 </template>
@@ -120,23 +132,23 @@
     </div>
 </template>
 <script lang="ts" setup>
-import {ref} from 'vue';
+import { ref } from 'vue';
 
-import type {TableColumnType} from 'ant-design-vue';
+import type { TableColumnType } from 'ant-design-vue';
 
-import {useSnapshotStore} from "@/stores/snapshot";
+import { useSnapshotStore } from "@/stores/snapshot";
 
 
-import type {DebugRequestBody} from '../../sdk';
-import {DefaultApiFactory} from '../../sdk/apis/default-api';
 import router from "@/router";
+import type { TestingRequestBody } from 'sdk/models';
+import { DefaultApiFactory } from '../../sdk/apis/default-api';
 
 
 const store = useSnapshotStore()
 
 const api = DefaultApiFactory(undefined, "http://localhost:8000")
 
-const loopCount = ref<number>(1);
+const repeat = ref<number>(1);
 
 const useCase = ref<boolean>(false)
 
@@ -159,7 +171,7 @@ const config = ref({
 
 const caseList = ref(
     [
-        {id: 1, name: "test", description: "test", data: [1, 2, 3, 4]},
+        { id: 1, name: "test", description: "test", data: [1, 2, 3, 4] },
     ],
 )
 
@@ -176,7 +188,7 @@ const columns: TableColumnType[] = [
         title: 'source',
         dataIndex: 'source',
         key: 'source',
-        ellipsis: {showTitle: false},
+        ellipsis: { showTitle: false },
     },
     {
         title: 'target',
@@ -198,7 +210,7 @@ interface Params {
 function sendBack(source: string) {
 
     let res = store.source.messages.map(item => {
-        let copied = {...item};
+        let copied = { ...item };
         copied.content = copied.content.replace('{{}}', source)
         console.log(copied)
         return copied
@@ -225,15 +237,15 @@ async function debugOne(params: Params) {
     var res = store.source.messages.filter(item => {
         return item.enable == true
     })
-    let body: DebugRequestBody = {
+    let body: TestingRequestBody = {
         messages: res,
-        source: params.source
+        sources: [params.source]
     }
-    await api.apiTestingSourcePost(body).then(
+    await api.apiTestingPost(body, repeat.value).then(
         (response) => {
             let element = response.data[0]
             element.id = params.id
-            result.value.push(element)
+            result.value.splice(0, 0, element)
         }
     )
 }
@@ -242,16 +254,26 @@ async function debugOne(params: Params) {
 async function debugAll() {
     var res = store.source.messages.map(item => item)
 
+
+
     if (useCase.value) {
-        await api.apiTestingCasePost(res, config.value.id,).then(
+        let body: TestingRequestBody = {
+            messages: res,
+            sources: config.value.data
+        }
+        await api.apiTestingPost(body, repeat.value).then(
             (response) => {
-                result.value = result.value.concat(response.data)
+                result.value.splice(0, 0, ...response.data)
             }
         )
     } else {
-        await api.apiTestingLoopPost(res, loopCount.value).then(
+        let body: TestingRequestBody = {
+            messages: res,
+            sources: ['']
+        }
+        await api.apiTestingPost(body, repeat.value).then(
             (response) => {
-                result.value = result.value.concat(response.data)
+                result.value.splice(0, 0, ...response.data)
             }
         )
     }
@@ -276,7 +298,7 @@ async function getCase(id: string) {
 
         result.value = array.map(
             (elem, index) => {
-                return {id: index, source: elem, target: ""}
+                return { id: index, source: elem, target: "" }
             }
         )
     })
