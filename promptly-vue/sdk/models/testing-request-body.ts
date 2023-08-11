@@ -11,23 +11,23 @@
  * https://github.com/swagger-api/swagger-codegen.git
  * Do not edit the class manually.
  */
-import { PromptItem } from './prompt-item';
+import { Message } from './message';
 /**
  * 
  * @export
- * @interface Snapshot
+ * @interface TestingRequestBody
  */
-export interface Snapshot {
+export interface TestingRequestBody {
     /**
      * 
-     * @type {Array<PromptItem>}
-     * @memberof Snapshot
+     * @type {Array<string>}
+     * @memberof TestingRequestBody
      */
-    prompt?: Array<PromptItem>;
+    sources: Array<string>;
     /**
      * 
-     * @type {string}
-     * @memberof Snapshot
+     * @type {Array<Message>}
+     * @memberof TestingRequestBody
      */
-    response?: string;
+    messages: Array<Message>;
 }

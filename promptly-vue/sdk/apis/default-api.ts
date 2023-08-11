@@ -19,9 +19,9 @@ import { BASE_PATH, COLLECTION_FORMATS, RequestArgs, BaseAPI, RequiredError } fr
 import { Argument } from '../models';
 import { Commit } from '../models';
 import { CommitRequest } from '../models';
-import { DebugRequestBody } from '../models';
 import { HTTPValidationError } from '../models';
 import { Message } from '../models';
+import { TestingRequestBody } from '../models';
 /**
  * DefaultApi - axios parameter creator
  * @export
@@ -404,6 +404,40 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         },
         /**
          * 
+         * @summary Ping
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        apiPingGet: async (options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/api/ping`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, 'https://example.com');
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+            const localVarRequestOptions :AxiosRequestConfig = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            const query = new URLSearchParams(localVarUrlObj.search);
+            for (const key in localVarQueryParameter) {
+                query.set(key, localVarQueryParameter[key]);
+            }
+            for (const key in options.params) {
+                query.set(key, options.params[key]);
+            }
+            localVarUrlObj.search = (new URLSearchParams(query)).toString();
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: localVarUrlObj.pathname + localVarUrlObj.search + localVarUrlObj.hash,
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
          * @summary List Prompt
          * @param {boolean} [refresh] 
          * @param {*} [options] Override http request option.
@@ -612,121 +646,18 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         },
         /**
          * 
-         * @summary Run Test With Case
-         * @param {Array<Message>} body 
-         * @param {string} name 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        apiTestingCasePost: async (body: Array<Message>, name: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
-            // verify required parameter 'body' is not null or undefined
-            if (body === null || body === undefined) {
-                throw new RequiredError('body','Required parameter body was null or undefined when calling apiTestingCasePost.');
-            }
-            // verify required parameter 'name' is not null or undefined
-            if (name === null || name === undefined) {
-                throw new RequiredError('name','Required parameter name was null or undefined when calling apiTestingCasePost.');
-            }
-            const localVarPath = `/api/testing/case`;
-            // use dummy base URL string because the URL constructor only accepts absolute URLs.
-            const localVarUrlObj = new URL(localVarPath, 'https://example.com');
-            let baseOptions;
-            if (configuration) {
-                baseOptions = configuration.baseOptions;
-            }
-            const localVarRequestOptions :AxiosRequestConfig = { method: 'POST', ...baseOptions, ...options};
-            const localVarHeaderParameter = {} as any;
-            const localVarQueryParameter = {} as any;
-
-            if (name !== undefined) {
-                localVarQueryParameter['name'] = name;
-            }
-
-            localVarHeaderParameter['Content-Type'] = 'application/json';
-
-            const query = new URLSearchParams(localVarUrlObj.search);
-            for (const key in localVarQueryParameter) {
-                query.set(key, localVarQueryParameter[key]);
-            }
-            for (const key in options.params) {
-                query.set(key, options.params[key]);
-            }
-            localVarUrlObj.search = (new URLSearchParams(query)).toString();
-            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
-            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
-            const needsSerialization = (typeof body !== "string") || localVarRequestOptions.headers['Content-Type'] === 'application/json';
-            localVarRequestOptions.data =  needsSerialization ? JSON.stringify(body !== undefined ? body : {}) : (body || "");
-
-            return {
-                url: localVarUrlObj.pathname + localVarUrlObj.search + localVarUrlObj.hash,
-                options: localVarRequestOptions,
-            };
-        },
-        /**
-         * 
-         * @summary Do Test
-         * @param {Array<Message>} body 
-         * @param {number} count 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        apiTestingLoopPost: async (body: Array<Message>, count: number, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
-            // verify required parameter 'body' is not null or undefined
-            if (body === null || body === undefined) {
-                throw new RequiredError('body','Required parameter body was null or undefined when calling apiTestingLoopPost.');
-            }
-            // verify required parameter 'count' is not null or undefined
-            if (count === null || count === undefined) {
-                throw new RequiredError('count','Required parameter count was null or undefined when calling apiTestingLoopPost.');
-            }
-            const localVarPath = `/api/testing/loop`;
-            // use dummy base URL string because the URL constructor only accepts absolute URLs.
-            const localVarUrlObj = new URL(localVarPath, 'https://example.com');
-            let baseOptions;
-            if (configuration) {
-                baseOptions = configuration.baseOptions;
-            }
-            const localVarRequestOptions :AxiosRequestConfig = { method: 'POST', ...baseOptions, ...options};
-            const localVarHeaderParameter = {} as any;
-            const localVarQueryParameter = {} as any;
-
-            if (count !== undefined) {
-                localVarQueryParameter['count'] = count;
-            }
-
-            localVarHeaderParameter['Content-Type'] = 'application/json';
-
-            const query = new URLSearchParams(localVarUrlObj.search);
-            for (const key in localVarQueryParameter) {
-                query.set(key, localVarQueryParameter[key]);
-            }
-            for (const key in options.params) {
-                query.set(key, options.params[key]);
-            }
-            localVarUrlObj.search = (new URLSearchParams(query)).toString();
-            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
-            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
-            const needsSerialization = (typeof body !== "string") || localVarRequestOptions.headers['Content-Type'] === 'application/json';
-            localVarRequestOptions.data =  needsSerialization ? JSON.stringify(body !== undefined ? body : {}) : (body || "");
-
-            return {
-                url: localVarUrlObj.pathname + localVarUrlObj.search + localVarUrlObj.hash,
-                options: localVarRequestOptions,
-            };
-        },
-        /**
-         * 
          * @summary Run Test With Source
-         * @param {DebugRequestBody} body 
+         * @param {TestingRequestBody} body 
+         * @param {number} [repeat] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        apiTestingSourcePost: async (body: DebugRequestBody, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        apiTestingPost: async (body: TestingRequestBody, repeat?: number, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'body' is not null or undefined
             if (body === null || body === undefined) {
-                throw new RequiredError('body','Required parameter body was null or undefined when calling apiTestingSourcePost.');
+                throw new RequiredError('body','Required parameter body was null or undefined when calling apiTestingPost.');
             }
-            const localVarPath = `/api/testing/source`;
+            const localVarPath = `/api/testing`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, 'https://example.com');
             let baseOptions;
@@ -736,6 +667,10 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             const localVarRequestOptions :AxiosRequestConfig = { method: 'POST', ...baseOptions, ...options};
             const localVarHeaderParameter = {} as any;
             const localVarQueryParameter = {} as any;
+
+            if (repeat !== undefined) {
+                localVarQueryParameter['repeat'] = repeat;
+            }
 
             localVarHeaderParameter['Content-Type'] = 'application/json';
 
@@ -952,6 +887,19 @@ export const DefaultApiFp = function(configuration?: Configuration) {
         },
         /**
          * 
+         * @summary Ping
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async apiPingGet(options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => Promise<AxiosResponse<any>>> {
+            const localVarAxiosArgs = await DefaultApiAxiosParamCreator(configuration).apiPingGet(options);
+            return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
+                const axiosRequestArgs :AxiosRequestConfig = {...localVarAxiosArgs.options, url: basePath + localVarAxiosArgs.url};
+                return axios.request(axiosRequestArgs);
+            };
+        },
+        /**
+         * 
          * @summary List Prompt
          * @param {boolean} [refresh] 
          * @param {*} [options] Override http request option.
@@ -1023,43 +971,14 @@ export const DefaultApiFp = function(configuration?: Configuration) {
         },
         /**
          * 
-         * @summary Run Test With Case
-         * @param {Array<Message>} body 
-         * @param {string} name 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        async apiTestingCasePost(body: Array<Message>, name: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => Promise<AxiosResponse<any>>> {
-            const localVarAxiosArgs = await DefaultApiAxiosParamCreator(configuration).apiTestingCasePost(body, name, options);
-            return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
-                const axiosRequestArgs :AxiosRequestConfig = {...localVarAxiosArgs.options, url: basePath + localVarAxiosArgs.url};
-                return axios.request(axiosRequestArgs);
-            };
-        },
-        /**
-         * 
-         * @summary Do Test
-         * @param {Array<Message>} body 
-         * @param {number} count 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        async apiTestingLoopPost(body: Array<Message>, count: number, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => Promise<AxiosResponse<any>>> {
-            const localVarAxiosArgs = await DefaultApiAxiosParamCreator(configuration).apiTestingLoopPost(body, count, options);
-            return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
-                const axiosRequestArgs :AxiosRequestConfig = {...localVarAxiosArgs.options, url: basePath + localVarAxiosArgs.url};
-                return axios.request(axiosRequestArgs);
-            };
-        },
-        /**
-         * 
          * @summary Run Test With Source
-         * @param {DebugRequestBody} body 
+         * @param {TestingRequestBody} body 
+         * @param {number} [repeat] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async apiTestingSourcePost(body: DebugRequestBody, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => Promise<AxiosResponse<any>>> {
-            const localVarAxiosArgs = await DefaultApiAxiosParamCreator(configuration).apiTestingSourcePost(body, options);
+        async apiTestingPost(body: TestingRequestBody, repeat?: number, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => Promise<AxiosResponse<any>>> {
+            const localVarAxiosArgs = await DefaultApiAxiosParamCreator(configuration).apiTestingPost(body, repeat, options);
             return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
                 const axiosRequestArgs :AxiosRequestConfig = {...localVarAxiosArgs.options, url: basePath + localVarAxiosArgs.url};
                 return axios.request(axiosRequestArgs);
@@ -1186,6 +1105,15 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
         },
         /**
          * 
+         * @summary Ping
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async apiPingGet(options?: AxiosRequestConfig): Promise<AxiosResponse<any>> {
+            return DefaultApiFp(configuration).apiPingGet(options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
          * @summary List Prompt
          * @param {boolean} [refresh] 
          * @param {*} [options] Override http request option.
@@ -1237,35 +1165,14 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
         },
         /**
          * 
-         * @summary Run Test With Case
-         * @param {Array<Message>} body 
-         * @param {string} name 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        async apiTestingCasePost(body: Array<Message>, name: string, options?: AxiosRequestConfig): Promise<AxiosResponse<any>> {
-            return DefaultApiFp(configuration).apiTestingCasePost(body, name, options).then((request) => request(axios, basePath));
-        },
-        /**
-         * 
-         * @summary Do Test
-         * @param {Array<Message>} body 
-         * @param {number} count 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        async apiTestingLoopPost(body: Array<Message>, count: number, options?: AxiosRequestConfig): Promise<AxiosResponse<any>> {
-            return DefaultApiFp(configuration).apiTestingLoopPost(body, count, options).then((request) => request(axios, basePath));
-        },
-        /**
-         * 
          * @summary Run Test With Source
-         * @param {DebugRequestBody} body 
+         * @param {TestingRequestBody} body 
+         * @param {number} [repeat] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async apiTestingSourcePost(body: DebugRequestBody, options?: AxiosRequestConfig): Promise<AxiosResponse<any>> {
-            return DefaultApiFp(configuration).apiTestingSourcePost(body, options).then((request) => request(axios, basePath));
+        async apiTestingPost(body: TestingRequestBody, repeat?: number, options?: AxiosRequestConfig): Promise<AxiosResponse<any>> {
+            return DefaultApiFp(configuration).apiTestingPost(body, repeat, options).then((request) => request(axios, basePath));
         },
         /**
          * 
@@ -1389,6 +1296,16 @@ export class DefaultApi extends BaseAPI {
     }
     /**
      * 
+     * @summary Ping
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApi
+     */
+    public async apiPingGet(options?: AxiosRequestConfig) : Promise<AxiosResponse<any>> {
+        return DefaultApiFp(this.configuration).apiPingGet(options).then((request) => request(this.axios, this.basePath));
+    }
+    /**
+     * 
      * @summary List Prompt
      * @param {boolean} [refresh] 
      * @param {*} [options] Override http request option.
@@ -1445,38 +1362,15 @@ export class DefaultApi extends BaseAPI {
     }
     /**
      * 
-     * @summary Run Test With Case
-     * @param {Array<Message>} body 
-     * @param {string} name 
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     * @memberof DefaultApi
-     */
-    public async apiTestingCasePost(body: Array<Message>, name: string, options?: AxiosRequestConfig) : Promise<AxiosResponse<any>> {
-        return DefaultApiFp(this.configuration).apiTestingCasePost(body, name, options).then((request) => request(this.axios, this.basePath));
-    }
-    /**
-     * 
-     * @summary Do Test
-     * @param {Array<Message>} body 
-     * @param {number} count 
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     * @memberof DefaultApi
-     */
-    public async apiTestingLoopPost(body: Array<Message>, count: number, options?: AxiosRequestConfig) : Promise<AxiosResponse<any>> {
-        return DefaultApiFp(this.configuration).apiTestingLoopPost(body, count, options).then((request) => request(this.axios, this.basePath));
-    }
-    /**
-     * 
      * @summary Run Test With Source
-     * @param {DebugRequestBody} body 
+     * @param {TestingRequestBody} body 
+     * @param {number} [repeat] 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof DefaultApi
      */
-    public async apiTestingSourcePost(body: DebugRequestBody, options?: AxiosRequestConfig) : Promise<AxiosResponse<any>> {
-        return DefaultApiFp(this.configuration).apiTestingSourcePost(body, options).then((request) => request(this.axios, this.basePath));
+    public async apiTestingPost(body: TestingRequestBody, repeat?: number, options?: AxiosRequestConfig) : Promise<AxiosResponse<any>> {
+        return DefaultApiFp(this.configuration).apiTestingPost(body, repeat, options).then((request) => request(this.axios, this.basePath));
     }
     /**
      * 
