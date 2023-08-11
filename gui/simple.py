@@ -7,9 +7,9 @@ import pandas as pd
 import PySimpleGUI as sg
 
 from gui.helper import EventLoop
-from promptly.server import api
+from promptly.server import llm
 from promptly.model.event import UpdateEvent
-from promptly.model.profile import Profile, ProfileManager
+from promptly.model.prompt import Profile, ProfileManager
 
 log = loguru.logger
 
@@ -72,7 +72,7 @@ def make_chat_request(nodes):
 
 def load_window():
     global manager
-    lst = manager.list_profile()
+    lst = manager.keys()
 
     name = sg.Input(tooltip="Name")
 
@@ -101,7 +101,7 @@ def load_window():
 
         elif event == "key_new":
             # manager.add(name.get())
-            lst = manager.list_profile()
+            lst = manager.keys()
             dd.update(value=name.get(), values=lst)
             window.refresh()
 
@@ -117,7 +117,7 @@ def load_window():
         elif event == "key_refresh":
             manager.save()
             manager = ProfileManager("profile")
-            lst = manager.list_profile()
+            lst = manager.keys()
             dd.update(value=name.get(), values=lst)
             window.refresh()
 
