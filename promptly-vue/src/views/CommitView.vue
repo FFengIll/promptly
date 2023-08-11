@@ -164,12 +164,11 @@ async function doChat(key: string, commit: Commit, args: Argument[]) {
 }
 
 async function gotoPrompt(commit: Commit) {
-    let res = commit.messages!!.map(item => {
-        let copied = { ...item };
-        return copied
-    })
 
     let name = key.value
+
+    await api.apiPromptKeyPost(commit.messages!!, name)
+
 
     console.log("args", args.value)
 
@@ -253,28 +252,28 @@ const pagination = {
     </a-row>
     <a-row :gutter="[16, 16]">
 
-            <a-col :span="8" v-for="(  commit, index  ) in   commits  " align="center" :key="index">
-                <a-card>
-                    <!--        response-->
-                    <a-textarea v-model:value="commit.response" :auto-size="{ minRows: 6, maxRows: 6 }">
+        <a-col :span="8" v-for="(  commit, index  ) in   commits  " align="center" :key="index">
+            <a-card>
+                <!--        response-->
+                <a-textarea v-model:value="commit.response" :auto-size="{ minRows: 6, maxRows: 6 }">
 
-                    </a-textarea>
+                </a-textarea>
 
-                    <!--        button-->
-                    <a-button @click="doChat(key, commit, args)">Request</a-button>
-                    <a-button @click="gotoTest(commit, args)">Goto Test</a-button>
-                    <a-button @click="gotoPrompt(commit)">Goto Advance</a-button>
-                    <a-button @click="doCommit(key, commit)">Commit</a-button>
-                    <a-button @click="dropCommit(index)">Drop</a-button>
+                <!--        button-->
+                <a-button @click="doChat(key, commit, args)">Request</a-button>
+                <a-button @click="gotoTest(commit, args)">Goto Test</a-button>
+                <a-button @click="gotoPrompt(commit)">Goto Prompt</a-button>
+                <a-button @click="doCommit(key, commit)">Commit</a-button>
+                <a-button @click="dropCommit(index)">Drop</a-button>
 
 
-                    <!--        prompt-->
-                    <PromptInput :messages="commit.messages"  with-copy with-sidebar>
+                <!--        prompt-->
+                <PromptInput :messages="commit.messages" with-copy with-sidebar>
 
-                    </PromptInput>
+                </PromptInput>
 
-                </a-card>
-            </a-col>
+            </a-card>
+        </a-col>
     </a-row>
 </template>
 

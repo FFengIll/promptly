@@ -22,8 +22,8 @@ const router = createRouter({
 
         },
         {
-            path: '/view/test',
-            name: 'prompt test',
+            path: '/view/testing',
+            name: 'prompt testing',
             component: () => import('../views/TestingView.vue'),
             props: true,
         },

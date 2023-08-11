@@ -15,7 +15,7 @@
 
                 <a-collapse>
                     <a-collapse-panel header="History">
-                        <a-space direction="horizontal" align="baseline" v-for="h in data.profile.history">
+                        <a-space direction="horizontal" align="baseline" v-for="h in prompt.history">
                             <a-button @click="copy(h)">
                                 <template #icon>
                                     <CopyOutlined />
@@ -25,7 +25,7 @@
                             <!-- <a-textarea v-bind="h"> </a-textarea> -->
 
 
-                            <!-- <button v-on:click="setContent(item.id, h)">Set</button> -->
+                            <!-- <button v-on:click="setContent(item.index, h)">Set</button> -->
 
                         </a-space>
                     </a-collapse-panel>
@@ -67,25 +67,25 @@
 
 
                 <a-card title="Prompt">
-                    <a-button @click="() => { data.profile.messages.forEach((item) => item.enable = false) }">Disable
+                    <a-button @click="() => { prompt.messages.forEach((item) => item.enable = false) }">Disable
                         All
                     </a-button>
-                    <a-button @click="() => { data.profile.messages.forEach((item) => item.enable = true) }">Enable
+                    <a-button @click="() => { prompt.messages.forEach((item) => item.enable = true) }">Enable
                         All
                     </a-button>
 
 
                     <div>
-                        <PromptInput :messages="data.profile.messages" with-copy with-control
-                            @order-up="id => order(id, -1)" @order-down="id => order(id, 1)"
-                            @remove="id => deletePrompt(id)" @add="id => addPrompt(id, '')">
+                        <PromptInput :messages="prompt.messages" with-copy with-control
+                            @order-up="index => order(index, -1)" @order-down="index => order(index, 1)"
+                            @remove="index => deletePrompt(index)" @add="index => addPrompt(index, '')">
 
                         </PromptInput>
                     </div>
 
                     <a-divider>
                         <a-space>
-                            <a-button @click="() => data.profile.messages.push({})">
+                            <a-button @click="() => prompt.messages.push({})">
                                 <template #icon>
                                     <PlusOutlined />
                                 </template>
@@ -105,7 +105,7 @@
                 <a-collapse>
 
                     <a-collapse-panel header="Prompt Preview">
-                        <PromptCard :messages="data.profile.messages.filter((i) => i.enable)"></PromptCard>
+                        <PromptCard :messages="prompt.messages.filter((i) => i.enable)"></PromptCard>
                     </a-collapse-panel>
                 </a-collapse>
 
@@ -116,10 +116,9 @@
                             <a-button @click="chat">Request</a-button>
                             <a-button @click="commit">Commit</a-button>
                             <a-button @click="reload">Reload</a-button>
-                            <a-button @click="gotoDebug">Goto Debug</a-button>
+                            <a-button @click="gotoTesting">Goto Testing</a-button>
                             <a-button @click="gotoCommit">Goto Commit</a-button>
                         </a-space>
-
 
                     </a-space>
                 </a-card>
@@ -139,8 +138,8 @@
 
                     <a-divider></a-divider>
 
-                    <a-textarea v-model:value="data.response" :auto-size="{ minRows: 20 }"
-                        placeholder="textarea with clear icon" allow-clear />
+                    <a-textarea v-model:value="response" :auto-size="{ minRows: 20 }" placeholder="textarea with clear icon"
+                        allow-clear />
                 </a-card>
 
             </a-col>
@@ -164,7 +163,7 @@ import { RouteHelper } from '@/scripts/router';
 import type { NotificationPlacement } from "ant-design-vue";
 import { notification } from 'ant-design-vue';
 import type { Commit } from 'sdk/models';
-import type { Snapshot } from "../../sdk";
+import type { Message } from "../../sdk";
 import PromptCard from '../components/PromptCard.vue';
 
 const [notification_api, contextHolder] = notification.useNotification();
@@ -184,37 +183,30 @@ const props = defineProps<{
 // field
 console.log(store.source.args)
 const args = ref(store.source.args)
-
-const history = ref<any>([{
-    messages: [
-        { id: 1, role: "user", content: "content", enable: true, order: 0 },
-    ],
-    response: ""
-}])
-
-const data = ref({
-    response: <string>"",
-    profile: {
-        payload: "",
-        "history": ["1"],
-        "messages": [
-            { id: 1, role: "角色1", content: "内容1", enable: true, order: 0, history: [] },
+const response = ref(<string>"")
+const prompt = ref(
+    {
+        "history": [],
+        "messages": <Message[]>[
+            { id: 1, role: "角色1", content: "内容1", enable: true, order: 0 },
             // 其他数据项
         ],
 
     }
-})
+)
 
 // created
 fetchProfile(key);
 
+
+
 // methods
 function sendToPrompt() {
-    addPrompt(data.value.profile.messages[data.value.profile.messages.length - 1].id, data.value.response)
+    addPrompt(prompt.value.messages[prompt.value.messages.length - 1].index, response.value)
 }
 
 function deletePrompt(order: number) {
-    let ms = data.value.profile.messages
+    let ms = prompt.value.messages
 
     ms.splice(order, 1); // 删除指定索引的元素
 
@@ -224,111 +216,56 @@ function deletePrompt(order: number) {
 function gotoCommit() {
     console.log(key)
 
-    store.sendSource(key, data.value.profile.messages, [])
+    store.sendSource(key, prompt.value.messages, [])
     RouteHelper.toCommit(key)
 }
 
-function gotoDebug() {
-    store.sendSource(key, data.value.profile.messages, [])
-    RouteHelper.toDebug(key)
+function gotoTesting() {
+    store.sendSource(key, prompt.value.messages, [])
+    RouteHelper.toTesting(key)
 }
 
-function useSnapshot(snapshot: Snapshot) {
-    console.log(snapshot)
-    let target = data.value.profile.messages
-    let prompt = snapshot.prompt!!
-    data.value.response = snapshot.response!!
-    for (let i = 0; i < target.length; i++) {
-        if (i >= prompt.length) {
-            target[i].enable = false
-        } else {
-            target[i].enable = true
-            target[i].role = prompt[i].role
-            target[i].content = prompt[i].content
-        }
 
-    }
-}
+async function commit() {
+    await api.apiPromptKeyPost(prompt.value.messages, key)
 
-function commit() {
-
-    // let prompt: PromptItem[] = []
-    // data.value.profile.messages.forEach(
-    //     (item: Message): any => {
-    //         if (item.enable) {
-    //             let res: PromptItem = { role: item.role, content: item.content }
-    //             prompt.push(res)
-    //         }
-
-    //     }
-    // )
     let commit: Commit = {
-        messages: data.value.profile.messages,
-        response: data.value.response
+        messages: prompt.value.messages,
+        response: response.value
     }
     api.apiCommitPost(commit, key,).then(() => {
 
     })
 }
 
-function addPrompt(id: number, content: string) {
-    let index = data.value.profile.messages.findIndex((item) => item.id == id)
-    let order = data.value.profile.messages[index].order
-    let max_id = 0
-    data.value.profile.messages.forEach((item) => {
-        if (item.id > max_id) {
-            max_id = item.id
-        }
-    })
+function addPrompt(index: number, content: string) {
+    let m: Message = { content: content, role: 'user', enable: true, id: 0, order: 0 }
+    prompt.value.messages.splice(index, 0, [m])
 
-    data.value.profile.messages.splice(
-        index,
-        0,
-        { role: "user", id: max_id + 1, enable: true, content: content, order: order, history: [] }
-    )
-
-    data.value.profile.messages.forEach((elem, index) => {
-        elem.order = index;
-        elem.id = index
-    })
-
-    console.log(data.value.profile.messages)
+    console.log(prompt.value.messages)
 }
 
-function order(id: number, delta: number) {
-    let index = data.value.profile.messages.findIndex((m) => {
-        return (m.id == id)
-    })
-
-    if (index < 0) {
+function order(index: number, delta: number) {
+    let another = index + delta
+    console.log('index', index, another)
+    if (another < 0 || another >= prompt.value.messages.length) {
         return
     }
+    let current = prompt.value.messages[index]
+    let next = prompt.value.messages[index + delta]
 
-    console.log(index)
+    prompt.value.messages[index] = next
+    prompt.value.messages[index + delta] = current
 
-    let temp = data.value.profile.messages[index]
-    data.value.profile.messages[index] = data.value.profile.messages[index + delta]
-    data.value.profile.messages[index + delta] = temp
-
-    for (var i = 0; i < data.value.profile.messages.length; i++) {
-        data.value.profile.messages[i].order = i
-    }
-
-    console.log(data.value.profile.messages)
+    console.log(prompt.value.messages)
 }
 
-function setContent(id: number, content: string) {
-    data.value.profile.messages.forEach((m) => {
-        if (m.id == id) {
-            m.content = content
-        }
-    })
-}
 
 async function fetchProfile(key: string) {
-    api.apiPromptKeyGet(key)
+    await api.apiPromptKeyGet(key)
         .then(response => {
-            data.value.profile = response.data;
+            prompt.value = response.data;
+            store.sendSource(key, prompt.value.messages, [])
         })
         .catch(error => {
             console.error(error);
@@ -351,8 +288,11 @@ function openNotification(message: string, status: string) {
 }
 
 async function chat() {
-    let response = await ApiHelper.doChat(key, data.value.profile.messages, args.value)
-    data.value.response = response.data;
+    await api.apiPromptKeyPost(prompt.value.messages, key)
+
+    response.value = ''
+    let res = await ApiHelper.doChat(key, prompt.value.messages, args.value)
+    response.value = res.data;
 }
 </script>
   

@@ -10,8 +10,8 @@ export class RouteHelper {
         router.push(`/view/commit/${key}`)
     }
 
-    static toDebug(key: string) {
-        router.push('/view/debug')
+    static toTesting(key: string) {
+        router.push('/view/testing')
     }
 }
 

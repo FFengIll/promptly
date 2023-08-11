@@ -58,7 +58,6 @@ const store = useSnapshotStore()
 fetchList(false)
 
 function openPrompt(key: string) {
-    store.sendSource(key, [], [])
     router.push(`/view/prompt/${key}`)
 }
 
