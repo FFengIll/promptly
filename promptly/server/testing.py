@@ -6,7 +6,7 @@ import loguru
 from pydantic import BaseModel
 
 from promptly.model.case import CaseResult
-from promptly.model.prompt import Message
+from promptly.model.prompt import Message, Commit
 from promptly.server import llm
 from promptly.server.app import app
 from promptly.server.app import mongo
@@ -48,7 +48,7 @@ async def batch_test(messages, data):
 
         target = await llm.chat(ms)
         log.info("response: {}", target)
-        mongo.history.push(Snapshot(prompt=ms, response=target))
+        mongo.history.push(Commit(messages=ms, response=target))
 
         res.append(CaseResult(source=source, target=target, id=idx).dict())
 
