@@ -177,7 +177,6 @@ const key = r.params.key.toString()
 
 // props
 const props = defineProps<{
-    key: string
 }>()
 
 // field
