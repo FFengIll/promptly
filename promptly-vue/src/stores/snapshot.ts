@@ -15,7 +15,7 @@ export const useSnapshotStore = defineStore('snapshot', {
     })
     ,
     actions: {
-        async sendSource(source: string, ms: Message[], args: Argument[]) {
+        sendSource(source: string, ms: Message[], args: Argument[]) {
             this.$patch(
                 {
                     source: {
