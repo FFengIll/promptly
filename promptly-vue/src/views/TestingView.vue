@@ -32,8 +32,6 @@
             </a-col>
             <a-col :span="12">
 
-
-
                 <!-- show dataset info -->
                 <a-card title="Case List">
                     <a-checkbox v-model:checked="useCase">Use Case</a-checkbox>
@@ -53,15 +51,11 @@
 
                     <a-divider />
 
-
                     <!-- case description -->
                     Case Description:&nbsp;&nbsp;
                     <span>{{ config.description }}</span>
                     <a-divider />
 
-                    <!-- <div v-for="item in config.data" :key="item">
-                        <a-list-item>{{ item }}</a-list-item>
-                    </div> -->
                 </a-card>
 
                 <a-card title="Operation">
@@ -82,10 +76,8 @@
                             </a-space>
                         </a-input-group>
 
-
                         <!-- click to run -->
                         <a-button type="primary" @click="debugAll">Run Test</a-button>
-
 
                     </a-space>
                 </a-card>
@@ -95,11 +87,21 @@
             <a-col :span="24">
 
                 <!-- show result -->
+                <div v-for="(item, index) in config.data" :key="index">
+                    <a-list-item>
+                        <a-typography-text> {{ item }}</a-typography-text>
+                        <a-button @click="debugOne(item)">Request</a-button>
+                        <a-button @click="sendBack(item)">Send Back</a-button>
+                        <a-button @click="gotoSource(store.source.name)"> Go To Source</a-button>
+                    </a-list-item>
+
+                </div>
+
                 <a-table :dataSource="result" :columns="columns" :rowKey="(record: any) => record.id">
                     <template #bodyCell="{ column, record }">
                         <template v-if="column.key === 'action'">
                             <span>
-                                <a-button @click="debugOne(record)">Request</a-button>
+                                <a-button @click="debugOne(record.source)">Request</a-button>
                                 <a-button @click="sendBack(record.source)">Send Back</a-button>
                                 <a-button @click="gotoSource(store.source.name)"> Go To Source</a-button>
 
@@ -164,7 +166,9 @@ const result = ref(
 
 const config = ref({
     id: "",
-    data: ["1", "2"],
+    data: [
+
+    ],
     description: "description"
 
 })
@@ -176,6 +180,14 @@ const caseList = ref(
 )
 
 listCase(false)
+
+function toTestcase() {
+    return config.value.data.map((item, index) => {
+        return { id: index, source: item, target: "" }
+    })
+}
+
+const testcase = ref(toTestcase())
 
 
 const columns: TableColumnType[] = [
@@ -216,7 +228,7 @@ function sendBack(source: string) {
         return copied
     })
 
-    api.apiPromptKeyPost(res, store.source.name)
+    api.apiPromptPost(res, store.source.name)
         .then(
             response => {
                 console.log(response)
@@ -231,20 +243,18 @@ function gotoSource(source: string) {
     router.push(`/view/prompt/${source}`)
 }
 
-async function debugOne(params: Params) {
-    console.log(params)
+async function debugOne(source: string) {
 
     var res = store.source.messages.filter(item => {
         return item.enable == true
     })
     let body: TestingRequestBody = {
         messages: res,
-        sources: [params.source]
+        sources: [source]
     }
     await api.apiTestingPost(body, repeat.value).then(
         (response) => {
             let element = response.data[0]
-            element.id = params.id
             result.value.splice(0, 0, element)
         }
     )
@@ -290,17 +300,10 @@ async function listCase(refresh: boolean) {
 
 async function getCase(id: string) {
     await api.apiCaseKeyGet(id).then((response) => {
-        config.value = response.data
-
-        let array: string[] = config.value.data
 
         console.log(response.data)
 
-        result.value = array.map(
-            (elem, index) => {
-                return { id: index, source: elem, target: "" }
-            }
-        )
+        config.value = response.data
     })
 }
 

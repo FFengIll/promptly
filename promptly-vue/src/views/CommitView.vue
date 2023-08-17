@@ -4,11 +4,13 @@ import router from "@/router";
 import { ApiFactory, ApiHelper } from "@/scripts/api";
 import { RouteHelper } from "@/scripts/router";
 import { useSnapshotStore } from "@/stores/snapshot";
-import { PlusOutlined, SyncOutlined } from "@ant-design/icons-vue";
 import { storeToRefs } from "pinia";
-import type { Argument, Commit, CommitRequest } from "sdk/models";
+import type { ArgumentSetting, CommitItem } from "sdk/models";
 import { ref } from "vue";
 import { useRoute } from 'vue-router';
+
+import CaseInput from '@/components/CaseInput.vue';
+import type { Argument } from '@/scripts/models.ts';
 
 //
 const api = ApiFactory()
@@ -23,17 +25,42 @@ const key = ref<string>(route.params.key.toString())
 const autoSave = ref<boolean>(true)
 const { source } = storeToRefs(store)
 
-const commits = ref<Commit[]>(
+const commits = ref<CommitItem[]>(
     []
 )
+const argSetting = ref<ArgumentSetting>(
+    {
+        name: "",
+        args: {}
+    }
+)
+const args = ref<Map<string, string>>(new Map())
 
-const args = ref<Argument[]>(
-    []
-)
 
 console.log("store source", source.value)
 
-getCommit(source.value.name)
+const created = async () => {
+    await api.apiPromptArgsGet(key.value)
+        .then(response => {
+            argSetting.value = response.data
+
+            console.log('setting', argSetting.value)
+            let tmp = argSetting.value.args
+            for (let key in tmp) {
+                if (tmp.hasOwnProperty(key)) {
+                    const values = tmp[key];
+                    console.log(tmp, key, values)
+                    args.value.set(key, values[0])
+                }
+            }
+
+            console.log("arguments", args.value)
+
+        })
+    await getCommit(source.value.name)
+}
+created()
+
 
 async function getCommit(name: string) {
 
@@ -41,11 +68,8 @@ async function getCommit(name: string) {
         response => {
             console.log('request', response.data)
 
-            commits.value = response.data.commits.filter(item => item.messages.length > 0)
+            commits.value = response.data.commits.filter((item: CommitItem) => item.messages.length > 0)
             console.log('data', commits.value)
-
-            args.value = response.data.args
-            console.log('args', args.value)
 
         }
     ).catch(error => {
@@ -55,7 +79,7 @@ async function getCommit(name: string) {
     console.log(store.source)
 
     if (commits.value.length <= 0) {
-        await api.apiPromptKeyGet(name).then(
+        await api.apiPromptGet(name).then(
             response => {
                 console.log('request', response.data)
 
@@ -72,13 +96,12 @@ async function getCommit(name: string) {
 }
 
 
-
-function gotoTest(it: Commit, args: Argument[]) {
+function gotoTest(it: CommitItem, args: Argument[]) {
     store.sendSource(store.source.name, it.messages, args)
     router.push('/view/debug')
 }
 
-async function doCommit(key: string, commit: Commit) {
+async function doCommit(key: string, commit: CommitItem) {
     // commit current
     await api.apiCommitPost(commit, key).then(
         response => {
@@ -98,42 +121,11 @@ async function doCommit(key: string, commit: Commit) {
     commits.value.unshift(another)
 }
 
-async function saveCommit(key: string, data: Commit[],) {
-    let req: CommitRequest = {
-        commits: data,
-        args: []
-    }
 
-    await api.apiCommitAllPost(req, key).then(
-        response => {
-            console.log("success")
-        }
-    )
-}
 
-async function saveArgument(key: string, args: Argument[]) {
-    let req: CommitRequest = {
-        commits: [],
-        args: args
-    }
+async function saveCommits(key: string, data: CommitItem[]) {
 
-    await api.apiCommitAllPost(req, key).then(
-        response => {
-            console.log("success")
-        }
-    )
-}
-
-async function saveCommits(key: string, data: Commit[], args: Argument[]) {
-
-    let req: CommitRequest = {
-        commits: data,
-        args: args
-    }
-
-    console.log('request', req)
-
-    await api.apiCommitAllPost(req, key).then(
+    await api.apiCommitAllPost(data, key).then(
         response => {
             console.log("success")
         }
@@ -145,44 +137,39 @@ function dropCommit(index: number) {
     commits.value.splice(index, 1)
 }
 
-function newArg() {
-    args.value.push({ key: '', value: '' })
+
+function argumentList() {
+    let items: Argument[] = []
+
+    // map for each params are different
+    args.value.forEach((value, key) => {
+        let item = <Argument>{ key: key, value: value }
+        items.push(item)
+    })
+
+    return items
 }
 
-function cleanArgs() {
-    args.value = args.value.filter(item => item.key != '' && item.value != '')
-    console.log(args.value)
-}
-
-async function doChat(key: string, commit: Commit, args: Argument[]) {
+async function doChat(key: string, commit: CommitItem) {
     commit.response = ""
-    let response = await ApiHelper.doChat(key, commit.messages!!, args)
+    let response = await ApiHelper.doChat(key, commit.messages!!, argumentList())
     console.log('response', response)
     commit.response = response.data
 
     console.log(commits.value)
 }
 
-async function gotoPrompt(commit: Commit) {
+async function gotoPrompt(commit: CommitItem) {
 
     let name = key.value
 
-    await api.apiPromptKeyPost(commit.messages!!, name)
-
+    await api.apiPromptPost(commit.messages!!, name)
 
     console.log("args", args.value)
 
-    await store.sendSource(name, commit.messages!!, args.value)
+    let items = argumentList()
 
-    // await api.apiPromptKeyPost(res, name)
-    //     .then(
-    //         response => {
-    //             console.log(response)
-    //         }
-    //     )
-    //     .catch(error => {
-    //         console.error(error)
-    //     })
+    store.sendSource(name, commit.messages!!, items)
 
     RouteHelper.toPrompt(name)
 }
@@ -199,33 +186,10 @@ const pagination = {
 <template>
     <a-row>
         <a-col>
-            <a-list item-layout="horizontal" :data-source="args">
-                <template #renderItem="{ item }">
-                    <a-list-item>
-                        <!-- <template #actions>
-                            <a key="list-loadmore-edit">edit</a>
-                            <a key="list-loadmore-more">more</a>
-                        </template> -->
-                        <a-input-group>
-                            <a-space direction="horizontal">
-                                <a-typography-text>
-                                    Key
-                                </a-typography-text>
-                                <a-input v-model:value="item.key"></a-input>
-
-                                <a-typography-text>
-                                    Value
-                                </a-typography-text>
-                                <a-input v-model:value="item.value"></a-input>
-
-                            </a-space>
-
-                        </a-input-group>
-                    </a-list-item>
-                </template>
-            </a-list>
+            <CaseInput :setting="argSetting" :args="args" @select="(key, value) => { args.set(key, value) }">
+            </CaseInput>
         </a-col>
-        <a-col>
+        <!-- <a-col>
             <a-button @click="newArg()">
                 <template #icon>
                     <PlusOutlined />
@@ -236,7 +200,7 @@ const pagination = {
                     <SyncOutlined />
                 </template>
             </a-button>
-        </a-col>
+        </a-col> -->
     </a-row>
     <a-row :gutter="[16, 16]">
         <a-col :span="24" class="gutter-row">
@@ -244,7 +208,7 @@ const pagination = {
                 <a-input-group compact>
                     <a-input v-model:value="key" style="width: 100px" />
                     <a-button type="primary" @click="getCommit(key)">Get</a-button>
-                    <a-button type="primary" @click="saveCommits(key, commits, args)">Save</a-button>
+                    <a-button type="primary" @click="saveCommits(key, commits)">Save</a-button>
                 </a-input-group>
                 <a-checkbox v-model:checked="autoSave">Auto Save</a-checkbox>
             </a-space>
@@ -260,10 +224,10 @@ const pagination = {
                 </a-textarea>
 
                 <!--        button-->
-                <a-button @click="doChat(key, commit, args)">Request</a-button>
+                <a-button @click="doChat(key, commit)">Request</a-button>
                 <a-button @click="gotoTest(commit, args)">Goto Test</a-button>
                 <a-button @click="gotoPrompt(commit)">Goto Prompt</a-button>
-                <a-button @click="doCommit(key, commit)">Commit</a-button>
+                <a-button @click="doCommit(key, commit)">CommitItem</a-button>
                 <a-button @click="dropCommit(index)">Drop</a-button>
 
 

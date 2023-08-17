@@ -63,13 +63,13 @@ function openPrompt(key: string) {
 
 
 async function create_profile(name: string) {
-    await api.apiPromptKeyPut(name)
+    await api.apiPromptPut(name)
     fetchList(true)
 }
 
 
 async function fetchList(refresh: boolean) {
-    return api.apiPromptGet(refresh).then(
+    return api.apiListPromptGet(refresh).then(
         response => {
             console.log(response.data)
             keys.value = response.data.keys
