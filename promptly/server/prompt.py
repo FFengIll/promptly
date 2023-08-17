@@ -3,8 +3,15 @@ from typing import List
 import fastapi
 import loguru
 from pydantic import BaseModel
+from pymongo import results
 
-from promptly.model.prompt import Argument, Commit, Message, Profile, Project
+from promptly.model.prompt import (
+    ArgumentSetting,
+    CommitItem,
+    Message,
+    Prompt,
+    PromptCommit,
+)
 from promptly.server import llm
 from promptly.server.app import app, mongo
 from promptly.server.llm import to_message
@@ -19,27 +26,19 @@ def shutdown_event():
     pass
 
 
-@app.put("/api/prompt/{key}")
+@app.put("/api/prompt")
 def create_prompt(key: str):
     if manager.get(key):
         log.warning("existed profile")
         return
 
-    p = Profile(name=key)
+    p = Prompt(name=key)
     manager.add_profile(p)
     manager.reload()
     return
 
 
-@app.get("/api/prompt/{key}/snapshot")
-def get_snapshot(key: str):
-    p = manager.get(key)
-    if p:
-        return [s.dict() for s in p.snapshots]
-    raise fastapi.HTTPException(status_code=404)
-
-
-@app.get("/api/prompt/{key}")
+@app.get("/api/prompt")
 def load_profile(key: str):
     profile = manager.get(key=key)
     if not profile:
@@ -47,7 +46,7 @@ def load_profile(key: str):
     return profile.dict()
 
 
-@app.post("/api/prompt/{key}")
+@app.post("/api/prompt")
 def update_profile(key: str, update: List[Message]):
     p = manager.get(key)
     p.messages = update
@@ -58,34 +57,6 @@ def update_profile(key: str, update: List[Message]):
     return p
 
 
-@app.post("/api/chat/{key}")
-async def chat_with_key(key: str, ms: List[Message]):
-    p: Profile = manager.get(key)
-    if not p:
-        raise fastapi.HTTPException(404)
-    p.messages = ms
-
-    for m in p.messages:
-        if m.content not in p.history:
-            p.history.append(m.content)
-
-    # update
-    manager.update_message(p)
-    manager.update_history(p)
-
-    ms = to_message(p.messages)
-    log.info(ms)
-
-    content = await llm.chat(ms)
-    log.info(content)
-
-    mongo.history.push(Snapshot(prompt=ms, response=content))
-
-    log.info(content)
-
-    return content
-
-
 @app.post("/api/chat/")
 async def chat(ms: List[Message]):
     ms = to_message(ms)
@@ -94,11 +65,11 @@ async def chat(ms: List[Message]):
     content = await llm.chat(ms)
     log.info(content)
 
-    mongo.history.push(Commit(messages=ms, response=content))
+    mongo.history.push(CommitItem(messages=ms, response=content))
     return content
 
 
-@app.get("/api/prompt")
+@app.get("/api/list/prompt")
 def list_prompt(refresh: bool = False):
     if refresh:
         manager.reload()
@@ -106,33 +77,53 @@ def list_prompt(refresh: bool = False):
 
 
 class CommitRequest(BaseModel):
-    commits: List[Commit]
-    args: List[Argument]
+    commits: List[CommitItem]
 
 
 @app.post("/api/commit")
-def commit_one(commit: Commit, name: str):
-    mongo.commit.add_commit(
+def commit_one(commit: CommitItem, name: str):
+    res = mongo.commit.add_commit(
         name,
         commit,
     )
+    return check_mongo_result(res)
 
 
-@app.post("/api/commit/args")
-def commit_one(args: List[Argument], name: str):
-    mongo.commit.update_args(
-        name,
-        args,
-    )
+def check_mongo_result(res: results.UpdateResult):
+    if not res.acknowledged:
+        raise fastapi.HTTPException(404)
+
+    # if res.modified_count <= 0 and res.matched_count<=0:
+    #     raise fastapi.HTTPException(404)
+
+
+@app.post("/api/prompt/args")
+def save_args(args: ArgumentSetting):
+    return mongo.argument.save_setting(args)
+
+
+@app.get("/api/prompt/args")
+def get_args(name: str):
+    return mongo.argument.get_setting(name)
+
+
+class ArgRequest(BaseModel):
+    key: str
+    value: str
+
+
+@app.post("/api/prompt/arg")
+def save_one_arg(item: ArgRequest, name: str):
+    mongo.argument.add_value(name, item.key, item.value)
 
 
 @app.post("/api/commit/all")
 def do_commit(
-    req: CommitRequest,
+    commits: List[CommitItem],
     name: str,
 ):
-    project = Project(name=name, iters=req.commits, args=req.args)
-    return mongo.commit.push(project)
+    project = PromptCommit(name=name, iters=commits)
+    mongo.commit.push(project)
 
 
 @app.get("/api/commit")
