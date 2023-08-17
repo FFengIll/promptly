@@ -4,10 +4,16 @@ import loguru
 from pymongo import MongoClient
 from pymongo.collection import Collection
 
-from dao.base import BaseCaseManager, BaseProfileManager
-from model.case import Case
+from promptly.dao.base import BaseCaseManager, BaseProfileManager
+from promptly.model.case import Case
 
-from model.prompt import ArgumentSetting, CommitItem, Argument, PromptCommit, Prompt
+from promptly.model.prompt import (
+    ArgumentSetting,
+    CommitItem,
+    Argument,
+    PromptCommit,
+    Prompt,
+)
 
 url = "mongodb://localhost:27017/"
 
