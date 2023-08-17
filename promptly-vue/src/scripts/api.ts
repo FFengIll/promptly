@@ -1,4 +1,5 @@
-import type { Argument, Message } from "sdk/models";
+import type { Argument } from '@/scripts/models.ts';
+import type { Message } from "sdk/models";
 import * as defaultApi from "../../sdk/apis/default-api";
 import { format } from "./template";
 
@@ -11,26 +12,24 @@ const api = ApiFactory()
 
 export class ApiHelper {
     static async doChat(key: string, messages: Message[], args: Argument[]) {
-        return await api.apiCommitArgsPost(args, key)
-            .then(
-                (response) => {
 
-                    console.log(messages)
+        console.log("origin message", messages)
+        console.log("origin argument", args)
 
-                    let ms = messages?.filter((item: Message) => item.enable)
+        let ms = messages?.filter((item: Message) => item.enable)
 
-                    let another: Message[] = JSON.parse(JSON.stringify(ms))
-                    another.forEach((item) => {
-                        item.content = format(item.content, args)
-                    })
-                    console.log("will chat with messages", another)
+        let another: Message[] = JSON.parse(JSON.stringify(ms))
+        another.forEach((item) => {
+            item.content = format(item.content, args)
+            console.log(item.content)
+        })
+        console.log("will chat with messages", another)
 
-                    return api.apiChatPost(another).then(
-                        (response) => {
-                            return response
-                        }
-                    )
-                }
-            )
+        return api.apiChatPost(another).then(
+            (response) => {
+                return response
+            }
+        )
+
     }
 }
