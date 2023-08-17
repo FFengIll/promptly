@@ -1,12 +1,11 @@
-export function format(template: string, kv: { key: string, value: string }[]) {
+import type {Argument} from '@/scripts/models.ts'
+
+export function format(template: string, args: Argument[]) {
     var res = template
 
-    kv.forEach(item => {
-        console.log('replace with', item)
-        res = res.replace("${" + item.key + "}", item.value)
+    args.forEach(item => {
+        res = res.replace("${" + item.key + "}", item.value!!)
     })
-
-    console.log(res)
 
     return res
 }
