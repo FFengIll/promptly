@@ -1,5 +1,5 @@
 from hashlib import md5
-from typing import Any, List
+from typing import Any, Dict, List
 from uuid import uuid1
 
 import loguru
@@ -40,7 +40,7 @@ class Message(BaseModel):
 
 
 @autocomplete
-class Commit(BaseModel):
+class CommitItem(BaseModel):
     messages: List[Message] = Field(default_factory=list)
     response: str = ""
     md5: str = ""
@@ -58,20 +58,24 @@ class Commit(BaseModel):
 
 
 class Argument(BaseModel):
-    key: str
-    value: str
+    key: str = Field(default="")
+    value: str = Field(default="")
+
+
+class ArgumentSetting(BaseModel):
+    name: str
+    args: Dict[str, List[str]] = Field(default_factory=dict)
 
 
 @autocomplete
-class Project(BaseModel):
+class PromptCommit(BaseModel):
     name: str
-    commits: List[Commit] = Field(default_factory=list)
-    args: List[Argument] = Field(default_factory=list)
+    commits: List[CommitItem] = Field(default_factory=list)
     cases: List[List[Argument]] = Field(default_factory=list)
 
 
 @autocomplete
-class Profile(BaseModel):
+class Prompt(BaseModel):
     name: str = Field(default="")
     messages: List[Message] = Field(default_factory=list)
     history: List[str] = Field(default_factory=list)
@@ -80,12 +84,12 @@ class Profile(BaseModel):
         super().__init__(**data)
 
     @classmethod
-    def sample(cls) -> "Profile":
-        return Profile(name="sample", messages=[Message.sample()])
+    def sample(cls) -> "Prompt":
+        return Prompt(name="sample", messages=[Message.sample()])
 
     @classmethod
     def generate_demo(cls):
-        return Profile(
+        return Prompt(
             name="demo", messages=[Message(id=1, role="user", content="hello")]
         )
 
@@ -100,7 +104,7 @@ class Profile(BaseModel):
 
 
 def test_model():
-    res = Profile.parse_obj(dict(name="", messages=[]))
+    res = Prompt.parse_obj(dict(name="", messages=[]))
     print(res)
 
 
@@ -112,5 +116,5 @@ def test_json():
 
 def test_commit():
     for i in range(5):
-        c = Commit()
+        c = CommitItem()
         print(c.md5)
