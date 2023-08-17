@@ -106,10 +106,8 @@ function color(role: string) {
                 </a-space>
 
             </a-divider>
-
         </a-row>
         <a-row>
-
             <!-- role -->
             <a-space direction="vertical">
                 <a-radio-group v-if="!withSidebar" v-model:value="item.role" option-type="button" button-style="solid">
@@ -136,7 +134,7 @@ function color(role: string) {
 
             <a-col :span='24'>
                 <!-- content edit -->
-                <a-textarea v-model:value="item.content" :auto-size="{ minRows: 3, maxRows: 5 }"
+                <a-textarea :disabled="!item.enable" v-model:value="item.content" :auto-size="{ minRows: 3, maxRows: 5 }"
                     placeholder="textarea with clear icon" />
             </a-col>
 
