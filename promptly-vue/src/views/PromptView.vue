@@ -123,7 +123,7 @@
                     <a-space direction="vertical">
                         <a-space direction="horizontal">
                             <a-button @click="chat">Request</a-button>
-                            <a-button @click="commit">Commit</a-button>
+                            <a-button @click="doCommit">Commit</a-button>
                             <a-button @click="reload">Reload</a-button>
                             <a-button @click="gotoTesting">Goto Testing</a-button>
                             <a-button @click="gotoCommit">Goto Commit</a-button>
@@ -143,7 +143,7 @@
                             <a-divider type="vertical"></a-divider>
 
                             <a-space>
-                                <a-button @click="sendToPrompt">Append to prompt</a-button>
+                                <a-button @click="responseToPrompt">Append to prompt</a-button>
                             </a-space>
 
                             <a-divider></a-divider>
@@ -256,8 +256,8 @@ function saveArgs() {
 
 
 // methods
-function sendToPrompt() {
-    addPrompt(prompt.value.messages[prompt.value.messages.length - 1].index, response.value)
+function responseToPrompt() {
+    addPrompt(prompt.value.messages.length - 1, response.value)
 }
 
 function deletePrompt(index: number) {
@@ -279,9 +279,7 @@ function gotoTesting() {
 }
 
 
-async function commit() {
-
-
+async function doCommit() {
     let commit: CommitItem = {
         messages: prompt.value.messages,
         response: response.value
@@ -289,7 +287,6 @@ async function commit() {
     api.apiCommitPost(commit, key,).then(() => {
 
     })
-
 }
 
 function addPrompt(index: number, content: string) {
