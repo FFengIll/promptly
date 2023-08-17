@@ -1,19 +1,17 @@
-from typing import Dict, List
+from typing import List
 
 import loguru
 from pymongo import MongoClient
 from pymongo.collection import Collection
 
-from promptly.manager.base import BaseCaseManager, BaseProfileManager
-from promptly.model.case import Case
-from promptly.model.prompt import (
-    Argument,
-    ArgumentSetting,
-    CommitItem,
-    Prompt,
-    PromptCommit,
-)
+from dao.base import BaseCaseManager, BaseProfileManager
+from model.case import Case
 
+from model.prompt import ArgumentSetting, CommitItem, Argument, PromptCommit, Prompt
+
+url = "mongodb://localhost:27017/"
+
+client = MongoClient(url)
 log = loguru.logger
 
 
@@ -200,8 +198,6 @@ class MongoPromptManger(BaseProfileManager):
 
 
 def test_mongo_manager():
-    from promptly.orm.mongo import client
-
     m = MongoPromptManger(client)
     print(m.index)
 

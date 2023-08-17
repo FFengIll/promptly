@@ -1,8 +1,7 @@
 import fastapi
 import loguru
 
-from promptly.manager.memory import CaseManager
-from promptly.manager.mongo import MongoCaseManager
+from promptly.dao.mongo import MongoCaseManager
 from promptly.model.case import Case
 from promptly.server.app import app, mongo
 
