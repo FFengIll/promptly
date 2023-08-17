@@ -1,10 +1,10 @@
 from typing import Dict
 
 from path import Path
-from tinydb import TinyDB, Query
+from tinydb import Query, TinyDB
 
 from promptly.manager.base import BaseProfileManager
-from promptly.model.prompt import Profile, History
+from promptly.model.prompt import History, Prompt
 
 
 class TinyDBProfileManager(BaseProfileManager):
@@ -16,7 +16,7 @@ class TinyDBProfileManager(BaseProfileManager):
 
         base = Path(path)
 
-        self.index: Dict[str, Profile] = {}
+        self.index: Dict[str, Prompt] = {}
 
         self.db = TinyDB(base.joinpath("profile.json"))
         self.history_db = TinyDB(base.joinpath("history.json"))
@@ -29,11 +29,11 @@ class TinyDBProfileManager(BaseProfileManager):
         db.close()
 
     def reload(self):
-        q: Profile = Query()
+        q: Prompt = Query()
         res = self.db.search(q.name != "")
 
         for data in res:
-            profile = Profile(**data)
+            profile = Prompt(**data)
             self.index[profile.name] = profile
 
     def keys(self):
@@ -49,9 +49,9 @@ class TinyDBProfileManager(BaseProfileManager):
 
 def test_tinydb():
     m = TinyDBProfileManager("db/tinydb/profile.json")
-    m.db.insert(Profile.sample().dict())
+    m.db.insert(Prompt.sample().dict())
 
-    q: Profile = Query()
+    q: Prompt = Query()
     res = m.db.search(q.name != "")
     for i in res:
         print(res)

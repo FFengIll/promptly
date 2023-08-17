@@ -3,31 +3,31 @@ from typing import List
 import pickledb
 
 from promptly.model.event import UpdateEvent
-from promptly.model.prompt import Profile, Message
+from promptly.model.prompt import Message, Prompt
 
 
 class PickleProfileManager:
     def __init__(self, path):
         self.path = path
         self.db = pickledb.load(path, False)
-        self.index = {k: Profile(**self.db.get(k)) for k in self.db.getall()}
+        self.index = {k: Prompt(**self.db.get(k)) for k in self.db.getall()}
 
     def list_profile(self):
         return list(self.index.keys())
 
-    def get(self, name) -> Profile:
+    def get(self, name) -> Prompt:
         res = self.db.get(name)
         if res:
-            return Profile(**res)
+            return Prompt(**res)
         return None
 
-    def add(self, name, profile: Profile = None):
+    def add(self, name, profile: Prompt = None):
         if not profile:
-            profile = Profile.generate_demo()
+            profile = Prompt.generate_demo()
         self.index[name] = profile
 
     def update(self, name, events: List[UpdateEvent]):
-        p: Profile = self.index[name]
+        p: Prompt = self.index[name]
 
         for e in events:
             for m in p.messages:
@@ -47,7 +47,7 @@ def test_pickledb():
     m = PickleProfileManager("../server/database.pickle.db")
     print(m.index)
 
-    p = Profile(name="demo", messages=[Message(id=1, role="user", content="hello")])
+    p = Prompt(name="demo", messages=[Message(id=1, role="user", content="hello")])
     m.add("demo", p)
 
     m.save()

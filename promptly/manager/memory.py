@@ -4,10 +4,10 @@ from typing import List
 import loguru
 from path import Path
 
-from promptly.manager.base import BaseProfileManager, BaseCaseManager
+from promptly.manager.base import BaseCaseManager, BaseProfileManager
 from promptly.model.case import Case
 from promptly.model.event import UpdateEvent
-from promptly.model.prompt import Profile, Message, Commit
+from promptly.model.prompt import CommitItem, Message, Prompt
 
 log = loguru.logger
 
@@ -16,7 +16,7 @@ class ProfileManager(BaseProfileManager):
     def __init__(self, path) -> None:
         self.path = path
         self.file_map = {}
-        self.profiles: List[Profile] = []
+        self.profiles: List[Prompt] = []
 
         self.reload()
 
@@ -32,7 +32,7 @@ class ProfileManager(BaseProfileManager):
         for file in Path(path).listdir("*.json"):
             with open(file) as fd:
                 obj = json.load(fd)
-                profile = Profile.parse_obj(obj)
+                profile = Prompt.parse_obj(obj)
                 for idx, m in enumerate(profile.messages):
                     m.order = idx
 
@@ -58,14 +58,14 @@ class ProfileManager(BaseProfileManager):
     def get(
         self,
         key=None,
-    ) -> Profile:
+    ) -> Prompt:
         for p in self.profiles:
             if p.name == key:
                 return p
         return None
 
     def update_all(self, key: str, ms: List[Message]):
-        p: Profile = self.get(key)
+        p: Prompt = self.get(key)
 
         to_add = []
         for msg in ms:
@@ -89,7 +89,7 @@ class ProfileManager(BaseProfileManager):
         p.messages.sort(key=lambda x: x.order)
 
     def update_one(self, key: str, msg: Message):
-        p: Profile = self.get(key)
+        p: Prompt = self.get(key)
         found = False
         for m in p.messages:
             if m.id == msg.id:
@@ -115,7 +115,7 @@ class ProfileManager(BaseProfileManager):
     #                     m.history.append(e.value)
     #                 m.content = e.value
     #                 break
-    def push_history(self, item: Commit):
+    def push_history(self, item: CommitItem):
         pass
 
 
