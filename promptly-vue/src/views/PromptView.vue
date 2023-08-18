@@ -173,6 +173,7 @@ import { useSnapshotStore } from '@/stores/snapshot';
 import CaseInput from '@/components/CaseInput.vue';
 import PromptInput from "@/components/PromptInput.vue";
 import { ApiFactory, ApiHelper } from "@/scripts/api";
+import { ArgumentHelper } from '@/scripts/argument';
 import { RouteHelper } from '@/scripts/router';
 import type { NotificationPlacement } from "ant-design-vue";
 import { notification } from 'ant-design-vue';
@@ -285,7 +286,8 @@ function gotoTesting() {
 async function doCommit() {
     let commit: CommitItem = {
         messages: prompt.value.messages,
-        response: response.value
+        response: response.value,
+        args: ArgumentHelper.toArgumentList(args.value),
     }
     api.apiCommitPost(commit, key,).then(() => {
 

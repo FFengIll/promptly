@@ -11,7 +11,8 @@
             <a-col :span="12">
                 <a-card :title="`Prompt Snapshot [ name = ${store.source.name} ]`">
 
-                    <CaseInput :setting="argSetting" :args="args" @select="(key, value) => { args.set(key, value) }">
+                    <CaseInput :setting="argSetting" :mask="caseKey" :args="args"
+                        @select="(key, value) => { args.set(key, value) }">
                     </CaseInput>
 
                     <a-divider></a-divider>
@@ -34,7 +35,7 @@
                         </a-input-group>
 
                         <!-- click to run -->
-                        <a-button type="primary" @click="runTest">Run Test</a-button>
+                        <a-button type="primary" @click="runTest(repeat)">Run Test</a-button>
                     </a-space>
 
                     <a-divider></a-divider>
@@ -96,13 +97,12 @@
                     <a-divider />
 
 
-
                     <div v-for="(item, index) in config.data" :key="index">
                         <a-list-item>
                             <a-button @click="debugOne(item)">Request</a-button>
                             <a-button @click="sendBack(item)">Send Back</a-button>
                             <a-button @click="gotoSource(store.source.name)"> Go To Source</a-button>
-                            <a-typography-text :ellipsis="true"> {{ item }}</a-typography-text>
+                            <a-typography-text :ellipsis="true" :copyable="true" :content="item"> </a-typography-text>
                             <a-divider />
                         </a-list-item>
 
@@ -325,8 +325,8 @@ async function debugOne(source: string) {
     )
 }
 
-async function doRunTest(body: TestingRequestBody, repeat: number) {
-    await api.apiTestingPost(body, repeat).then(
+async function doRunTest(body: TestingRequestBody) {
+    await api.apiTestingPost(body, 1).then(
         (response) => {
             result.value.splice(0, 0, ...response.data)
         }
@@ -343,12 +343,12 @@ async function runTestWithCase() {
         args: ArgumentHelper.toArgumentList(args.value)
     }
 
-    doRunTest(body, 1)
+    doRunTest(body)
 
 }
 
 
-async function runTest() {
+async function runTest(repeat: number) {
     var res = store.source.messages.map(item => item)
 
     let body: TestingRequestBody = {
@@ -358,7 +358,9 @@ async function runTest() {
         args: ArgumentHelper.toArgumentList(args.value)
     }
 
-    doRunTest(body, repeat.value)
+    for (let i = 0; i < repeat; i++) {
+        doRunTest(body)
+    }
 }
 
 async function listCase(refresh: boolean) {

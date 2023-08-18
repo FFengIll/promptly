@@ -1,7 +1,4 @@
-export interface Argument {
-    key: string
-    value: string
-}
+import type { Argument } from "sdk/models"
 
 export class ArgumentHelper {
     static toArgumentList(args: Map<string, string>) {
