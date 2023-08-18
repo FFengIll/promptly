@@ -1,4 +1,5 @@
 export * from './arg-request';
+export * from './argument';
 export * from './argument-setting';
 export * from './commit-item';
 export * from './httpvalidation-error';
