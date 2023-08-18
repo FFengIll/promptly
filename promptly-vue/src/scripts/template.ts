@@ -1,10 +1,12 @@
-import type {Argument} from '@/scripts/models.ts'
+import type { Argument } from '@/scripts/argument'
 
 export function format(template: string, args: Argument[]) {
     var res = template
 
     args.forEach(item => {
-        res = res.replace("${" + item.key + "}", item.value!!)
+        if (item.value.length > 0) {
+            res = res.replace("${" + item.key + "}", item.value!!)
+        }
     })
 
     return res
