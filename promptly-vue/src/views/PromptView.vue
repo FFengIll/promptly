@@ -162,7 +162,7 @@
 
 <script lang="ts" setup>
 import { useClipboard } from '@vueuse/core';
-import { ref } from 'vue';
+import { onMounted, ref } from 'vue';
 
 import { CopyOutlined, PlusOutlined, SaveOutlined, SyncOutlined } from '@ant-design/icons-vue';
 
@@ -218,9 +218,12 @@ const prompt = ref(
 )
 
 // created
-const create = (() => {
-    fetchProfile(key)
-})()
+onMounted(
+    () => {
+        fetchProfile(key)
+    }
+)
+
 
 
 function newArg() {

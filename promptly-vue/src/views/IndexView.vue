@@ -42,7 +42,7 @@ import router from "@/router";
 
 import { ApiFactory } from "@/scripts/api";
 import { useSnapshotStore } from "@/stores/snapshot";
-import { ref } from 'vue';
+import { onMounted, ref } from 'vue';
 
 const api = ApiFactory()
 
@@ -55,7 +55,12 @@ const keys = ref([
 const store = useSnapshotStore()
 
 // created
-fetchList(false)
+onMounted(
+    () => {
+        fetchList(false)
+    }
+)
+
 
 function openPrompt(key: string) {
     router.push(`/view/prompt/${key}`)

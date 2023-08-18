@@ -6,10 +6,11 @@ import { RouteHelper } from "@/scripts/router";
 import { useSnapshotStore } from "@/stores/snapshot";
 import { storeToRefs } from "pinia";
 import type { ArgumentSetting, CommitItem } from "sdk/models";
-import { ref } from "vue";
+import { onMounted, ref } from "vue";
 import { useRoute } from 'vue-router';
 
 import CaseInput from '@/components/CaseInput.vue';
+import { ArgumentHelper } from "@/scripts/argument";
 import type { Argument } from '@/scripts/models.ts';
 
 //
@@ -39,27 +40,28 @@ const args = ref<Map<string, string>>(new Map())
 
 console.log("store source", source.value)
 
-const created = async () => {
-    await api.apiPromptArgsGet(key.value)
-        .then(response => {
-            argSetting.value = response.data
+onMounted(
+    () => {
+        api.apiPromptArgsGet(key.value)
+            .then(response => {
+                argSetting.value = response.data
 
-            console.log('setting', argSetting.value)
-            let tmp = argSetting.value.args
-            for (let key in tmp) {
-                if (tmp.hasOwnProperty(key)) {
-                    const values = tmp[key];
-                    console.log(tmp, key, values)
-                    args.value.set(key, values[0])
+                console.log('setting', argSetting.value)
+                let tmp = argSetting.value.args
+                for (let key in tmp) {
+                    if (tmp.hasOwnProperty(key)) {
+                        const values = tmp[key];
+                        console.log(tmp, key, values)
+                        args.value.set(key, values[0])
+                    }
                 }
-            }
 
-            console.log("arguments", args.value)
+                console.log("arguments", args.value)
 
-        })
-    await getCommit(source.value.name)
-}
-created()
+            })
+        getCommit(source.value.name)
+    }
+)
 
 
 async function getCommit(name: string) {
@@ -138,21 +140,9 @@ function dropCommit(index: number) {
 }
 
 
-function argumentList() {
-    let items: Argument[] = []
-
-    // map for each params are different
-    args.value.forEach((value, key) => {
-        let item = <Argument>{ key: key, value: value }
-        items.push(item)
-    })
-
-    return items
-}
-
 async function doChat(key: string, commit: CommitItem) {
     commit.response = ""
-    let response = await ApiHelper.doChat(key, commit.messages!!, argumentList())
+    let response = await ApiHelper.doChat(key, commit.messages!!, ArgumentHelper.toArgumentList(args.value))
     console.log('response', response)
     commit.response = response.data
 
@@ -167,7 +157,7 @@ async function gotoPrompt(commit: CommitItem) {
 
     console.log("args", args.value)
 
-    let items = argumentList()
+    let items = ArgumentHelper.toArgumentList(args.value)
 
     store.sendSource(name, commit.messages!!, items)
 
@@ -242,3 +232,4 @@ const pagination = {
 </template>
 
 <style></style>
+@/scripts/argument
