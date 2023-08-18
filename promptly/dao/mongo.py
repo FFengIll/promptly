@@ -6,12 +6,10 @@ from pymongo.collection import Collection
 
 from promptly.dao.base import BaseCaseManager, BaseProfileManager
 from promptly.model.case import Case
-
 from promptly.model.prompt import (
+    Argument,
     ArgumentSetting,
     CommitItem,
-    Argument,
-    PromptCommit,
     Prompt,
 )
 
@@ -114,21 +112,19 @@ class MongoCommitManager:
         )
         return res
 
-    def push(self, project: PromptCommit):
-        data = dict(name=project.name)
-        if project.commits:
-            data["commits"] = [c.dict() for c in project.commits]
+    def push(self, name: str, *args: CommitItem):
+        data = dict(name=name)
+        if args:
+            data["commits"] = [c.dict() for c in args]
 
-        res = self.collection.update_one(
-            dict(name=project.name), {"$set": data}, upsert=True
-        )
+        res = self.collection.update_one(dict(name=name), {"$set": data}, upsert=True)
 
         return res
 
-    def get(self, name: str):
+    def get(self, name: str) -> List[CommitItem]:
         res = self.collection.find_one(dict(name=name))
         if res:
-            return PromptCommit(**res)
+            return [CommitItem(**i) for i in res["commits"]]
         return None
 
 

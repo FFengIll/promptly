@@ -39,8 +39,14 @@ class Message(BaseModel):
         return Message(role="user", content="sample")
 
 
+class Argument(BaseModel):
+    key: str = Field(default="")
+    value: str = Field(default="")
+
+
 @autocomplete
 class CommitItem(BaseModel):
+    args: List[Argument] = Field(default_factory=list)
     messages: List[Message] = Field(default_factory=list)
     response: str = ""
     md5: str = ""
@@ -57,21 +63,12 @@ class CommitItem(BaseModel):
         return h.hexdigest()
 
 
-class Argument(BaseModel):
-    key: str = Field(default="")
-    value: str = Field(default="")
-
-
 class ArgumentSetting(BaseModel):
     name: str
     args: Dict[str, List[str]] = Field(default_factory=dict)
 
 
-@autocomplete
-class PromptCommit(BaseModel):
-    name: str
-    commits: List[CommitItem] = Field(default_factory=list)
-    cases: List[List[Argument]] = Field(default_factory=list)
+
 
 
 @autocomplete
