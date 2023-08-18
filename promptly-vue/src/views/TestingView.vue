@@ -9,15 +9,12 @@
         <!-- prompt view -->
         <a-row :gutter="12">
             <a-col :span="12">
-                <a-card title="Prompt Snapshot">
-                    <a-typography-text>
-                        Source: {{ store.source.name }}
-                    </a-typography-text>
-                    <a-button @click="gotoSource(store.source.name)"> Go To Source</a-button>
-                    <a-divider></a-divider>
-                    <a-space>
-                        <a-button @click="sendBack('')">Write Back</a-button>
-                    </a-space>
+                <a-card :title="`Prompt Snapshot [ name = ${store.source.name} ]`">
+
+
+
+                    <CaseInput :setting="argSetting" :args="args" @select="(key, value) => { args.set(key, value) }">
+                    </CaseInput>
                     <a-divider></a-divider>
                     <a-space direction="vertical" :style="{ width: '100%' }">
                         <div v-for="item in store.source.messages" :key="item.id">
@@ -51,10 +48,35 @@
 
                     <a-divider />
 
+
+
                     <!-- case description -->
                     Case Description:&nbsp;&nbsp;
                     <span>{{ config.description }}</span>
+
                     <a-divider />
+
+
+                    <a-select style="width:300px" @change="(value: string) => { caseKey = value }">
+                        <a-select-option v-for="key in args.keys()" :key="key">
+                            {{ key }}
+                        </a-select-option>
+                    </a-select>
+
+
+                    <a-divider />
+
+                    <div v-for="(item, index) in config.data" :key="index">
+                        <a-list-item>
+                            <a-typography-text> {{ item }}</a-typography-text>
+                            <a-button @click="debugOne(item)">Request</a-button>
+                            <a-button @click="sendBack(item)">Send Back</a-button>
+                            <a-button @click="gotoSource(store.source.name)"> Go To Source</a-button>
+                        </a-list-item>
+
+                    </div>
+
+
 
                 </a-card>
 
@@ -78,7 +100,7 @@
 
                         <!-- click to run -->
                         <a-button type="primary" @click="debugAll">Run Test</a-button>
-
+                        <a-button @click="gotoSource(store.source.name)"> Go To Source</a-button>
                     </a-space>
                 </a-card>
             </a-col>
@@ -87,16 +109,6 @@
             <a-col :span="24">
 
                 <!-- show result -->
-                <div v-for="(item, index) in config.data" :key="index">
-                    <a-list-item>
-                        <a-typography-text> {{ item }}</a-typography-text>
-                        <a-button @click="debugOne(item)">Request</a-button>
-                        <a-button @click="sendBack(item)">Send Back</a-button>
-                        <a-button @click="gotoSource(store.source.name)"> Go To Source</a-button>
-                    </a-list-item>
-
-                </div>
-
                 <a-table :dataSource="result" :columns="columns" :rowKey="(record: any) => record.id">
                     <template #bodyCell="{ column, record }">
                         <template v-if="column.key === 'action'">
@@ -134,15 +146,17 @@
     </div>
 </template>
 <script lang="ts" setup>
-import { ref } from 'vue';
+import { onMounted, ref } from 'vue';
 
 import type { TableColumnType } from 'ant-design-vue';
 
 import { useSnapshotStore } from "@/stores/snapshot";
 
+import CaseInput from '@/components/CaseInput.vue';
 
 import router from "@/router";
-import type { TestingRequestBody } from 'sdk/models';
+import { ArgumentHelper } from '@/scripts/argument';
+import type { ArgumentSetting, TestingRequestBody } from 'sdk/models';
 import { DefaultApiFactory } from '../../sdk/apis/default-api';
 
 
@@ -153,6 +167,14 @@ const api = DefaultApiFactory(undefined, "http://localhost:8000")
 const repeat = ref<number>(1);
 
 const useCase = ref<boolean>(false)
+
+const argSetting = ref<ArgumentSetting>(
+    {
+        name: "",
+        args: {}
+    }
+)
+const args = ref<Map<string, string>>(new Map())
 
 interface ResultItem {
     id: number,
@@ -179,13 +201,40 @@ const caseList = ref(
     ],
 )
 
-listCase(false)
+
+onMounted(
+    () => {
+        listCase(false)
+
+        let key = store.source.name
+        api.apiPromptArgsGet(key)
+            .then(response => {
+                argSetting.value = response.data
+
+                console.log('response', argSetting.value)
+
+                let tmp = argSetting.value.args
+                for (let key in tmp) {
+                    if (tmp.hasOwnProperty(key)) {
+                        const values = tmp[key];
+                        console.log(tmp, key, values)
+                        args.value.set(key, values[0])
+                    }
+                }
+            }).catch(error => {
+                console.log(error)
+            })
+    }
+)
+
 
 function toTestcase() {
     return config.value.data.map((item, index) => {
         return { id: index, source: item, target: "" }
     })
 }
+
+const caseKey = ref("")
 
 const testcase = ref(toTestcase())
 
@@ -248,10 +297,16 @@ async function debugOne(source: string) {
     var res = store.source.messages.filter(item => {
         return item.enable == true
     })
+
+
+
     let body: TestingRequestBody = {
         messages: res,
-        sources: [source]
+        key: caseKey.value,
+        sources: [source],
+        args: ArgumentHelper.toArgumentList(args.value)
     }
+
     await api.apiTestingPost(body, repeat.value).then(
         (response) => {
             let element = response.data[0]
