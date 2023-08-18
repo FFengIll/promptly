@@ -11,7 +11,7 @@ import { useRoute } from 'vue-router';
 
 import CaseInput from '@/components/CaseInput.vue';
 import { ArgumentHelper } from "@/scripts/argument";
-import type { Argument } from '@/scripts/models.ts';
+import type { Argument } from "../../sdk/models";
 
 //
 const api = ApiFactory()
@@ -70,7 +70,7 @@ async function getCommit(name: string) {
         response => {
             console.log('request', response.data)
 
-            commits.value = response.data.commits.filter((item: CommitItem) => item.messages.length > 0)
+            commits.value = response.data.filter((item: CommitItem) => item.messages.length > 0)
             console.log('data', commits.value)
 
         }
@@ -139,6 +139,15 @@ function dropCommit(index: number) {
     commits.value.splice(index, 1)
 }
 
+
+async function replay(key: string, commit: CommitItem) {
+    commit.response = ""
+    let response = await ApiHelper.doChat(key, commit.messages!!, commit.args!!)
+    console.log('response', response)
+    commit.response = response.data
+
+    console.log(commits.value)
+}
 
 async function doChat(key: string, commit: CommitItem) {
     commit.response = ""
@@ -215,14 +224,28 @@ const pagination = {
 
                 <!--        button-->
                 <a-button @click="doChat(key, commit)">Request</a-button>
+                <a-button @click="replay(key, commit)">Replay</a-button>
                 <a-button @click="gotoTest(commit, args)">Goto Test</a-button>
                 <a-button @click="gotoPrompt(commit)">Goto Prompt</a-button>
                 <a-button @click="doCommit(key, commit)">CommitItem</a-button>
                 <a-button @click="dropCommit(index)">Drop</a-button>
 
+                <a-divider></a-divider>
 
-                <!--        prompt-->
-                <PromptInput :messages="commit.messages" with-copy with-sidebar>
+                <!-- args -->
+
+                <a-card title="Args">
+                    <a-space v-for="(item, index) in commit.args" :key="index">
+                        <a-typography-text :content="item.key">
+                        </a-typography-text>
+                        <a-input :value="item.value">
+                        </a-input>
+                    </a-space>
+                </a-card>
+                <a-divider></a-divider>
+
+                <!-- prompt -->
+                <PromptInput :title="'Prompt'" :messages="commit.messages" with-copy with-sidebar>
 
                 </PromptInput>
 
