@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import type { ArgumentSetting } from 'sdk/models';
-import { ref } from 'vue';
 
 
 const props = defineProps<{
@@ -9,7 +8,6 @@ const props = defineProps<{
 
 }>()
 
-const extra = ref(null)
 
 console.log(props.setting)
 
@@ -70,6 +68,8 @@ const columns = [
                     <a-select ref="select" :value="args.get(key)" style="width: 300px"
                         @select="(value, option) => onSelect(key, value)">
                         <a-select-option v-for=" (v, index) in values" :key="v">{{ v }}</a-select-option>
+                        <a-select-option :key="''">
+                        </a-select-option>
                     </a-select>
 
                 </a-space>
