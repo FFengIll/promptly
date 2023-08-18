@@ -11,18 +11,45 @@
             <a-col :span="12">
                 <a-card :title="`Prompt Snapshot [ name = ${store.source.name} ]`">
 
-
-
                     <CaseInput :setting="argSetting" :args="args" @select="(key, value) => { args.set(key, value) }">
                     </CaseInput>
+
                     <a-divider></a-divider>
+
+
+                    <a-space direction="horizontal">
+                        <!-- repeat -->
+                        <a-input-group>
+                            <a-space align="middle">
+                                <a-typography-text>Repeat</a-typography-text>
+                                <a-input-number id="inputNumber" v-model:value="repeat" :min="1" :max="10">
+                                    <template #upIcon>
+                                        <ArrowUpOutlined />
+                                    </template>
+                                    <template #downIcon>
+                                        <ArrowDownOutlined />
+                                    </template>
+                                </a-input-number>
+                            </a-space>
+                        </a-input-group>
+
+                        <!-- click to run -->
+                        <a-button type="primary" @click="runTest">Run Test</a-button>
+                    </a-space>
+
+                    <a-divider></a-divider>
+
+
                     <a-space direction="vertical" :style="{ width: '100%' }">
+                        <!-- <PromptCard :messages="store.source.messages.filter(item => item.enable)"></PromptCard> -->
                         <div v-for="item in store.source.messages" :key="item.id">
-                            <span :style="{ color: 'blue' }">{{ item.role }} </span><span>:&nbsp;</span>
-                            <span>
-                                <a-textarea v-model:value="item.content" :auto-size="{ maxRows: 3 }">
-                                </a-textarea>
-                            </span>
+                            <div v-if="item.enable">
+                                <span :style="{ color: 'blue' }">{{ item.role }} </span><span>:&nbsp;</span>
+                                <span>
+                                    <a-textarea v-model:value="item.content" :auto-size="{ maxRows: 3 }">
+                                    </a-textarea>
+                                </span>
+                            </div>
                         </div>
                     </a-space>
                 </a-card>
@@ -31,7 +58,6 @@
 
                 <!-- show dataset info -->
                 <a-card title="Case List">
-                    <a-checkbox v-model:checked="useCase">Use Case</a-checkbox>
 
                     <a-divider></a-divider>
                     <!-- case select -->
@@ -57,21 +83,27 @@
                     <a-divider />
 
 
-                    <a-select style="width:300px" @change="(value: string) => { caseKey = value }">
-                        <a-select-option v-for="key in args.keys()" :key="key">
-                            {{ key }}
-                        </a-select-option>
-                    </a-select>
+                    <a-space direction="horizontal">
+                        <a-select style="width:300px" @change="(value: string) => { caseKey = value }">
+                            <a-select-option v-for="key in args.keys()" :key="key">
+                                {{ key }}
+                            </a-select-option>
+                        </a-select>
 
+                        <a-button type="primary" @click="runTestWithCase">Run With Case</a-button>
+                    </a-space>
 
                     <a-divider />
 
+
+
                     <div v-for="(item, index) in config.data" :key="index">
                         <a-list-item>
-                            <a-typography-text> {{ item }}</a-typography-text>
                             <a-button @click="debugOne(item)">Request</a-button>
                             <a-button @click="sendBack(item)">Send Back</a-button>
                             <a-button @click="gotoSource(store.source.name)"> Go To Source</a-button>
+                            <a-typography-text :ellipsis="true"> {{ item }}</a-typography-text>
+                            <a-divider />
                         </a-list-item>
 
                     </div>
@@ -80,29 +112,7 @@
 
                 </a-card>
 
-                <a-card title="Operation">
-                    <a-space align="middle">
 
-                        <!-- loop -->
-                        <a-input-group>
-                            <a-space align="middle">
-                                <a-typography-text>Repeat</a-typography-text>
-                                <a-input-number id="inputNumber" v-model:value="repeat" :min="1" :max="10">
-                                    <template #upIcon>
-                                        <ArrowUpOutlined />
-                                    </template>
-                                    <template #downIcon>
-                                        <ArrowDownOutlined />
-                                    </template>
-                                </a-input-number>
-                            </a-space>
-                        </a-input-group>
-
-                        <!-- click to run -->
-                        <a-button type="primary" @click="debugAll">Run Test</a-button>
-                        <a-button @click="gotoSource(store.source.name)"> Go To Source</a-button>
-                    </a-space>
-                </a-card>
             </a-col>
         </a-row>
         <a-row>
@@ -315,33 +325,40 @@ async function debugOne(source: string) {
     )
 }
 
+async function doRunTest(body: TestingRequestBody, repeat: number) {
+    await api.apiTestingPost(body, repeat).then(
+        (response) => {
+            result.value.splice(0, 0, ...response.data)
+        }
+    )
+}
 
-async function debugAll() {
+async function runTestWithCase() {
     var res = store.source.messages.map(item => item)
 
-
-
-    if (useCase.value) {
-        let body: TestingRequestBody = {
-            messages: res,
-            sources: config.value.data
-        }
-        await api.apiTestingPost(body, repeat.value).then(
-            (response) => {
-                result.value.splice(0, 0, ...response.data)
-            }
-        )
-    } else {
-        let body: TestingRequestBody = {
-            messages: res,
-            sources: ['']
-        }
-        await api.apiTestingPost(body, repeat.value).then(
-            (response) => {
-                result.value.splice(0, 0, ...response.data)
-            }
-        )
+    let body: TestingRequestBody = {
+        messages: res,
+        key: caseKey.value,
+        sources: config.value.data,
+        args: ArgumentHelper.toArgumentList(args.value)
     }
+
+    doRunTest(body, 1)
+
+}
+
+
+async function runTest() {
+    var res = store.source.messages.map(item => item)
+
+    let body: TestingRequestBody = {
+        messages: res,
+        key: caseKey.value,
+        sources: [''],
+        args: ArgumentHelper.toArgumentList(args.value)
+    }
+
+    doRunTest(body, repeat.value)
 }
 
 async function listCase(refresh: boolean) {
