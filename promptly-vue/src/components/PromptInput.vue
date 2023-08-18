@@ -25,6 +25,7 @@ const props = defineProps<{
     withControl?: boolean,
     withCopy?: boolean
     withSidebar?: boolean
+    title?: string
 }>(
 
 )
@@ -66,7 +67,7 @@ function color(role: string) {
 </script>
 
 <template>
-    <a-card v-for="(item, index) in messages" :key="index">
+    <a-card v-for="(item, index) in messages" :key="index" :title="title">
         <!-- <template #extra><a href="#">more</a></template> -->
 
         <a-row v-if="withControl">

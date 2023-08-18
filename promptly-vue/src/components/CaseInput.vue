@@ -4,8 +4,8 @@ import type { ArgumentSetting } from 'sdk/models';
 
 const props = defineProps<{
     setting: ArgumentSetting,
-    args: Map<string, string>
-
+    args: Map<string, string>,
+    mask: string | string[] | undefined,
 }>()
 
 
@@ -30,6 +30,22 @@ function data() {
         }
     }
     )
+}
+
+function isDisable(key: string) {
+    console.log(props.mask)
+
+    if (typeof props.mask === "string") {
+        if (key == props.mask) {
+            return true
+        }
+    } else if (typeof props.mask === 'object') {
+        if (props.mask.findIndex(key) >= 0) {
+            return true
+        }
+    }
+
+    return false
 }
 
 
@@ -65,7 +81,7 @@ const columns = [
                         {{ key }}
                     </a-typography-text>
 
-                    <a-select ref="select" :value="args.get(key)" style="width: 300px"
+                    <a-select :disabled="isDisable(key)" ref="select" :value="args.get(key)" style="width: 300px"
                         @select="(value, option) => onSelect(key, value)">
                         <a-select-option v-for=" (v, index) in values" :key="v">{{ v }}</a-select-option>
                         <a-select-option :key="''">
