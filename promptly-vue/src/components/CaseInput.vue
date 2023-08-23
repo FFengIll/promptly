@@ -83,9 +83,20 @@ const columns = [
 
                     <a-select :disabled="isDisable(key)" ref="select" :value="args.get(key)" style="width: 300px"
                         @select="(value, option) => onSelect(key, value)">
-                        <a-select-option v-for=" (v, index) in values" :key="v">{{ v }}</a-select-option>
+
                         <a-select-option :key="''">
                         </a-select-option>
+
+                        <a-select-option v-for=" (v, index) in values" :key="v">
+                            <a-popover :title="key">
+                                <template #content>
+                                    <p> {{ v }}</p>
+                                </template>
+                                {{ v }}
+                            </a-popover>
+
+                        </a-select-option>
+
                     </a-select>
 
                 </a-space>
