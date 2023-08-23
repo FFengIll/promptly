@@ -10,7 +10,7 @@ tasks:
     cmds:
       - echo "{{.GREETING}}"
     silent: true
-
+  
   swagger:
     desc: "generate sdk via swagger"
     dir: "{{.ROOT_DIR}}"
@@ -19,22 +19,33 @@ tasks:
       - rm -rf ./promptly-vue/sdk
       - swagger-codegen generate -i ./swagger.json -l typescript-axios -o ./promptly-vue/sdk
       - git add ./promptly-vue/sdk
-
-
+  
   dist:
     desc: "build for dist"
     dir: "{{.ROOT_DIR}}"
     cmds:
-      - cd promptly-vue;pnpm run build-only
+      - cd promptly-vue; pnpm run build-only
   
   front:
     desc: start front for dev
     dir: "{{.ROOT_DIR}}/promptly-vue"
+    aliases:
+      - "web"
+      - "node"
     cmds:
       - pnpm run dev
   
   backend:
     desc: start backend for dev
     dir: "{{.ROOT_DIR}}"
+    aliases:
+      - "py"
     cmds:
       - uvicorn main:app --reload
+  
+  run:
+    desc: run server without reload
+    dir: "{{.ROOT_DIR}}"
+    cmds:
+      - uvicorn main:app
+      
