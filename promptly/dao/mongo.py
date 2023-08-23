@@ -6,12 +6,7 @@ from pymongo.collection import Collection
 
 from promptly.dao.base import BaseCaseManager, BaseProfileManager
 from promptly.model.case import Case
-from promptly.model.prompt import (
-    Argument,
-    ArgumentSetting,
-    CommitItem,
-    Prompt,
-)
+from promptly.model.prompt import Argument, ArgumentSetting, CommitItem, Prompt
 
 url = "mongodb://localhost:27017/"
 
@@ -30,9 +25,18 @@ class MongoManager:
         self.commit: MongoCommitManager = MongoCommitManager(self.db["commit"])
         self.argument: MongoArgumentManager = MongoArgumentManager(self.db["argument"])
 
+    @staticmethod
+    def default():
+        return MongoManager(client)
+
     def reload(self):
         self.case.reload()
         self.prompt.reload()
+
+    def rename(self, left, right):
+        self.prompt.rename(left, right)
+        self.commit.rename(left, right)
+        self.argument.rename(left, right)
 
 
 class MongoArgumentManager:
@@ -68,6 +72,10 @@ class MongoArgumentManager:
         res = self.collection.find_one({"name": name})
         log.info(res)
         return ArgumentSetting(**res)
+
+    def rename(self, left, right):
+        res = self.collection.update_one({"name": left}, {"$set": {"name": right}})
+        log.info(res)
 
 
 class MongoCommitManager:
@@ -126,6 +134,10 @@ class MongoCommitManager:
         if res:
             return [CommitItem(**i) for i in res["commits"]]
         return None
+
+    def rename(self, left, right):
+        res = self.collection.update_one({"name": left}, {"$set": {"name": right}})
+        log.info(res)
 
 
 class MongoCaseManager(BaseCaseManager):
@@ -197,6 +209,10 @@ class MongoPromptManger(BaseProfileManager):
 
     def add_profile(self, p: Prompt):
         self.collection.insert_one(p.dict())
+
+    def rename(self, left, right):
+        res = self.collection.update_one({"name": left}, {"$set": {"name": right}})
+        log.info(res)
 
 
 def test_mongo_manager():
