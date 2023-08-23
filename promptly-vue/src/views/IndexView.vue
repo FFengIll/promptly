@@ -17,7 +17,9 @@
             </a-input-search>
 
             <a-button @click="fetchList(true)">
-                Refresh
+                <template #icon>
+                    <SyncOutlined></SyncOutlined>
+                </template>
             </a-button>
 
 
@@ -42,6 +44,7 @@ import router from "@/router";
 
 import { ApiFactory } from "@/scripts/api";
 import { useSnapshotStore } from "@/stores/snapshot";
+import { SyncOutlined } from "@ant-design/icons-vue";
 import { onMounted, ref } from 'vue';
 
 const api = ApiFactory()

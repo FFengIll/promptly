@@ -125,6 +125,8 @@
                             <a-button @click="chat">Request</a-button>
                             <a-button @click="doCommit">Commit</a-button>
                             <a-button @click="reload">Reload</a-button>
+                        </a-space>
+                        <a-space direction="horizontal">
                             <a-button @click="gotoTesting">Goto Testing</a-button>
                             <a-button @click="gotoCommit">Goto Commit</a-button>
                         </a-space>
@@ -296,7 +298,7 @@ async function doCommit() {
 
 function addPrompt(index: number, content: string) {
     let m: Message = { content: content, role: 'user', enable: true, }
-    prompt.value.messages.splice(index, 0, [m])
+    prompt.value.messages.splice(index, 0, m)
 
     console.log(prompt.value.messages)
 }
