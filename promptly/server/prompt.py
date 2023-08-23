@@ -42,7 +42,10 @@ def load_profile(key: str):
 
 
 @app.post("/api/prompt")
-def update_profile(key: str, update: List[Message]):
+def update_profile(
+    update: List[Message],
+    key: str,
+):
     p = manager.get(key)
     p.messages = update
 
