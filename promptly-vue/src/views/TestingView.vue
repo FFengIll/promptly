@@ -168,11 +168,12 @@ import router from "@/router";
 import { ArgumentHelper } from '@/scripts/argument';
 import type { ArgumentSetting, TestingRequestBody } from 'sdk/models';
 import { DefaultApiFactory } from '../../sdk/apis/default-api';
+import { ApiFactory } from '@/scripts/api';
 
 
 const store = useSnapshotStore()
 
-const api = DefaultApiFactory(undefined, "http://localhost:8000")
+const api = ApiFactory()
 
 const repeat = ref<number>(1);
 
@@ -336,14 +337,16 @@ async function doRunTest(body: TestingRequestBody) {
 async function runTestWithCase() {
     var res = store.source.messages.map(item => item)
 
-    let body: TestingRequestBody = {
-        messages: res,
-        key: caseKey.value,
-        sources: config.value.data,
-        args: ArgumentHelper.toArgumentList(args.value)
-    }
+    config.value.data.forEach(source => {
+        let body: TestingRequestBody = {
+            messages: res,
+            key: caseKey.value,
+            sources: [source],
+            args: ArgumentHelper.toArgumentList(args.value)
+        }
 
-    doRunTest(body)
+        doRunTest(body)
+    })
 
 }
 
