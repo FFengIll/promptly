@@ -1,12 +1,11 @@
-import type { Argument } from '@/scripts/models.ts';
-import type { Message } from "sdk/models";
+import type {Argument, Message} from "sdk/models";
 import * as defaultApi from "../../sdk/apis/default-api";
-import { format } from "./template";
+import {format} from "./template";
 
 export function ApiFactory() {
-    return defaultApi.DefaultApiFactory(undefined, "http://localhost:8000")
+    let baseURL = import.meta.env.VITE_BASE_API
+    return defaultApi.DefaultApiFactory(undefined, baseURL)
 }
-
 
 const api = ApiFactory()
 
