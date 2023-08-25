@@ -1,4 +1,4 @@
-import type { Argument } from '@/scripts/argument'
+import type {Argument} from "sdk"
 
 export function format(template: string, args: Argument[]) {
     var res = template
