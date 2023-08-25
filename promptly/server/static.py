@@ -1,14 +1,8 @@
-from collections import defaultdict
-from typing import Dict, List
-
 import loguru
 from fastapi import Request
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
-from pydantic import BaseModel
 
-from promptly.model.event import ActionEvent, UpdateEvent
-from promptly.model.graph import Graph
 from promptly.server.app import app
 
 log = loguru.logger

@@ -1,12 +1,11 @@
 import copy
 from typing import List
 
-import fastapi
 import loguru
 from pydantic import BaseModel
 
 from promptly.model.case import CaseResult
-from promptly.model.prompt import Argument, CommitItem, Message
+from promptly.model.prompt import Argument, CommitItem, Message, ArgumentSetting
 from promptly.server import llm
 from promptly.server.app import app, mongo
 from promptly.server.llm import to_message

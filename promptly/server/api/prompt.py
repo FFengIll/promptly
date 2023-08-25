@@ -5,7 +5,7 @@ import loguru
 from pydantic import BaseModel
 from pymongo import results
 
-from promptly.model.prompt import CommitItem, Message, Prompt
+from promptly.model.prompt import CommitItem, Message, Prompt, ArgumentSetting
 from promptly.server.app import app, mongo
 
 log = loguru.logger
@@ -78,26 +78,27 @@ def check_mongo_result(res: results.UpdateResult):
     return True
 
 
-@app.get("/api/prompt/args/{name}")
-def get_args(name: str):
-    return mongo.argument.get_setting(name)
+@app.get("/api/prompt/args/{name}", response_model=ArgumentSetting)
+def get_argument(name: str):
+    res = mongo.argument.get_setting(name)
+    return res.json()
 
 
 @app.put("/api/prompt/args/{name}")
-def save_one_arg(item: ArgRequest, name: str):
+def update_argument(item: ArgRequest, name: str):
     mongo.argument.add_value(name, item.key, item.value)
 
 
-class NewCommitRequest(BaseModel):
+class NewCommitBody(BaseModel):
     commit: CommitItem
     name: str
 
 
 @app.post("/api/commit")
-def new_commit(request: NewCommitRequest):
+def new_commit(body: NewCommitBody):
     res = mongo.commit.add_commit(
-        name=request.name,
-        commit=request.commit,
+        name=body.name,
+        commit=body.commit,
     )
     return check_mongo_result(res)
 

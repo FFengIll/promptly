@@ -2,7 +2,6 @@ import loguru
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-
 from promptly.dao.mongo import client, MongoManager
 
 log = loguru.logger
