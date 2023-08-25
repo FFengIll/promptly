@@ -40,8 +40,8 @@ class Message(BaseModel):
 
 
 class Argument(BaseModel):
-    key: str = Field(default="")
-    value: str = Field(default="")
+    key: str
+    value: str
 
 
 @autocomplete
