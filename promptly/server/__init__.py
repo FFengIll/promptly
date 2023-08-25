@@ -1,6 +1,7 @@
-from . import case
-from . import testing
-from . import prompt
+# must import api at first
+from .api import testing
+from .api import case
+from .api import prompt
 
 # keep it at last
 from . import static

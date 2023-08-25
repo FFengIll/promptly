@@ -25,7 +25,7 @@ def to_placeholder(key):
     return "${" + key + "}"
 
 
-@app.post("/api/testing")
+@app.post("/api/action/testing")
 async def run_test_with_source(body: TestingRequestBody, repeat: int = 1):
     messages: List[Message] = body.messages
     sources = body.sources
