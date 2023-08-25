@@ -76,7 +76,6 @@
                     <a-divider />
 
 
-
                     <!-- case description -->
                     Case Description:&nbsp;&nbsp;
                     <span>{{ config.description }}</span>
@@ -102,12 +101,11 @@
                             <a-button @click="debugOne(item)">Request</a-button>
                             <a-button @click="sendBack(item)">Send Back</a-button>
                             <a-button @click="gotoSource(store.source.name)"> Go To Source</a-button>
-                            <a-typography-text :ellipsis="true" :copyable="true" :content="item"> </a-typography-text>
+                            <a-typography-text :ellipsis="true" :copyable="true" :content="item"></a-typography-text>
                             <a-divider />
                         </a-list-item>
 
                     </div>
-
 
 
                 </a-card>
@@ -166,14 +164,12 @@ import CaseInput from '@/components/CaseInput.vue';
 
 import router from "@/router";
 import { ArgumentHelper } from '@/scripts/argument';
+import { backend } from '@/scripts/backend';
 import type { ArgumentSetting, TestingRequestBody } from 'sdk/models';
-import { DefaultApiFactory } from '../../sdk/apis/default-api';
-import { ApiFactory } from '@/scripts/api';
 
 
 const store = useSnapshotStore()
 
-const api = ApiFactory()
 
 const repeat = ref<number>(1);
 
@@ -199,9 +195,7 @@ const result = ref(
 
 const config = ref({
     id: "",
-    data: [
-
-    ],
+    data: [],
     description: "description"
 
 })
@@ -218,7 +212,7 @@ onMounted(
         listCase(false)
 
         let key = store.source.name
-        api.apiPromptArgsGet(key)
+        backend.apiPromptArgsNameGet(key)
             .then(response => {
                 argSetting.value = response.data
 
@@ -288,7 +282,7 @@ function sendBack(source: string) {
         return copied
     })
 
-    api.apiPromptPost(res, store.source.name)
+    backend.apiPromptNamePut(res, store.source.name)
         .then(
             response => {
                 console.log(response)
@@ -310,7 +304,6 @@ async function debugOne(source: string) {
     })
 
 
-
     let body: TestingRequestBody = {
         messages: res,
         key: caseKey.value,
@@ -318,7 +311,7 @@ async function debugOne(source: string) {
         args: ArgumentHelper.toArgumentList(args.value)
     }
 
-    await api.apiTestingPost(body, repeat.value).then(
+    await backend.apiActionTestingPost(body, repeat.value).then(
         (response) => {
             let element = response.data[0]
             result.value.splice(0, 0, element)
@@ -327,7 +320,7 @@ async function debugOne(source: string) {
 }
 
 async function doRunTest(body: TestingRequestBody) {
-    await api.apiTestingPost(body, 1).then(
+    await backend.apiActionTestingPost(body, 1).then(
         (response) => {
             result.value.splice(0, 0, ...response.data)
         }
@@ -367,7 +360,7 @@ async function runTest(repeat: number) {
 }
 
 async function listCase(refresh: boolean) {
-    await api.apiCaseGet(refresh).then(
+    await backend.apiCaseGet(refresh).then(
         (response) => {
             caseList.value = response.data
             console.log(caseList.value)
@@ -376,7 +369,7 @@ async function listCase(refresh: boolean) {
 }
 
 async function getCase(id: string) {
-    await api.apiCaseKeyGet(id).then((response) => {
+    await backend.apiCaseKeyGet(id).then((response) => {
 
         console.log(response.data)
 

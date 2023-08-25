@@ -1,20 +1,19 @@
 <script setup lang="ts">
 import PromptInput from "@/components/PromptInput.vue";
 import router from "@/router";
-import { ApiFactory, ApiHelper } from "@/scripts/api";
-import { RouteHelper } from "@/scripts/router";
-import { useSnapshotStore } from "@/stores/snapshot";
-import { storeToRefs } from "pinia";
-import type { ArgumentSetting, CommitItem } from "sdk/models";
-import { onMounted, ref } from "vue";
-import { useRoute } from 'vue-router';
+import {backend} from "@/scripts/backend";
+import {RouteHelper} from "@/scripts/router";
+import {useSnapshotStore} from "@/stores/snapshot";
+import {storeToRefs} from "pinia";
+import type {ArgumentSetting, CommitItem} from "sdk/models";
+import {onMounted, ref} from "vue";
+import {useRoute} from 'vue-router';
 
 import CaseInput from '@/components/CaseInput.vue';
-import { ArgumentHelper } from "@/scripts/argument";
-import type { Argument } from "../../sdk/models";
+import {ArgumentHelper} from "@/scripts/argument";
+import type {Argument} from "../../sdk/models";
 
 //
-const api = ApiFactory()
 const store = useSnapshotStore()
 
 // 
@@ -24,7 +23,7 @@ const key = ref<string>(route.params.key.toString())
 
 //
 const autoSave = ref<boolean>(true)
-const { source } = storeToRefs(store)
+const {source} = storeToRefs(store)
 
 const commits = ref<CommitItem[]>(
     []
@@ -42,7 +41,7 @@ console.log("store source", source.value)
 
 onMounted(
     () => {
-        api.apiPromptArgsGet(key.value)
+        backend.apiPromptArgsNameGet(key.value)
             .then(response => {
                 argSetting.value = response.data
 
@@ -66,7 +65,7 @@ onMounted(
 
 async function getCommit(name: string) {
 
-    await api.apiCommitGet(name).then(
+    await backend.apiCommitNameGet(name).then(
         response => {
             console.log('request', response.data)
 
@@ -81,7 +80,7 @@ async function getCommit(name: string) {
     console.log(store.source)
 
     if (commits.value.length <= 0) {
-        await api.apiPromptGet(name).then(
+        await backend.apiPromptNameGet(name).then(
             response => {
                 console.log('request', response.data)
 
@@ -105,7 +104,7 @@ function gotoTest(it: CommitItem, args: Argument[]) {
 
 async function doCommit(key: string, commit: CommitItem) {
     // commit current
-    await api.apiCommitPost(commit, key).then(
+    await backend.apiCommitPost(commit, key, "").then(
         response => {
             console.log(response)
         }
@@ -124,10 +123,9 @@ async function doCommit(key: string, commit: CommitItem) {
 }
 
 
-
 async function saveCommits(key: string, data: CommitItem[]) {
 
-    await api.apiCommitAllPost(data, key).then(
+    await backend.apiCommitNamePut(data, key).then(
         response => {
             console.log("success")
         }
@@ -142,7 +140,7 @@ function dropCommit(index: number) {
 
 async function replay(key: string, commit: CommitItem) {
     commit.response = ""
-    let response = await ApiHelper.doChat(key, commit.messages!!, commit.args!!)
+    let response = await BackendHelper.doChat(key, commit.messages!!, commit.args!!)
     console.log('response', response)
     commit.response = response.data
 
@@ -151,7 +149,7 @@ async function replay(key: string, commit: CommitItem) {
 
 async function doChat(key: string, commit: CommitItem) {
     commit.response = ""
-    let response = await ApiHelper.doChat(key, commit.messages!!, ArgumentHelper.toArgumentList(args.value))
+    let response = await BackendHelper.doChat(key, commit.messages!!, ArgumentHelper.toArgumentList(args.value))
     console.log('response', response)
     commit.response = response.data
 
@@ -162,7 +160,7 @@ async function gotoPrompt(commit: CommitItem) {
 
     let name = key.value
 
-    await api.apiPromptPost(commit.messages!!, name)
+    await backend.apiPromptNamePut(commit.messages!!, name)
 
     console.log("args", args.value)
 
@@ -205,7 +203,7 @@ const pagination = {
         <a-col :span="24" class="gutter-row">
             <a-space direction="horizontal">
                 <a-input-group compact>
-                    <a-input v-model:value="key" style="width: 100px" />
+                    <a-input v-model:value="key" style="width: 100px"/>
                     <a-button type="primary" @click="getCommit(key)">Get</a-button>
                     <a-button type="primary" @click="saveCommits(key, commits)">Save</a-button>
                 </a-input-group>
@@ -255,4 +253,3 @@ const pagination = {
 </template>
 
 <style></style>
-@/scripts/argument

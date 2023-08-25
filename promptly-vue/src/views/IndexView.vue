@@ -10,7 +10,7 @@
 
 
             <a-input-search v-model:value="store.source.name" placeholder="input search text" size="large"
-                @search="create_profile">
+                            @search="create_profile">
                 <template #enterButton>
                     <a-button>Create</a-button>
                 </template>
@@ -42,12 +42,11 @@
 <script lang="ts" setup>
 import router from "@/router";
 
-import { ApiFactory } from "@/scripts/api";
-import { useSnapshotStore } from "@/stores/snapshot";
-import { SyncOutlined } from "@ant-design/icons-vue";
-import { onMounted, ref } from 'vue';
+import {backend} from "@/scripts/backend";
+import {useSnapshotStore} from "@/stores/snapshot";
+import {SyncOutlined} from "@ant-design/icons-vue";
+import {onMounted, ref} from 'vue';
 
-const api = ApiFactory()
 
 // field
 const keys = ref([
@@ -71,13 +70,13 @@ function openPrompt(key: string) {
 
 
 async function create_profile(name: string) {
-    await api.apiPromptPut(name)
+    await backend.apiPromptPost(name)
     fetchList(true)
 }
 
 
 async function fetchList(refresh: boolean) {
-    return api.apiListPromptGet(refresh).then(
+    return backend.apiPromptGet(refresh).then(
         response => {
             console.log(response.data)
             keys.value = response.data.keys

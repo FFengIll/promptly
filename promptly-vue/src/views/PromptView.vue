@@ -18,7 +18,7 @@
                         <a-space direction="horizontal" align="baseline" v-for="h in prompt.history">
                             <a-button @click="copy(h)">
                                 <template #icon>
-                                    <CopyOutlined />
+                                    <CopyOutlined/>
                                 </template>
                             </a-button>
                             <p>{{ h }}</p>
@@ -44,7 +44,7 @@
 
                                     <a-button @click="newArg()">
                                         <template #icon>
-                                            <PlusOutlined />
+                                            <PlusOutlined/>
                                         </template>
                                         New
                                     </a-button>
@@ -54,18 +54,13 @@
                             <a-row justify="center">
                                 <a-space direction="horizontal">
 
-                                    <a-button @click="saveArgs()">
+                                    <a-button @click="fetchArgument(key)">
                                         <template #icon>
-                                            <SaveOutlined />
+                                            <SyncOutlined/>
                                         </template>
-                                        Save
+                                        Refresh
                                     </a-button>
-                                    <a-button @click="cleanArgs()">
-                                        <template #icon>
-                                            <SyncOutlined />
-                                        </template>
-                                        Clean
-                                    </a-button>
+
                                 </a-space>
                             </a-row>
                         </template>
@@ -87,8 +82,8 @@
 
                     <a-row justify="space-around">
                         <PromptInput :messages="prompt.messages" with-copy with-control
-                            @order-up="index => order(index, -1)" @order-down="index => order(index, 1)"
-                            @remove="index => deletePrompt(index)" @add="index => addPrompt(index, '')">
+                                     @order-up="index => order(index, -1)" @order-down="index => order(index, 1)"
+                                     @remove="index => deletePrompt(index)" @add="index => addPrompt(index, '')">
                         </PromptInput>
                     </a-row>
 
@@ -96,7 +91,7 @@
                         <a-space>
                             <a-button @click="() => prompt.messages.push({})">
                                 <template #icon>
-                                    <PlusOutlined />
+                                    <PlusOutlined/>
                                 </template>
                             </a-button>
                         </a-space>
@@ -151,7 +146,7 @@
                             <a-divider></a-divider>
 
                             <a-textarea v-model:value="response" :auto-size="{ minRows: 20 }"
-                                placeholder="textarea with clear icon" allow-clear />
+                                        placeholder="textarea with clear icon" allow-clear/>
                         </div>
                     </a-skeleton>
 
@@ -163,23 +158,23 @@
 </template>
 
 <script lang="ts" setup>
-import { useClipboard } from '@vueuse/core';
-import { onMounted, ref } from 'vue';
+import {useClipboard} from '@vueuse/core';
+import {onMounted, ref} from 'vue';
 
-import { CopyOutlined, PlusOutlined, SaveOutlined, SyncOutlined } from '@ant-design/icons-vue';
+import {CopyOutlined, PlusOutlined, SyncOutlined} from '@ant-design/icons-vue';
 
-import { useRoute } from 'vue-router';
+import {useRoute} from 'vue-router';
 
-import { useSnapshotStore } from '@/stores/snapshot';
+import {useSnapshotStore} from '@/stores/snapshot';
 
 import CaseInput from '@/components/CaseInput.vue';
 import PromptInput from "@/components/PromptInput.vue";
-import { ApiFactory, ApiHelper } from "@/scripts/api";
-import { ArgumentHelper } from '@/scripts/argument';
-import { RouteHelper } from '@/scripts/router';
-import type { NotificationPlacement } from "ant-design-vue";
-import { notification } from 'ant-design-vue';
-import type { ArgRequest, ArgumentSetting, CommitItem, Message } from "../../sdk";
+import {ArgumentHelper} from '@/scripts/argument';
+import {BackendHelper, backend} from "@/scripts/backend";
+import {RouteHelper} from '@/scripts/router';
+import type {NotificationPlacement} from "ant-design-vue";
+import {notification} from 'ant-design-vue';
+import type {ArgRequest, ArgumentSetting, Message, NewCommitBody} from "../../sdk";
 import PromptCard from '../components/PromptCard.vue';
 
 const [notification_api, contextHolder] = notification.useNotification();
@@ -187,13 +182,12 @@ const [notification_api, contextHolder] = notification.useNotification();
 // use
 const store = useSnapshotStore()
 const r = useRoute()
-const { text, copy, copied, isSupported } = useClipboard({})
-const api = ApiFactory()
+const {text, copy, copied, isSupported} = useClipboard({})
+
 const key = r.params.key.toString()
 
 // props
-const props = defineProps<{
-}>()
+const props = defineProps<{}>()
 
 // field
 console.log(store.source.args)
@@ -214,7 +208,7 @@ const prompt = ref(
     {
         "history": [],
         "messages": <Message[]>[
-            { role: "角色1", content: "内容1", enable: true },
+            {role: "角色1", content: "内容1", enable: true},
             // 其他数据项
         ],
     }
@@ -228,8 +222,7 @@ onMounted(
 )
 
 
-
-function newArg() {
+async function newArg() {
     let body: ArgRequest = {
         key: argKey.value,
         value: argValue.value
@@ -239,25 +232,13 @@ function newArg() {
         return
     }
 
-    api.apiPromptArgPost(body, key)
+    await backend.apiPromptArgsNamePut(body, key)
         .then(response => {
-
-            if (!argSetting.value.args!![argKey.value]) {
-                argSetting.value.args!![argKey.value] = []
-            }
-
-            let array = argSetting.value.args!![argKey.value]
-            array.push(argValue.value)
+            args.value.set(body.key, body.value)
         })
-}
 
-function cleanArgs() {
-    argSetting.value = argSetting.value.filter(item => item.key != '' && item.value != '')
-    console.log(argSetting.value)
-}
+    await fetchArgument(key)
 
-function saveArgs() {
-    api.apiPromptArgsPost(argSetting.value)
 }
 
 
@@ -286,18 +267,21 @@ function gotoTesting() {
 
 
 async function doCommit() {
-    let commit: CommitItem = {
-        messages: prompt.value.messages,
-        response: response.value,
-        args: ArgumentHelper.toArgumentList(args.value),
+    let body: NewCommitBody = {
+        name: key,
+        commit: {
+            messages: prompt.value.messages,
+            response: response.value,
+            args: ArgumentHelper.toArgumentList(args.value),
+        },
     }
-    api.apiCommitPost(commit, key,).then(() => {
+    backend.apiCommitPost(body).then(() => {
 
     })
 }
 
 function addPrompt(index: number, content: string) {
-    let m: Message = { content: content, role: 'user', enable: true, }
+    let m: Message = {content: content, role: 'user', enable: true,}
     prompt.value.messages.splice(index, 0, m)
 
     console.log(prompt.value.messages)
@@ -319,28 +303,33 @@ function order(index: number, delta: number) {
 }
 
 
-async function fetchProfile(key: string) {
-    await api.apiPromptArgsGet(key)
+async function fetchArgument(name: string) {
+    await backend.apiPromptArgsNameGet(name)
         .then(response => {
             argSetting.value = response.data
 
             console.log('response', argSetting.value)
 
-            let tmp = argSetting.value.args
-            for (let key in tmp) {
-                if (tmp.hasOwnProperty(key)) {
-                    const values = tmp[key];
-                    console.log(tmp, key, values)
-                    args.value.set(key, values[0])
-                }
-            }
         }).catch(error => {
             console.log(error)
         })
 
+}
+
+async function fetchProfile(name: string) {
+    await fetchArgument(name)
+
+    let tmp = argSetting.value.args
+    for (let key in tmp) {
+        if (tmp.hasOwnProperty(key)) {
+            const values = tmp[key];
+            console.log(tmp, key, values)
+            args.value.set(key, values[0])
+        }
+    }
     console.log(args.value)
 
-    await api.apiPromptGet(key)
+    await backend.apiPromptNameGet(name)
         .then(response => {
             console.log(response.data)
             prompt.value = response.data;
@@ -368,11 +357,11 @@ function openNotification(message: string, status: string) {
 async function chat() {
 
     console.log(prompt.value.messages)
-    await api.apiPromptPost(prompt.value.messages, key)
+    await backend.apiPromptNamePut(prompt.value.messages, key)
 
     let argList = []
     for (const [key, value] of args.value) {
-        argList.push({ key: key, value: value })
+        argList.push({key: key, value: value})
     }
 
     console.log("arg list", argList)
@@ -380,10 +369,9 @@ async function chat() {
     loading.value = true
 
     response.value = ''
-    let res = await ApiHelper.doChat(key, prompt.value.messages, argList)
+    let res = await BackendHelper.doChat(key, prompt.value.messages, argList)
     response.value = res.data;
 
     loading.value = false
 }
 </script>
-  
