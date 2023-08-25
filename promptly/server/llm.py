@@ -4,8 +4,8 @@ from typing import List
 import loguru
 from httpx import AsyncClient
 
-from promptly.model.prompt import Message
 from promptly.config import key, url
+from promptly.model.prompt import Message
 
 log = loguru.logger
 
@@ -33,11 +33,12 @@ def simple_chat(content):
 client = AsyncClient()
 
 
-async def chat(messages):
+async def chat(messages, model=""):
     headers = {}
 
     data = deepcopy(payload)
     data["messages"] = messages
+    data["model"] = model
 
     response = await client.post(url=url, headers=headers, json=data, timeout=30)
     log.info(response)
