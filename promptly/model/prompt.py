@@ -46,6 +46,7 @@ class Argument(BaseModel):
 
 @autocomplete
 class CommitItem(BaseModel):
+    model: str = ""
     args: List[Argument] = Field(default_factory=list)
     messages: List[Message] = Field(default_factory=list)
     response: str = ""
@@ -66,9 +67,6 @@ class CommitItem(BaseModel):
 class ArgumentSetting(BaseModel):
     name: str
     args: Dict[str, List[str]] = Field(default_factory=dict)
-
-
-
 
 
 @autocomplete
