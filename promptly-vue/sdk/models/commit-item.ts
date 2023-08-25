@@ -21,6 +21,12 @@ import { Message } from './message';
 export interface CommitItem {
     /**
      * 
+     * @type {string}
+     * @memberof CommitItem
+     */
+    model?: string;
+    /**
+     * 
      * @type {Array<Argument>}
      * @memberof CommitItem
      */
