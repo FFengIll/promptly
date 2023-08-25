@@ -43,7 +43,7 @@
 
                     <a-space direction="vertical" :style="{ width: '100%' }">
                         <!-- <PromptCard :messages="store.source.messages.filter(item => item.enable)"></PromptCard> -->
-                        <div v-for="item in store.source.messages" :key="item.id">
+                        <div v-for="(item, index) in store.source.messages" :key="index">
                             <div v-if="item.enable">
                                 <span :style="{ color: 'blue' }">{{ item.role }} </span><span>:&nbsp;</span>
                                 <span>

@@ -18,7 +18,7 @@
                         <a-space direction="horizontal" align="baseline" v-for="h in prompt.history">
                             <a-button @click="copy(h)">
                                 <template #icon>
-                                    <CopyOutlined/>
+                                    <CopyOutlined />
                                 </template>
                             </a-button>
                             <p>{{ h }}</p>
@@ -44,7 +44,7 @@
 
                                     <a-button @click="newArg()">
                                         <template #icon>
-                                            <PlusOutlined/>
+                                            <PlusOutlined />
                                         </template>
                                         New
                                     </a-button>
@@ -56,7 +56,7 @@
 
                                     <a-button @click="fetchArgument(key)">
                                         <template #icon>
-                                            <SyncOutlined/>
+                                            <SyncOutlined />
                                         </template>
                                         Refresh
                                     </a-button>
@@ -82,16 +82,16 @@
 
                     <a-row justify="space-around">
                         <PromptInput :messages="prompt.messages" with-copy with-control
-                                     @order-up="index => order(index, -1)" @order-down="index => order(index, 1)"
-                                     @remove="index => deletePrompt(index)" @add="index => addPrompt(index, '')">
+                            @order-up="index => order(index, -1)" @order-down="index => order(index, 1)"
+                            @remove="index => deletePrompt(index)" @add="index => addPrompt(index, '')">
                         </PromptInput>
                     </a-row>
 
                     <a-divider>
                         <a-space>
-                            <a-button @click="() => prompt.messages.push({})">
+                            <a-button @click="() => prompt.messages.push({ role: 'system', enable: true, content: '' })">
                                 <template #icon>
-                                    <PlusOutlined/>
+                                    <PlusOutlined />
                                 </template>
                             </a-button>
                         </a-space>
@@ -146,7 +146,7 @@
                             <a-divider></a-divider>
 
                             <a-textarea v-model:value="response" :auto-size="{ minRows: 20 }"
-                                        placeholder="textarea with clear icon" allow-clear/>
+                                placeholder="textarea with clear icon" allow-clear />
                         </div>
                     </a-skeleton>
 
@@ -158,23 +158,23 @@
 </template>
 
 <script lang="ts" setup>
-import {useClipboard} from '@vueuse/core';
-import {onMounted, ref} from 'vue';
+import { useClipboard } from '@vueuse/core';
+import { onMounted, ref } from 'vue';
 
-import {CopyOutlined, PlusOutlined, SyncOutlined} from '@ant-design/icons-vue';
+import { CopyOutlined, PlusOutlined, SyncOutlined } from '@ant-design/icons-vue';
 
-import {useRoute} from 'vue-router';
+import { useRoute } from 'vue-router';
 
-import {useSnapshotStore} from '@/stores/snapshot';
+import { useSnapshotStore } from '@/stores/snapshot';
 
 import CaseInput from '@/components/CaseInput.vue';
 import PromptInput from "@/components/PromptInput.vue";
-import {ArgumentHelper} from '@/scripts/argument';
-import {BackendHelper, backend} from "@/scripts/backend";
-import {RouteHelper} from '@/scripts/router';
-import type {NotificationPlacement} from "ant-design-vue";
-import {notification} from 'ant-design-vue';
-import type {ArgRequest, ArgumentSetting, Message, NewCommitBody} from "../../sdk";
+import { ArgumentHelper } from '@/scripts/argument';
+import { BackendHelper, backend } from "@/scripts/backend";
+import { RouteHelper } from '@/scripts/router';
+import type { NotificationPlacement } from "ant-design-vue";
+import { notification } from 'ant-design-vue';
+import type { ArgRequest, ArgumentSetting, Message, NewCommitBody } from "../../sdk";
 import PromptCard from '../components/PromptCard.vue';
 
 const [notification_api, contextHolder] = notification.useNotification();
@@ -182,7 +182,7 @@ const [notification_api, contextHolder] = notification.useNotification();
 // use
 const store = useSnapshotStore()
 const r = useRoute()
-const {text, copy, copied, isSupported} = useClipboard({})
+const { text, copy, copied, isSupported } = useClipboard({})
 
 const key = r.params.key.toString()
 
@@ -208,7 +208,7 @@ const prompt = ref(
     {
         "history": [],
         "messages": <Message[]>[
-            {role: "角色1", content: "内容1", enable: true},
+            { role: "角色1", content: "内容1", enable: true },
             // 其他数据项
         ],
     }
@@ -281,7 +281,7 @@ async function doCommit() {
 }
 
 function addPrompt(index: number, content: string) {
-    let m: Message = {content: content, role: 'user', enable: true,}
+    let m: Message = { content: content, role: 'user', enable: true, }
     prompt.value.messages.splice(index, 0, m)
 
     console.log(prompt.value.messages)
@@ -361,7 +361,7 @@ async function chat() {
 
     let argList = []
     for (const [key, value] of args.value) {
-        argList.push({key: key, value: value})
+        argList.push({ key: key, value: value })
     }
 
     console.log("arg list", argList)

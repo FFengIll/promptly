@@ -1,17 +1,17 @@
 <script setup lang="ts">
 import PromptInput from "@/components/PromptInput.vue";
 import router from "@/router";
-import {backend} from "@/scripts/backend";
-import {RouteHelper} from "@/scripts/router";
-import {useSnapshotStore} from "@/stores/snapshot";
-import {storeToRefs} from "pinia";
-import type {ArgumentSetting, CommitItem} from "sdk/models";
-import {onMounted, ref} from "vue";
-import {useRoute} from 'vue-router';
+import { BackendHelper, backend } from "@/scripts/backend";
+import { RouteHelper } from "@/scripts/router";
+import { useSnapshotStore } from "@/stores/snapshot";
+import { storeToRefs } from "pinia";
+import type { ArgumentSetting, CommitItem } from "sdk/models";
+import { onMounted, ref } from "vue";
+import { useRoute } from 'vue-router';
 
 import CaseInput from '@/components/CaseInput.vue';
-import {ArgumentHelper} from "@/scripts/argument";
-import type {Argument} from "../../sdk/models";
+import { ArgumentHelper } from "@/scripts/argument";
+import type { Argument } from "../../sdk/models";
 
 //
 const store = useSnapshotStore()
@@ -23,7 +23,7 @@ const key = ref<string>(route.params.key.toString())
 
 //
 const autoSave = ref<boolean>(true)
-const {source} = storeToRefs(store)
+const { source } = storeToRefs(store)
 
 const commits = ref<CommitItem[]>(
     []
@@ -98,28 +98,8 @@ async function getCommit(name: string) {
 
 
 function gotoTest(it: CommitItem, args: Argument[]) {
-    store.sendSource(store.source.name, it.messages, args)
+    store.sendSource(store.source.name, it.messages!!, args)
     router.push('/view/debug')
-}
-
-async function doCommit(key: string, commit: CommitItem) {
-    // commit current
-    await backend.apiCommitPost(commit, key, "").then(
-        response => {
-            console.log(response)
-        }
-    ).catch(
-        error => {
-            console.log(error)
-        }
-    )
-
-    // then copy to create a new one
-    let another = JSON.parse(JSON.stringify(commit))
-    another.response = ""
-
-    // add to head
-    commits.value.unshift(another)
 }
 
 
@@ -203,7 +183,7 @@ const pagination = {
         <a-col :span="24" class="gutter-row">
             <a-space direction="horizontal">
                 <a-input-group compact>
-                    <a-input v-model:value="key" style="width: 100px"/>
+                    <a-input v-model:value="key" style="width: 100px" />
                     <a-button type="primary" @click="getCommit(key)">Get</a-button>
                     <a-button type="primary" @click="saveCommits(key, commits)">Save</a-button>
                 </a-input-group>
@@ -243,7 +223,7 @@ const pagination = {
                 <a-divider></a-divider>
 
                 <!-- prompt -->
-                <PromptInput :title="'Prompt'" :messages="commit.messages" with-copy with-sidebar>
+                <PromptInput :title="'Prompt'" :messages="commit.messages!!" with-copy with-sidebar>
 
                 </PromptInput>
 
