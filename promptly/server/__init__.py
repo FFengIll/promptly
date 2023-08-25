@@ -1,5 +1,5 @@
 # must import api at first
-from .api import testing
+from .api import action
 from .api import case
 from .api import prompt
 

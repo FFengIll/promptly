@@ -25,6 +25,26 @@ def to_placeholder(key):
     return "${" + key + "}"
 
 
+async def batch_test(messages, key, data):
+    res = []
+    for idx, source in enumerate(data):
+        replaced_ms = copy.deepcopy(messages)
+        for m in replaced_ms:
+            m.content = m.content.replace(to_placeholder(key), source)
+
+        ms = to_message(replaced_ms)
+
+        log.info("debug with\n{}", ms)
+
+        target = await llm.chat(ms)
+        log.info("response: {}", target)
+        mongo.history.push(CommitItem(messages=ms, response=target))
+
+        res.append(CaseResult(source=source, target=target, id=idx).dict())
+
+    return res
+
+
 @app.post("/api/action/testing")
 async def run_test_with_source(body: TestingRequestBody, repeat: int = 1):
     messages: List[Message] = body.messages
@@ -45,21 +65,13 @@ async def run_test_with_source(body: TestingRequestBody, repeat: int = 1):
     return res
 
 
-async def batch_test(messages, key, data):
-    res = []
-    for idx, source in enumerate(data):
-        replaced_ms = copy.deepcopy(messages)
-        for m in replaced_ms:
-            m.content = m.content.replace(to_placeholder(key), source)
+@app.post("/api/action/chat")
+async def chat(ms: List[Message], model: str = ""):
+    ms = to_message(ms)
+    log.info(ms)
 
-        ms = to_message(replaced_ms)
+    content = await llm.chat(ms, model=model)
+    log.info(content)
 
-        log.info("debug with\n{}", ms)
-
-        target = await llm.chat(ms)
-        log.info("response: {}", target)
-        mongo.history.push(CommitItem(messages=ms, response=target))
-
-        res.append(CaseResult(source=source, target=target, id=idx).dict())
-
-    return res
+    mongo.history.push(CommitItem(messages=ms, response=content))
+    return content

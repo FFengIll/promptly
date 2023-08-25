@@ -5,10 +5,8 @@ import loguru
 from pydantic import BaseModel
 from pymongo import results
 
-from promptly.model.prompt import ArgumentSetting, CommitItem, Message, Prompt
-from promptly.server import llm
+from promptly.model.prompt import CommitItem, Message, Prompt
 from promptly.server.app import app, mongo
-from promptly.server.llm import to_message
 
 log = loguru.logger
 
@@ -70,18 +68,6 @@ def update_profile(
     return p
 
 
-@app.post("/api/action/chat")
-async def chat(ms: List[Message], model: str):
-    ms = to_message(ms)
-    log.info(ms)
-
-    content = await llm.chat(ms, model=model)
-    log.info(content)
-
-    mongo.history.push(CommitItem(messages=ms, response=content))
-    return content
-
-
 def check_mongo_result(res: results.UpdateResult):
     if not res.acknowledged:
         raise fastapi.HTTPException(404)
@@ -89,10 +75,7 @@ def check_mongo_result(res: results.UpdateResult):
     # if res.modified_count <= 0 and res.matched_count<=0:
     #     raise fastapi.HTTPException(404)
 
-
-@app.post("/api/prompt/args")
-def save_args(args: ArgumentSetting):
-    return mongo.argument.save_setting(args)
+    return True
 
 
 @app.get("/api/prompt/args/{name}")
@@ -105,11 +88,16 @@ def save_one_arg(item: ArgRequest, name: str):
     mongo.argument.add_value(name, item.key, item.value)
 
 
+class NewCommitRequest(BaseModel):
+    commit: CommitItem
+    name: str
+
+
 @app.post("/api/commit")
-def commit_one(commit: CommitItem, name: str, model: str):
+def new_commit(request: NewCommitRequest):
     res = mongo.commit.add_commit(
-        name,
-        commit,
+        name=request.name,
+        commit=request.commit,
     )
     return check_mongo_result(res)
 
