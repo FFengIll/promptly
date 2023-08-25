@@ -81,7 +81,7 @@ def check_mongo_result(res: results.UpdateResult):
 @app.get("/api/prompt/args/{name}", response_model=ArgumentSetting)
 def get_argument(name: str):
     res = mongo.argument.get_setting(name)
-    return res.json()
+    return res
 
 
 @app.put("/api/prompt/args/{name}")
