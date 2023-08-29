@@ -69,6 +69,8 @@ const columns = [
 </script>
 
 <template>
+    <slot name="extra"></slot>
+
     <a-list item-layout="horizontal">
         <!-- <a-table :columns="columns" :data-source="data"> -->
         <!-- </a-table> -->
@@ -106,8 +108,6 @@ const columns = [
 
 
     </a-list>
-
-    <slot name="extra"></slot>
 </template>
 
 <style scoped></style>
