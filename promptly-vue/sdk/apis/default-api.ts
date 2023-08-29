@@ -22,7 +22,9 @@ import { CommitItem } from '../models';
 import { HTTPValidationError } from '../models';
 import { Message } from '../models';
 import { NewCommitBody } from '../models';
+import { Prompt } from '../models';
 import { TestingRequestBody } from '../models';
+import { UpdatePromptBody } from '../models';
 /**
  * DefaultApi - axios parameter creator
  * @export
@@ -253,17 +255,60 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         },
         /**
          * 
+         * @summary New Commit
+         * @param {NewCommitBody} body 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        apiCommitPost: async (body: NewCommitBody, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'body' is not null or undefined
+            if (body === null || body === undefined) {
+                throw new RequiredError('body','Required parameter body was null or undefined when calling apiCommitPost.');
+            }
+            const localVarPath = `/api/commit`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, 'https://example.com');
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+            const localVarRequestOptions :AxiosRequestConfig = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            const query = new URLSearchParams(localVarUrlObj.search);
+            for (const key in localVarQueryParameter) {
+                query.set(key, localVarQueryParameter[key]);
+            }
+            for (const key in options.params) {
+                query.set(key, options.params[key]);
+            }
+            localVarUrlObj.search = (new URLSearchParams(query)).toString();
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            const needsSerialization = (typeof body !== "string") || localVarRequestOptions.headers['Content-Type'] === 'application/json';
+            localVarRequestOptions.data =  needsSerialization ? JSON.stringify(body !== undefined ? body : {}) : (body || "");
+
+            return {
+                url: localVarUrlObj.pathname + localVarUrlObj.search + localVarUrlObj.hash,
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
          * @summary Get Commit
          * @param {string} name 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        apiCommitNameGet: async (name: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        apiCommitsNameGet: async (name: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'name' is not null or undefined
             if (name === null || name === undefined) {
-                throw new RequiredError('name','Required parameter name was null or undefined when calling apiCommitNameGet.');
+                throw new RequiredError('name','Required parameter name was null or undefined when calling apiCommitsNameGet.');
             }
-            const localVarPath = `/api/commit/{name}`
+            const localVarPath = `/api/commits/{name}`
                 .replace(`{${"name"}}`, encodeURIComponent(String(name)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, 'https://example.com');
@@ -299,16 +344,16 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        apiCommitNamePut: async (body: Array<CommitItem>, name: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        apiCommitsNamePut: async (body: Array<CommitItem>, name: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'body' is not null or undefined
             if (body === null || body === undefined) {
-                throw new RequiredError('body','Required parameter body was null or undefined when calling apiCommitNamePut.');
+                throw new RequiredError('body','Required parameter body was null or undefined when calling apiCommitsNamePut.');
             }
             // verify required parameter 'name' is not null or undefined
             if (name === null || name === undefined) {
-                throw new RequiredError('name','Required parameter name was null or undefined when calling apiCommitNamePut.');
+                throw new RequiredError('name','Required parameter name was null or undefined when calling apiCommitsNamePut.');
             }
-            const localVarPath = `/api/commit/{name}`
+            const localVarPath = `/api/commits/{name}`
                 .replace(`{${"name"}}`, encodeURIComponent(String(name)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, 'https://example.com');
@@ -317,49 +362,6 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
                 baseOptions = configuration.baseOptions;
             }
             const localVarRequestOptions :AxiosRequestConfig = { method: 'PUT', ...baseOptions, ...options};
-            const localVarHeaderParameter = {} as any;
-            const localVarQueryParameter = {} as any;
-
-            localVarHeaderParameter['Content-Type'] = 'application/json';
-
-            const query = new URLSearchParams(localVarUrlObj.search);
-            for (const key in localVarQueryParameter) {
-                query.set(key, localVarQueryParameter[key]);
-            }
-            for (const key in options.params) {
-                query.set(key, options.params[key]);
-            }
-            localVarUrlObj.search = (new URLSearchParams(query)).toString();
-            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
-            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
-            const needsSerialization = (typeof body !== "string") || localVarRequestOptions.headers['Content-Type'] === 'application/json';
-            localVarRequestOptions.data =  needsSerialization ? JSON.stringify(body !== undefined ? body : {}) : (body || "");
-
-            return {
-                url: localVarUrlObj.pathname + localVarUrlObj.search + localVarUrlObj.hash,
-                options: localVarRequestOptions,
-            };
-        },
-        /**
-         * 
-         * @summary New Commit
-         * @param {NewCommitBody} body 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        apiCommitPost: async (body: NewCommitBody, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
-            // verify required parameter 'body' is not null or undefined
-            if (body === null || body === undefined) {
-                throw new RequiredError('body','Required parameter body was null or undefined when calling apiCommitPost.');
-            }
-            const localVarPath = `/api/commit`;
-            // use dummy base URL string because the URL constructor only accepts absolute URLs.
-            const localVarUrlObj = new URL(localVarPath, 'https://example.com');
-            let baseOptions;
-            if (configuration) {
-                baseOptions = configuration.baseOptions;
-            }
-            const localVarRequestOptions :AxiosRequestConfig = { method: 'POST', ...baseOptions, ...options};
             const localVarHeaderParameter = {} as any;
             const localVarQueryParameter = {} as any;
 
@@ -547,7 +549,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         },
         /**
          * 
-         * @summary Load Profile
+         * @summary Load Prompt
          * @param {string} name 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -588,12 +590,12 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         /**
          * 
          * @summary Update Profile
-         * @param {Array<Message>} body 
+         * @param {UpdatePromptBody} body 
          * @param {string} name 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        apiPromptNamePut: async (body: Array<Message>, name: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        apiPromptNamePut: async (body: UpdatePromptBody, name: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'body' is not null or undefined
             if (body === null || body === undefined) {
                 throw new RequiredError('body','Required parameter body was null or undefined when calling apiPromptNamePut.');
@@ -828,13 +830,27 @@ export const DefaultApiFp = function(configuration?: Configuration) {
         },
         /**
          * 
+         * @summary New Commit
+         * @param {NewCommitBody} body 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async apiCommitPost(body: NewCommitBody, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => Promise<AxiosResponse<any>>> {
+            const localVarAxiosArgs = await DefaultApiAxiosParamCreator(configuration).apiCommitPost(body, options);
+            return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
+                const axiosRequestArgs :AxiosRequestConfig = {...localVarAxiosArgs.options, url: basePath + localVarAxiosArgs.url};
+                return axios.request(axiosRequestArgs);
+            };
+        },
+        /**
+         * 
          * @summary Get Commit
          * @param {string} name 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async apiCommitNameGet(name: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => Promise<AxiosResponse<any>>> {
-            const localVarAxiosArgs = await DefaultApiAxiosParamCreator(configuration).apiCommitNameGet(name, options);
+        async apiCommitsNameGet(name: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => Promise<AxiosResponse<any>>> {
+            const localVarAxiosArgs = await DefaultApiAxiosParamCreator(configuration).apiCommitsNameGet(name, options);
             return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
                 const axiosRequestArgs :AxiosRequestConfig = {...localVarAxiosArgs.options, url: basePath + localVarAxiosArgs.url};
                 return axios.request(axiosRequestArgs);
@@ -848,22 +864,8 @@ export const DefaultApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async apiCommitNamePut(body: Array<CommitItem>, name: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => Promise<AxiosResponse<any>>> {
-            const localVarAxiosArgs = await DefaultApiAxiosParamCreator(configuration).apiCommitNamePut(body, name, options);
-            return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
-                const axiosRequestArgs :AxiosRequestConfig = {...localVarAxiosArgs.options, url: basePath + localVarAxiosArgs.url};
-                return axios.request(axiosRequestArgs);
-            };
-        },
-        /**
-         * 
-         * @summary New Commit
-         * @param {NewCommitBody} body 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        async apiCommitPost(body: NewCommitBody, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => Promise<AxiosResponse<any>>> {
-            const localVarAxiosArgs = await DefaultApiAxiosParamCreator(configuration).apiCommitPost(body, options);
+        async apiCommitsNamePut(body: Array<CommitItem>, name: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => Promise<AxiosResponse<any>>> {
+            const localVarAxiosArgs = await DefaultApiAxiosParamCreator(configuration).apiCommitsNamePut(body, name, options);
             return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
                 const axiosRequestArgs :AxiosRequestConfig = {...localVarAxiosArgs.options, url: basePath + localVarAxiosArgs.url};
                 return axios.request(axiosRequestArgs);
@@ -927,12 +929,12 @@ export const DefaultApiFp = function(configuration?: Configuration) {
         },
         /**
          * 
-         * @summary Load Profile
+         * @summary Load Prompt
          * @param {string} name 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async apiPromptNameGet(name: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => Promise<AxiosResponse<any>>> {
+        async apiPromptNameGet(name: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => Promise<AxiosResponse<Prompt>>> {
             const localVarAxiosArgs = await DefaultApiAxiosParamCreator(configuration).apiPromptNameGet(name, options);
             return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
                 const axiosRequestArgs :AxiosRequestConfig = {...localVarAxiosArgs.options, url: basePath + localVarAxiosArgs.url};
@@ -942,12 +944,12 @@ export const DefaultApiFp = function(configuration?: Configuration) {
         /**
          * 
          * @summary Update Profile
-         * @param {Array<Message>} body 
+         * @param {UpdatePromptBody} body 
          * @param {string} name 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async apiPromptNamePut(body: Array<Message>, name: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => Promise<AxiosResponse<any>>> {
+        async apiPromptNamePut(body: UpdatePromptBody, name: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => Promise<AxiosResponse<any>>> {
             const localVarAxiosArgs = await DefaultApiAxiosParamCreator(configuration).apiPromptNamePut(body, name, options);
             return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
                 const axiosRequestArgs :AxiosRequestConfig = {...localVarAxiosArgs.options, url: basePath + localVarAxiosArgs.url};
@@ -1057,13 +1059,23 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
         },
         /**
          * 
+         * @summary New Commit
+         * @param {NewCommitBody} body 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async apiCommitPost(body: NewCommitBody, options?: AxiosRequestConfig): Promise<AxiosResponse<any>> {
+            return DefaultApiFp(configuration).apiCommitPost(body, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
          * @summary Get Commit
          * @param {string} name 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async apiCommitNameGet(name: string, options?: AxiosRequestConfig): Promise<AxiosResponse<any>> {
-            return DefaultApiFp(configuration).apiCommitNameGet(name, options).then((request) => request(axios, basePath));
+        async apiCommitsNameGet(name: string, options?: AxiosRequestConfig): Promise<AxiosResponse<any>> {
+            return DefaultApiFp(configuration).apiCommitsNameGet(name, options).then((request) => request(axios, basePath));
         },
         /**
          * 
@@ -1073,18 +1085,8 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async apiCommitNamePut(body: Array<CommitItem>, name: string, options?: AxiosRequestConfig): Promise<AxiosResponse<any>> {
-            return DefaultApiFp(configuration).apiCommitNamePut(body, name, options).then((request) => request(axios, basePath));
-        },
-        /**
-         * 
-         * @summary New Commit
-         * @param {NewCommitBody} body 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        async apiCommitPost(body: NewCommitBody, options?: AxiosRequestConfig): Promise<AxiosResponse<any>> {
-            return DefaultApiFp(configuration).apiCommitPost(body, options).then((request) => request(axios, basePath));
+        async apiCommitsNamePut(body: Array<CommitItem>, name: string, options?: AxiosRequestConfig): Promise<AxiosResponse<any>> {
+            return DefaultApiFp(configuration).apiCommitsNamePut(body, name, options).then((request) => request(axios, basePath));
         },
         /**
          * 
@@ -1128,23 +1130,23 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
         },
         /**
          * 
-         * @summary Load Profile
+         * @summary Load Prompt
          * @param {string} name 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async apiPromptNameGet(name: string, options?: AxiosRequestConfig): Promise<AxiosResponse<any>> {
+        async apiPromptNameGet(name: string, options?: AxiosRequestConfig): Promise<AxiosResponse<Prompt>> {
             return DefaultApiFp(configuration).apiPromptNameGet(name, options).then((request) => request(axios, basePath));
         },
         /**
          * 
          * @summary Update Profile
-         * @param {Array<Message>} body 
+         * @param {UpdatePromptBody} body 
          * @param {string} name 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async apiPromptNamePut(body: Array<Message>, name: string, options?: AxiosRequestConfig): Promise<AxiosResponse<any>> {
+        async apiPromptNamePut(body: UpdatePromptBody, name: string, options?: AxiosRequestConfig): Promise<AxiosResponse<any>> {
             return DefaultApiFp(configuration).apiPromptNamePut(body, name, options).then((request) => request(axios, basePath));
         },
         /**
@@ -1244,14 +1246,25 @@ export class DefaultApi extends BaseAPI {
     }
     /**
      * 
+     * @summary New Commit
+     * @param {NewCommitBody} body 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApi
+     */
+    public async apiCommitPost(body: NewCommitBody, options?: AxiosRequestConfig) : Promise<AxiosResponse<any>> {
+        return DefaultApiFp(this.configuration).apiCommitPost(body, options).then((request) => request(this.axios, this.basePath));
+    }
+    /**
+     * 
      * @summary Get Commit
      * @param {string} name 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof DefaultApi
      */
-    public async apiCommitNameGet(name: string, options?: AxiosRequestConfig) : Promise<AxiosResponse<any>> {
-        return DefaultApiFp(this.configuration).apiCommitNameGet(name, options).then((request) => request(this.axios, this.basePath));
+    public async apiCommitsNameGet(name: string, options?: AxiosRequestConfig) : Promise<AxiosResponse<any>> {
+        return DefaultApiFp(this.configuration).apiCommitsNameGet(name, options).then((request) => request(this.axios, this.basePath));
     }
     /**
      * 
@@ -1262,19 +1275,8 @@ export class DefaultApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof DefaultApi
      */
-    public async apiCommitNamePut(body: Array<CommitItem>, name: string, options?: AxiosRequestConfig) : Promise<AxiosResponse<any>> {
-        return DefaultApiFp(this.configuration).apiCommitNamePut(body, name, options).then((request) => request(this.axios, this.basePath));
-    }
-    /**
-     * 
-     * @summary New Commit
-     * @param {NewCommitBody} body 
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     * @memberof DefaultApi
-     */
-    public async apiCommitPost(body: NewCommitBody, options?: AxiosRequestConfig) : Promise<AxiosResponse<any>> {
-        return DefaultApiFp(this.configuration).apiCommitPost(body, options).then((request) => request(this.axios, this.basePath));
+    public async apiCommitsNamePut(body: Array<CommitItem>, name: string, options?: AxiosRequestConfig) : Promise<AxiosResponse<any>> {
+        return DefaultApiFp(this.configuration).apiCommitsNamePut(body, name, options).then((request) => request(this.axios, this.basePath));
     }
     /**
      * 
@@ -1322,25 +1324,25 @@ export class DefaultApi extends BaseAPI {
     }
     /**
      * 
-     * @summary Load Profile
+     * @summary Load Prompt
      * @param {string} name 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof DefaultApi
      */
-    public async apiPromptNameGet(name: string, options?: AxiosRequestConfig) : Promise<AxiosResponse<any>> {
+    public async apiPromptNameGet(name: string, options?: AxiosRequestConfig) : Promise<AxiosResponse<Prompt>> {
         return DefaultApiFp(this.configuration).apiPromptNameGet(name, options).then((request) => request(this.axios, this.basePath));
     }
     /**
      * 
      * @summary Update Profile
-     * @param {Array<Message>} body 
+     * @param {UpdatePromptBody} body 
      * @param {string} name 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof DefaultApi
      */
-    public async apiPromptNamePut(body: Array<Message>, name: string, options?: AxiosRequestConfig) : Promise<AxiosResponse<any>> {
+    public async apiPromptNamePut(body: UpdatePromptBody, name: string, options?: AxiosRequestConfig) : Promise<AxiosResponse<any>> {
         return DefaultApiFp(this.configuration).apiPromptNamePut(body, name, options).then((request) => request(this.axios, this.basePath));
     }
     /**

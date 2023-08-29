@@ -11,42 +11,35 @@
  * https://github.com/swagger-api/swagger-codegen.git
  * Do not edit the class manually.
  */
-import { Argument } from './argument';
 import { Message } from './message';
 /**
  * 
  * @export
- * @interface CommitItem
+ * @interface Prompt
  */
-export interface CommitItem {
-    /**
-     * 
-     * @type {Array<Argument>}
-     * @memberof CommitItem
-     */
-    args?: Array<Argument>;
-    /**
-     * 
-     * @type {Array<Message>}
-     * @memberof CommitItem
-     */
-    messages?: Array<Message>;
+export interface Prompt {
     /**
      * 
      * @type {string}
-     * @memberof CommitItem
+     * @memberof Prompt
      */
-    response?: string;
+    name?: string;
     /**
      * 
      * @type {string}
-     * @memberof CommitItem
+     * @memberof Prompt
      */
     model?: string;
     /**
      * 
-     * @type {string}
-     * @memberof CommitItem
+     * @type {Array<Message>}
+     * @memberof Prompt
      */
-    md5?: string;
+    messages?: Array<Message>;
+    /**
+     * 
+     * @type {Array<string>}
+     * @memberof Prompt
+     */
+    history?: Array<string>;
 }

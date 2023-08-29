@@ -5,5 +5,7 @@ export * from './commit-item';
 export * from './httpvalidation-error';
 export * from './message';
 export * from './new-commit-body';
+export * from './prompt';
 export * from './testing-request-body';
+export * from './update-prompt-body';
 export * from './validation-error';
