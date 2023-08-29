@@ -205,7 +205,7 @@ class MongoPromptManger(BaseProfileManager):
         messages = [m.dict() for m in p.messages]
         for idx, m in enumerate(messages):
             m["id"] = idx
-        self.collection.update_one({"name": p.name}, {"$set": {"messages": messages}})
+        return self.collection.update_one({"name": p.name}, {"$set": p.dict()})
 
     def add_profile(self, p: Prompt):
         self.collection.insert_one(p.dict())
