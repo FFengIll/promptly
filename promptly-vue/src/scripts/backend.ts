@@ -10,7 +10,8 @@ function ApiFactory() {
 export const backend = ApiFactory()
 
 export class BackendHelper {
-    static async doChat(key: string, messages: Message[], args: Argument[]) {
+
+    static async doChat(model: string, messages: Message[], args: Argument[],) {
 
         console.log("origin message", messages)
         console.log("origin argument", args)
@@ -24,7 +25,7 @@ export class BackendHelper {
         })
         console.log("will chat with messages", another)
 
-        return backend.apiActionChatPost(another, "").then(
+        return backend.apiActionChatPost(another, model).then(
             (response) => {
                 return response
             }
