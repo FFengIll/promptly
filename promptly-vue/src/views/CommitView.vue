@@ -65,7 +65,7 @@ onMounted(
 
 async function getCommit(name: string) {
 
-    await backend.apiCommitNameGet(name).then(
+    await backend.apiCommitsNameGet(name).then(
         response => {
             console.log('request', response.data)
 
@@ -105,7 +105,7 @@ function gotoTest(it: CommitItem, args: Argument[]) {
 
 async function saveCommits(key: string, data: CommitItem[]) {
 
-    await backend.apiCommitNamePut(data, key).then(
+    await backend.apiCommitsNamePut(data, key).then(
         response => {
             console.log("success")
         }
@@ -120,7 +120,7 @@ function dropCommit(index: number) {
 
 async function replay(key: string, commit: CommitItem) {
     commit.response = ""
-    let response = await BackendHelper.doChat(key, commit.messages!!, commit.args!!)
+    let response = await BackendHelper.doChat("", commit.messages!!, commit.args!!)
     console.log('response', response)
     commit.response = response.data
 
@@ -129,7 +129,7 @@ async function replay(key: string, commit: CommitItem) {
 
 async function doChat(key: string, commit: CommitItem) {
     commit.response = ""
-    let response = await BackendHelper.doChat(key, commit.messages!!, ArgumentHelper.toArgumentList(args.value))
+    let response = await BackendHelper.doChat("", commit.messages!!, ArgumentHelper.toArgumentList(args.value))
     console.log('response', response)
     commit.response = response.data
 
@@ -161,10 +161,21 @@ const pagination = {
 </script>
 
 <template>
-    <a-row>
-        <a-col>
+    <a-row :gutter="[16, 16]">
+        <a-col :span="10">
             <CaseInput :setting="argSetting" :args="args" @select="(key, value) => { args.set(key, value) }">
             </CaseInput>
+        </a-col>
+
+        <a-col :span="10" class="gutter-row">
+            <a-space direction="horizontal">
+                <a-input-group compact>
+                    <a-input v-model:value="key" style="width: 200px" />
+                    <a-button type="primary" @click="getCommit(key)">Get</a-button>
+                    <a-button type="primary" @click="saveCommits(key, commits)">Save</a-button>
+                </a-input-group>
+                <a-checkbox v-model:checked="autoSave">Auto Save</a-checkbox>
+            </a-space>
         </a-col>
         <!-- <a-col>
             <a-button @click="newArg()">
@@ -180,32 +191,33 @@ const pagination = {
         </a-col> -->
     </a-row>
     <a-row :gutter="[16, 16]">
-        <a-col :span="24" class="gutter-row">
-            <a-space direction="horizontal">
-                <a-input-group compact>
-                    <a-input v-model:value="key" style="width: 100px" />
-                    <a-button type="primary" @click="getCommit(key)">Get</a-button>
-                    <a-button type="primary" @click="saveCommits(key, commits)">Save</a-button>
-                </a-input-group>
-                <a-checkbox v-model:checked="autoSave">Auto Save</a-checkbox>
-            </a-space>
-        </a-col>
+
     </a-row>
+    <a-divider></a-divider>
     <a-row :gutter="[16, 16]">
 
-        <a-col :span="8" v-for="(  commit, index  ) in   commits  " align="center" :key="index">
+        <a-col :span="8" v-for="(  commit, index  ) in    commits   " align="center" :key="index">
             <a-card>
                 <!--        response-->
-                <a-textarea v-model:value="commit.response" :auto-size="{ minRows: 6, maxRows: 6 }">
+                <a-card :title="commit.model || 'GPT-3.5'">
 
-                </a-textarea>
+                    <template #extra>
+                        <a-typography-text>
+
+                        </a-typography-text>
+                    </template>
+                    <a-textarea v-model:value="commit.response" :auto-size="{ minRows: 6, maxRows: 6 }">
+
+                    </a-textarea>
+                </a-card>
+                <a-divider></a-divider>
+
 
                 <!--        button-->
                 <a-button @click="doChat(key, commit)">Request</a-button>
                 <a-button @click="replay(key, commit)">Replay</a-button>
                 <a-button @click="gotoTest(commit, args)">Goto Test</a-button>
                 <a-button @click="gotoPrompt(commit)">Goto Prompt</a-button>
-                <a-button @click="doCommit(key, commit)">CommitItem</a-button>
                 <a-button @click="dropCommit(index)">Drop</a-button>
 
                 <a-divider></a-divider>
@@ -213,7 +225,7 @@ const pagination = {
                 <!-- args -->
 
                 <a-card title="Args">
-                    <a-space v-for="(item, index) in commit.args" :key="index">
+                    <a-space v-for="( item, index ) in  commit.args " :key="index">
                         <a-typography-text :content="item.key">
                         </a-typography-text>
                         <a-input :value="item.value">
@@ -221,6 +233,8 @@ const pagination = {
                     </a-space>
                 </a-card>
                 <a-divider></a-divider>
+
+
 
                 <!-- prompt -->
                 <PromptInput :title="'Prompt'" :messages="commit.messages!!" with-copy with-sidebar>

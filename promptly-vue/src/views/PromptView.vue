@@ -32,10 +32,25 @@
                 </a-collapse>
 
                 <a-card title="Argument">
+
+                    <template #extra>
+                        <a-button @click="fetchArgument(key)">
+                            <template #icon>
+                                <SyncOutlined />
+                            </template>
+                        </a-button>
+                    </template>
+
                     <CaseInput :setting="argSetting" :args="args" @select="(key, value) => { args.set(key, value) }">
                         <template #extra>
                             <a-row justify="center">
                                 <a-space direction="horizontal">
+
+
+                                    <a-select ref="select" v-model:value="argKey" style="width: 120px" show-search>
+                                        <a-select-option v-for="k in args.keys()" :key="k">{{ k }}</a-select-option>
+                                    </a-select>
+
                                     <a-input v-model:value="argKey">
                                     </a-input>
 
@@ -51,26 +66,43 @@
                                 </a-space>
 
                             </a-row>
-                            <a-row justify="center">
-                                <a-space direction="horizontal">
 
-                                    <a-button @click="fetchArgument(key)">
-                                        <template #icon>
-                                            <SyncOutlined />
-                                        </template>
-                                        Refresh
-                                    </a-button>
-
-                                </a-space>
-                            </a-row>
                         </template>
                     </CaseInput>
+
+
+                </a-card>
+
+
+                <a-divider></a-divider>
+
+                <a-card title="Model">
+
+                    <template #extra>
+                        <ModelSelect :model="model" v-on:select="(value) => { model = value }" style="width: 200px">
+
+                        </ModelSelect>
+                        <a-button @click="fetchArgument(key)">
+                            <template #icon>
+                                <SyncOutlined />
+                            </template>
+                        </a-button>
+                    </template>
+
                 </a-card>
 
                 <a-divider></a-divider>
 
-
                 <a-card title="Prompt">
+                    <template #extra>
+                        <a-button @click="reload">
+
+                            <template #icon>
+                                <SyncOutlined />
+                            </template>
+                        </a-button>
+                    </template>
+
                     <a-row justify="end">
                         <a-button @click="() => { prompt.messages.forEach((item) => item.enable = false) }">Disable
                             All
@@ -119,7 +151,6 @@
                         <a-space direction="horizontal">
                             <a-button @click="chat">Request</a-button>
                             <a-button @click="doCommit">Commit</a-button>
-                            <a-button @click="reload">Reload</a-button>
                         </a-space>
                         <a-space direction="horizontal">
                             <a-button @click="gotoTesting">Goto Testing</a-button>
@@ -168,13 +199,14 @@ import { useRoute } from 'vue-router';
 import { useSnapshotStore } from '@/stores/snapshot';
 
 import CaseInput from '@/components/CaseInput.vue';
+import ModelSelect from '@/components/ModelSelect.vue';
 import PromptInput from "@/components/PromptInput.vue";
 import { ArgumentHelper } from '@/scripts/argument';
 import { BackendHelper, backend } from "@/scripts/backend";
 import { RouteHelper } from '@/scripts/router';
 import type { NotificationPlacement } from "ant-design-vue";
 import { notification } from 'ant-design-vue';
-import type { ArgRequest, ArgumentSetting, Message, NewCommitBody } from "../../sdk";
+import type { ArgRequest, ArgumentSetting, Message, NewCommitBody, Prompt, UpdatePromptBody } from "../../sdk";
 import PromptCard from '../components/PromptCard.vue';
 
 const [notification_api, contextHolder] = notification.useNotification();
@@ -193,6 +225,7 @@ const props = defineProps<{}>()
 console.log(store.source.args)
 
 const loading = ref(false)
+const model = ref<string>("")
 
 const argValue = ref<string>("")
 const argKey = ref<string>("")
@@ -204,13 +237,14 @@ const argSetting = ref<ArgumentSetting>(
     }
 )
 const args = ref<Map<string, string>>(new Map())
-const prompt = ref(
+const prompt = ref<Prompt>(
     {
         "history": [],
         "messages": <Message[]>[
             { role: "角色1", content: "内容1", enable: true },
             // 其他数据项
         ],
+        model: "",
     }
 )
 
@@ -218,6 +252,7 @@ const prompt = ref(
 onMounted(
     () => {
         fetchProfile(key)
+
     }
 )
 
@@ -274,6 +309,7 @@ async function doCommit() {
             response: response.value,
             args: ArgumentHelper.toArgumentList(args.value),
         },
+        model: model.value,
     }
     backend.apiCommitPost(body).then(() => {
 
@@ -333,6 +369,9 @@ async function fetchProfile(name: string) {
         .then(response => {
             console.log(response.data)
             prompt.value = response.data;
+
+            model.value = prompt.value.model
+            console.log(model.value)
         })
         .catch(error => {
             console.error(error);
@@ -355,9 +394,13 @@ function openNotification(message: string, status: string) {
 }
 
 async function chat() {
-
+    console.log("model", model.value)
     console.log(prompt.value.messages)
-    await backend.apiPromptNamePut(prompt.value.messages, key)
+    let body: UpdatePromptBody = {
+        messages: prompt.value.messages!!,
+        model: model.value
+    }
+    await backend.apiPromptNamePut(body, key)
 
     let argList = []
     for (const [key, value] of args.value) {
@@ -369,7 +412,7 @@ async function chat() {
     loading.value = true
 
     response.value = ''
-    let res = await BackendHelper.doChat(key, prompt.value.messages, argList)
+    let res = await BackendHelper.doChat(model.value, prompt.value.messages, argList)
     response.value = res.data;
 
     loading.value = false
