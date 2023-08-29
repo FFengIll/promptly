@@ -46,11 +46,11 @@ class Argument(BaseModel):
 
 @autocomplete
 class CommitItem(BaseModel):
-    model: str = ""
     args: List[Argument] = Field(default_factory=list)
     messages: List[Message] = Field(default_factory=list)
-    response: str = ""
-    md5: str = ""
+    response: str = Field(default="")
+    model: str = Field(default="")
+    md5: str = Field(default="")
 
     def __init__(self, **data: Any):
         super().__init__(**data)
@@ -59,8 +59,15 @@ class CommitItem(BaseModel):
     def calc_md5(self):
         items = [m.json() for m in self.messages]
         h = md5()
+
+        # firstly, process model
+        h.update(self.model.encode())
+
+        # then for the messages
         for it in items:
             h.update(it.encode())
+
+        # done
         return h.hexdigest()
 
 
@@ -72,6 +79,7 @@ class ArgumentSetting(BaseModel):
 @autocomplete
 class Prompt(BaseModel):
     name: str = Field(default="")
+    model: str = Field(default="")
     messages: List[Message] = Field(default_factory=list)
     history: List[str] = Field(default_factory=list)
 
