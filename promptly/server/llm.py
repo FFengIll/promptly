@@ -1,20 +1,12 @@
-from copy import deepcopy
 from typing import List
 
 import loguru
-from httpx import AsyncClient
+import openai
 
 from promptly.config import key, url
 from promptly.model.prompt import Message
 
 log = loguru.logger
-
-
-payload = {
-    "messages": [],
-    "key": key,
-    "model": "",
-}
 
 
 def to_message(ms: List[Message]):
@@ -30,23 +22,19 @@ def simple_chat(content):
     return chat(messages)
 
 
-client = AsyncClient()
-
-
 async def chat(messages, model=""):
-    headers = {}
+    openai.api_base = url
+    openai.api_key = key
 
-    data = deepcopy(payload)
-    data["messages"] = messages
-    data["model"] = model
+    response = openai.ChatCompletion.create(
+        model=model,
+        messages=messages,
+        headers={"HTTP-Referer": "test", "X-Title": "test"},
+    )
 
-    response = await client.post(url=url, headers=headers, json=data, timeout=30)
     log.info(response)
-    response.raise_for_status()
 
-    answer = response.json()
-
-    res = answer["data"]["choices"][0]["message"]["content"]
+    res = response["choices"][0]["message"]["content"]
     log.info(res)
 
     return res
