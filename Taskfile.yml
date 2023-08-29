@@ -13,9 +13,16 @@ tasks:
 
   build:
     deps:
+      - install
       - black
       - swagger
       - dist
+
+  install:
+    desc: "install deps for the project"
+    cmds:
+      - cd promptly-vue; npm install
+      - poetry install
 
   black:
     desc: "format python with black"
