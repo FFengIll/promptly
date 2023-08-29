@@ -10,6 +10,17 @@ tasks:
     cmds:
       - echo "{{.GREETING}}"
     silent: true
+
+  build:
+    deps:
+      - black
+      - swagger
+      - dist
+
+  black:
+    desc: "format python with black"
+    cmds:
+      - black .
   
   swagger:
     desc: "generate sdk via swagger"
