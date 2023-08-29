@@ -74,3 +74,16 @@ async def chat(ms: List[Message], model: str = ""):
 
     mongo.history.push(CommitItem(messages=ms, response=content))
     return content
+
+
+@app.post(
+    "/api/action/args/clean",
+)
+async def clean_args(name: str):
+    arg_setting: ArgumentSetting = mongo.argument.get_setting(name)
+    pending = set()
+    for i in arg_setting.args:
+        pending.add(i)
+    arg_setting.args = list(pending)
+    mongo.argument.save_setting(arg_setting)
+    return True

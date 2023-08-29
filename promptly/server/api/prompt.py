@@ -2,10 +2,11 @@ from typing import List
 
 import fastapi
 import loguru
+import pydantic
 from pydantic import BaseModel
 from pymongo import results
 
-from promptly.model.prompt import CommitItem, Message, Prompt, ArgumentSetting
+from promptly.model.prompt import ArgumentSetting, CommitItem, Message, Prompt
 from promptly.server.app import app, mongo
 
 log = loguru.logger
@@ -46,21 +47,27 @@ def create_prompt(name: str):
     return
 
 
-@app.get("/api/prompt/{name}")
-def load_profile(name: str):
-    profile = manager.get(key=name)
-    if not profile:
+@app.get("/api/prompt/{name}", response_model=Prompt)
+def load_prompt(name: str):
+    prompt = manager.get(key=name)
+    if not prompt:
         raise fastapi.HTTPException(status_code=404)
-    return profile.dict()
+    return prompt.dict()
+
+
+class UpdatePromptBody(BaseModel):
+    messages: List[Message]
+    model: str = pydantic.Field(default="")
 
 
 @app.put("/api/prompt/{name}")
 def update_profile(
-    update: List[Message],
+    body: UpdatePromptBody,
     name: str,
 ):
     p = manager.get(name)
-    p.messages = update
+    p.messages = body.messages
+    p.model = body.model
 
     manager.update_message(p)
 
@@ -92,6 +99,7 @@ def update_argument(item: ArgRequest, name: str):
 class NewCommitBody(BaseModel):
     commit: CommitItem
     name: str
+    model: str = pydantic.Field(default="")
 
 
 @app.post("/api/commit")
@@ -103,17 +111,17 @@ def new_commit(body: NewCommitBody):
     return check_mongo_result(res)
 
 
-@app.put("/api/commit/{name}")
-def commit_prompt(
-    commits: List[CommitItem],
-    name: str,
-):
-    mongo.commit.push(name, *commits)
-
-
-@app.get("/api/commit/{name}")
+@app.get("/api/commits/{name}")
 def get_commit(name: str):
     res = mongo.commit.get(name)
     if not res:
         raise fastapi.HTTPException(404)
     return res
+
+
+@app.put("/api/commits/{name}")
+def commit_prompt(
+    commits: List[CommitItem],
+    name: str,
+):
+    mongo.commit.push(name, *commits)
