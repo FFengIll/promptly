@@ -1,17 +1,19 @@
 <script setup lang="ts">
 import PromptInput from "@/components/PromptInput.vue";
 import router from "@/router";
-import { BackendHelper, backend } from "@/scripts/backend";
-import { RouteHelper } from "@/scripts/router";
-import { useSnapshotStore } from "@/stores/snapshot";
-import { storeToRefs } from "pinia";
-import type { ArgumentSetting, CommitItem } from "sdk/models";
-import { onMounted, ref } from "vue";
-import { useRoute } from 'vue-router';
+import {BackendHelper, backend} from "@/scripts/backend";
+import {RouteHelper} from "@/scripts/router";
+import {useSnapshotStore} from "@/stores/snapshot";
+import {storeToRefs} from "pinia";
+import type {ArgumentSetting, CommitItem} from "sdk/models";
+import {onMounted, ref} from "vue";
+import {useRoute} from 'vue-router';
+
+import {HeartOutlined, HeartFilled, HeartTwoTone} from "@ant-design/icons-vue"
 
 import CaseInput from '@/components/CaseInput.vue';
-import { ArgumentHelper } from "@/scripts/argument";
-import type { Argument } from "../../sdk/models";
+import {ArgumentHelper} from "@/scripts/argument";
+import type {Argument} from "../../sdk/models";
 
 //
 const store = useSnapshotStore()
@@ -23,7 +25,7 @@ const key = ref<string>(route.params.key.toString())
 
 //
 const autoSave = ref<boolean>(true)
-const { source } = storeToRefs(store)
+const {source} = storeToRefs(store)
 
 const commits = ref<CommitItem[]>(
     []
@@ -112,7 +114,11 @@ async function saveCommits(key: string, data: CommitItem[]) {
     )
 }
 
-function dropCommit(index: number) {
+function dropCommit(commit: CommitItem, index: number) {
+    if (commit.star ?? false) {
+        return
+    }
+
     console.log(index)
     commits.value.splice(index, 1)
 }
@@ -158,6 +164,19 @@ const pagination = {
     pageSize: 3,
 };
 
+async function changeStar(commit: CommitItem) {
+    let value = !(commit.star ?? false)
+    await backend.apiActionStarPost(
+        {
+            name: key.value,
+            md5: commit.md5!!,
+            value: value
+        }
+    ).then(response => {
+        commit.star = value
+    })
+}
+
 </script>
 
 <template>
@@ -170,7 +189,7 @@ const pagination = {
         <a-col :span="10" class="gutter-row">
             <a-space direction="horizontal">
                 <a-input-group compact>
-                    <a-input v-model:value="key" style="width: 200px" />
+                    <a-input v-model:value="key" style="width: 200px"/>
                     <a-button type="primary" @click="getCommit(key)">Get</a-button>
                     <a-button type="primary" @click="saveCommits(key, commits)">Save</a-button>
                 </a-input-group>
@@ -202,9 +221,12 @@ const pagination = {
                 <a-card :title="commit.model || 'GPT-3.5'">
 
                     <template #extra>
-                        <a-typography-text>
-
-                        </a-typography-text>
+                        <a-button @click="changeStar(commit)">
+                            <template #icon>
+                                <HeartTwoTone v-if="commit.star" two-tone-color="#eb2f96"/>
+                                <HeartOutlined v-else/>
+                            </template>
+                        </a-button>
                     </template>
                     <a-textarea v-model:value="commit.response" :auto-size="{ minRows: 6, maxRows: 6 }">
 
@@ -218,7 +240,7 @@ const pagination = {
                 <a-button @click="replay(key, commit)">Replay</a-button>
                 <a-button @click="gotoTest(commit, args)">Goto Test</a-button>
                 <a-button @click="gotoPrompt(commit)">Goto Prompt</a-button>
-                <a-button @click="dropCommit(index)">Drop</a-button>
+                <a-button @click="dropCommit(commit, index)">Drop</a-button>
 
                 <a-divider></a-divider>
 
@@ -233,7 +255,6 @@ const pagination = {
                     </a-space>
                 </a-card>
                 <a-divider></a-divider>
-
 
 
                 <!-- prompt -->
