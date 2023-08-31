@@ -24,15 +24,9 @@ def generate_id():
 
 @autocomplete
 class Message(BaseModel):
-    role: str
-    content: str
-    enable: bool = Field(default=True)
-
-    def __init__(self, **data: Any):
-        super().__init__(**data)
-
-    def __hash__(self):
-        return self.id
+    role: str = ...
+    content: str = ...
+    enable: bool = False
 
     @classmethod
     def sample(cls):
@@ -47,10 +41,12 @@ class Argument(BaseModel):
 @autocomplete
 class CommitItem(BaseModel):
     args: List[Argument] = Field(default_factory=list)
-    messages: List[Message] = Field(default_factory=list)
-    response: str = Field(default="")
-    model: str = Field(default="")
-    md5: str = Field(default="")
+    messages: List[Message] = ...
+    response: str = ""
+    model: str = ""
+    md5: str = ""
+    star: bool = False
+    tag: str = ""
 
     def __init__(self, **data: Any):
         super().__init__(**data)
@@ -78,13 +74,14 @@ class ArgumentSetting(BaseModel):
 
 @autocomplete
 class Prompt(BaseModel):
-    name: str = Field(default="")
+    name: str = ...
     model: str = Field(default="")
-    messages: List[Message] = Field(default_factory=list)
+    messages: List[Message] = ...
     history: List[str] = Field(default_factory=list)
 
-    def __init__(self, **data: Any):
-        super().__init__(**data)
+    def __init__(self, **kwargs):
+        messages = kwargs.pop("messages", list())
+        super().__init__(messages=messages, **kwargs)
 
     @classmethod
     def sample(cls) -> "Prompt":
@@ -95,29 +92,3 @@ class Prompt(BaseModel):
         return Prompt(
             name="demo", messages=[Message(id=1, role="user", content="hello")]
         )
-
-    def remove(self, id):
-        found = None
-        for i in self.messages:
-            if i.id == id:
-                found = i
-                break
-        if found:
-            self.messages.remove(found)
-
-
-def test_model():
-    res = Prompt.parse_obj(dict(name="", messages=[]))
-    print(res)
-
-
-def test_json():
-    for i in range(5):
-        m = Message(role="1", content="123")
-        print(m.json())
-
-
-def test_commit():
-    for i in range(5):
-        c = CommitItem()
-        print(c.md5)
