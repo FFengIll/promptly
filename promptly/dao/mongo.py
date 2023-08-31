@@ -84,6 +84,13 @@ class MongoCommitManager:
 
         self.index = set()
 
+    def star(self, name, md5, value):
+        res = self.collection.update_one(
+            {"name": name, "commits": {"$elemMatch": {"md5": md5}}},
+            {"$set": {"commits.$.star": value}},
+        )
+        return res
+
     def append_commit(self, name, commit: CommitItem):
         res = self.collection.update_one(
             {"name": name}, {"$push": {"commits": commit.dict()}}, upsert=True
