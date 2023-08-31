@@ -11,35 +11,28 @@
  * https://github.com/swagger-api/swagger-codegen.git
  * Do not edit the class manually.
  */
-import { Message } from './message';
 /**
  * 
  * @export
- * @interface Prompt
+ * @interface StarBody
  */
-export interface Prompt {
+export interface StarBody {
     /**
      * 
      * @type {string}
-     * @memberof Prompt
+     * @memberof StarBody
      */
     name: string;
     /**
      * 
      * @type {string}
-     * @memberof Prompt
+     * @memberof StarBody
      */
-    model?: string;
+    md5: string;
     /**
      * 
-     * @type {Array<Message>}
-     * @memberof Prompt
+     * @type {boolean}
+     * @memberof StarBody
      */
-    messages: Array<Message>;
-    /**
-     * 
-     * @type {Array<string>}
-     * @memberof Prompt
-     */
-    history?: Array<string>;
+    value: boolean;
 }

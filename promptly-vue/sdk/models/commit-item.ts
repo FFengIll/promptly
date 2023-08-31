@@ -30,7 +30,7 @@ export interface CommitItem {
      * @type {Array<Message>}
      * @memberof CommitItem
      */
-    messages?: Array<Message>;
+    messages: Array<Message>;
     /**
      * 
      * @type {string}
@@ -49,4 +49,16 @@ export interface CommitItem {
      * @memberof CommitItem
      */
     md5?: string;
+    /**
+     * 
+     * @type {boolean}
+     * @memberof CommitItem
+     */
+    star?: boolean;
+    /**
+     * 
+     * @type {string}
+     * @memberof CommitItem
+     */
+    tag?: string;
 }
