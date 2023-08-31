@@ -8,6 +8,7 @@ from pymongo import results
 
 from promptly.model.prompt import ArgumentSetting, CommitItem, Message, Prompt
 from promptly.server.app import app, mongo
+from promptly.server.api.util import check_mongo_result
 
 log = loguru.logger
 
@@ -73,16 +74,6 @@ def update_profile(
 
     p = manager.get(name)
     return p
-
-
-def check_mongo_result(res: results.UpdateResult):
-    if not res.acknowledged:
-        raise fastapi.HTTPException(404)
-
-    # if res.modified_count <= 0 and res.matched_count<=0:
-    #     raise fastapi.HTTPException(404)
-
-    return True
 
 
 @app.get("/api/prompt/args/{name}", response_model=ArgumentSetting)

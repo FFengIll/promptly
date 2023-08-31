@@ -9,6 +9,7 @@ from promptly.model.prompt import Argument, CommitItem, Message, ArgumentSetting
 from promptly.server import llm
 from promptly.server.app import app, mongo
 from promptly.server.llm import to_message
+from promptly.server.api.util import check_mongo_result
 
 log = loguru.logger
 
@@ -62,6 +63,18 @@ async def run_test_with_source(body: TestingRequestBody, repeat: int = 1):
         res += await batch_test(messages, key, sources)
 
     return res
+
+
+class StarBody(BaseModel):
+    name: str
+    md5: str
+    value: bool
+
+
+@app.post("/api/action/star")
+def new_commit(body: StarBody):
+    res = mongo.commit.star(body.name, body.md5, body.value)
+    return check_mongo_result(res)
 
 
 @app.post("/api/action/chat")
