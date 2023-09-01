@@ -31,7 +31,7 @@ def use_route_names_as_operation_ids(app: FastAPI) -> None:
 use_route_names_as_operation_ids(app)
 
 if __name__ == "__main__":
-    with open("../data/swagger.json", "w") as fd:
+    with open("./data/swagger.json", "w") as fd:
         use_route_names_as_operation_ids(app)
         schema = app.openapi()
         json.dump(schema, fd, indent=4, ensure_ascii=False)
