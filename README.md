@@ -1,15 +1,18 @@
 # prompt
+
 The prompt engineering tools.
 
 # deps
+
 - python: fastapi
 - typescript: vuejs v3
-- build: taskfile, poetry, npm
+- build: taskfile, poetry, pnpm
 - db: mongodb
 - env: docker
-- (DEPRECATED) gui: pysimplegui 
+- (DEPRECATED) gui: pysimplegui
 
 # run
+
 - task install
 - task build
 - task run
@@ -19,6 +22,7 @@ The prompt engineering tools.
 > see [Install](https://taskfile.dev/installation/) to install `task`.
 
 # features
+
 - build a prompt
 - run a prompt (with available model service)
 - using arguments for prompt
