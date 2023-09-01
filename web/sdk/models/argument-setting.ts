@@ -28,5 +28,5 @@ export interface ArgumentSetting {
      * @type {any}
      * @memberof ArgumentSetting
      */
-    args: any;
+    args?: any;
 }

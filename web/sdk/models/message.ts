@@ -14,25 +14,25 @@
 /**
  * 
  * @export
- * @interface MessageInput
+ * @interface Message
  */
-export interface MessageInput {
+export interface Message {
     /**
      * 
      * @type {any}
-     * @memberof MessageInput
+     * @memberof Message
      */
     role: any;
     /**
      * 
      * @type {any}
-     * @memberof MessageInput
+     * @memberof Message
      */
     content: any;
     /**
      * 
      * @type {any}
-     * @memberof MessageInput
+     * @memberof Message
      */
     enable?: any;
 }

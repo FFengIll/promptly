@@ -28,7 +28,7 @@ export interface Prompt {
      * @type {any}
      * @memberof Prompt
      */
-    model: any;
+    model?: any;
     /**
      * 
      * @type {any}
@@ -40,5 +40,5 @@ export interface Prompt {
      * @type {any}
      * @memberof Prompt
      */
-    history: any;
+    history?: any;
 }
