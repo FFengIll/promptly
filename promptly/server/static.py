@@ -7,7 +7,7 @@ from promptly.server.app import app
 
 log = loguru.logger
 
-templates = Jinja2Templates(directory="./promptly-vue/dist")
+templates = Jinja2Templates(directory="./web/dist")
 
 
 @app.get("/view/{path:path}")
@@ -22,4 +22,4 @@ def index(request: Request):
 
 
 # put this after all
-app.mount("/", StaticFiles(directory="./promptly-vue/dist"), name="static")
+app.mount("/", StaticFiles(directory="./web/dist"), name="static")
