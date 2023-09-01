@@ -11,23 +11,22 @@
  * https://github.com/swagger-api/swagger-codegen.git
  * Do not edit the class manually.
  */
-import { Message } from './message';
 /**
  * 
  * @export
- * @interface UpdatePromptBody
+ * @interface Argument
  */
-export interface UpdatePromptBody {
+export interface Argument {
     /**
      * 
-     * @type {Array<Message>}
-     * @memberof UpdatePromptBody
+     * @type {any}
+     * @memberof Argument
      */
-    messages: Array<Message>;
+    key: any;
     /**
      * 
-     * @type {string}
-     * @memberof UpdatePromptBody
+     * @type {any}
+     * @memberof Argument
      */
-    model?: string;
+    value: any;
 }

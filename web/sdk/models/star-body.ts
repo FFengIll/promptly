@@ -11,17 +11,28 @@
  * https://github.com/swagger-api/swagger-codegen.git
  * Do not edit the class manually.
  */
-import { ValidationError } from './validation-error';
 /**
  * 
  * @export
- * @interface HTTPValidationError
+ * @interface StarBody
  */
-export interface HTTPValidationError {
+export interface StarBody {
     /**
      * 
-     * @type {Array<ValidationError>}
-     * @memberof HTTPValidationError
+     * @type {any}
+     * @memberof StarBody
      */
-    detail?: Array<ValidationError>;
+    name: any;
+    /**
+     * 
+     * @type {any}
+     * @memberof StarBody
+     */
+    md5: any;
+    /**
+     * 
+     * @type {any}
+     * @memberof StarBody
+     */
+    value: any;
 }

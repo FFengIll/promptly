@@ -11,29 +11,16 @@
  * https://github.com/swagger-api/swagger-codegen.git
  * Do not edit the class manually.
  */
-import { CommitItem } from './commit-item';
 /**
  * 
  * @export
- * @interface NewCommitBody
+ * @interface HTTPValidationError
  */
-export interface NewCommitBody {
+export interface HTTPValidationError {
     /**
      * 
-     * @type {CommitItem}
-     * @memberof NewCommitBody
+     * @type {any}
+     * @memberof HTTPValidationError
      */
-    commit: CommitItem;
-    /**
-     * 
-     * @type {string}
-     * @memberof NewCommitBody
-     */
-    name: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof NewCommitBody
-     */
-    model?: string;
+    detail?: any;
 }

@@ -14,25 +14,19 @@
 /**
  * 
  * @export
- * @interface Message
+ * @interface UpdatePromptBody
  */
-export interface Message {
+export interface UpdatePromptBody {
     /**
      * 
-     * @type {string}
-     * @memberof Message
+     * @type {any}
+     * @memberof UpdatePromptBody
      */
-    role: string;
+    messages: any;
     /**
      * 
-     * @type {string}
-     * @memberof Message
+     * @type {any}
+     * @memberof UpdatePromptBody
      */
-    content: string;
-    /**
-     * 
-     * @type {boolean}
-     * @memberof Message
-     */
-    enable?: boolean;
+    model?: any;
 }

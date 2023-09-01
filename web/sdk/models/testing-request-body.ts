@@ -14,25 +14,31 @@
 /**
  * 
  * @export
- * @interface StarBody
+ * @interface TestingRequestBody
  */
-export interface StarBody {
+export interface TestingRequestBody {
     /**
      * 
-     * @type {string}
-     * @memberof StarBody
+     * @type {any}
+     * @memberof TestingRequestBody
      */
-    name: string;
+    sources: any;
     /**
      * 
-     * @type {string}
-     * @memberof StarBody
+     * @type {any}
+     * @memberof TestingRequestBody
      */
-    md5: string;
+    messages: any;
     /**
      * 
-     * @type {boolean}
-     * @memberof StarBody
+     * @type {any}
+     * @memberof TestingRequestBody
      */
-    value: boolean;
+    key: any;
+    /**
+     * 
+     * @type {any}
+     * @memberof TestingRequestBody
+     */
+    args: any;
 }

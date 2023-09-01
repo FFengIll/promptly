@@ -14,19 +14,25 @@
 /**
  * 
  * @export
- * @interface Argument
+ * @interface MessageOutput
  */
-export interface Argument {
+export interface MessageOutput {
     /**
      * 
-     * @type {string}
-     * @memberof Argument
+     * @type {any}
+     * @memberof MessageOutput
      */
-    key: string;
+    role: any;
     /**
      * 
-     * @type {string}
-     * @memberof Argument
+     * @type {any}
+     * @memberof MessageOutput
      */
-    value: string;
+    content: any;
+    /**
+     * 
+     * @type {any}
+     * @memberof MessageOutput
+     */
+    enable: any;
 }

@@ -14,25 +14,19 @@
 /**
  * 
  * @export
- * @interface ValidationError
+ * @interface ArgumentSetting
  */
-export interface ValidationError {
+export interface ArgumentSetting {
     /**
      * 
-     * @type {Array<string | number>}
-     * @memberof ValidationError
+     * @type {any}
+     * @memberof ArgumentSetting
      */
-    loc: Array<string | number>;
+    name: any;
     /**
      * 
-     * @type {string}
-     * @memberof ValidationError
+     * @type {any}
+     * @memberof ArgumentSetting
      */
-    msg: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof ValidationError
-     */
-    type: string;
+    args: any;
 }

@@ -14,19 +14,25 @@
 /**
  * 
  * @export
- * @interface ArgumentSetting
+ * @interface MessageInput
  */
-export interface ArgumentSetting {
+export interface MessageInput {
     /**
      * 
-     * @type {string}
-     * @memberof ArgumentSetting
+     * @type {any}
+     * @memberof MessageInput
      */
-    name: string;
+    role: any;
     /**
      * 
-     * @type {{ [key: string]: Array<string>; }}
-     * @memberof ArgumentSetting
+     * @type {any}
+     * @memberof MessageInput
      */
-    args?: { [key: string]: Array<string>; };
+    content: any;
+    /**
+     * 
+     * @type {any}
+     * @memberof MessageInput
+     */
+    enable?: any;
 }

@@ -11,35 +11,22 @@
  * https://github.com/swagger-api/swagger-codegen.git
  * Do not edit the class manually.
  */
-import { Message } from './message';
 /**
  * 
  * @export
- * @interface Prompt
+ * @interface ArgRequest
  */
-export interface Prompt {
+export interface ArgRequest {
     /**
      * 
-     * @type {string}
-     * @memberof Prompt
+     * @type {any}
+     * @memberof ArgRequest
      */
-    name: string;
+    key: any;
     /**
      * 
-     * @type {string}
-     * @memberof Prompt
+     * @type {any}
+     * @memberof ArgRequest
      */
-    model?: string;
-    /**
-     * 
-     * @type {Array<Message>}
-     * @memberof Prompt
-     */
-    messages: Array<Message>;
-    /**
-     * 
-     * @type {Array<string>}
-     * @memberof Prompt
-     */
-    history?: Array<string>;
+    value: any;
 }

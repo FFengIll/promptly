@@ -18,9 +18,7 @@ import { Configuration } from '../configuration';
 import { BASE_PATH, COLLECTION_FORMATS, RequestArgs, BaseAPI, RequiredError } from '../base';
 import { ArgRequest } from '../models';
 import { ArgumentSetting } from '../models';
-import { CommitItem } from '../models';
 import { HTTPValidationError } from '../models';
-import { Message } from '../models';
 import { NewCommitBody } from '../models';
 import { Prompt } from '../models';
 import { StarBody } from '../models';
@@ -35,11 +33,11 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         /**
          * 
          * @summary Clean Args
-         * @param {string} name 
+         * @param {any} name 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        apiActionArgsCleanPost: async (name: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        apiActionArgsCleanPost: async (name: any, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'name' is not null or undefined
             if (name === null || name === undefined) {
                 throw new RequiredError('name','Required parameter name was null or undefined when calling apiActionArgsCleanPost.');
@@ -78,12 +76,12 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         /**
          * 
          * @summary Chat
-         * @param {Array<Message>} body 
-         * @param {string} [model] 
+         * @param {any} body 
+         * @param {any} [model] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        apiActionChatPost: async (body: Array<Message>, model?: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        apiActionChatPost: async (body: any, model?: any, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'body' is not null or undefined
             if (body === null || body === undefined) {
                 throw new RequiredError('body','Required parameter body was null or undefined when calling apiActionChatPost.');
@@ -170,11 +168,11 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
          * 
          * @summary Run Test With Source
          * @param {TestingRequestBody} body 
-         * @param {number} [repeat] 
+         * @param {any} [repeat] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        apiActionTestingPost: async (body: TestingRequestBody, repeat?: number, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        apiActionTestingPost: async (body: TestingRequestBody, repeat?: any, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'body' is not null or undefined
             if (body === null || body === undefined) {
                 throw new RequiredError('body','Required parameter body was null or undefined when calling apiActionTestingPost.');
@@ -217,11 +215,11 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         /**
          * 
          * @summary List Case
-         * @param {boolean} reload 
+         * @param {any} reload 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        apiCaseGet: async (reload: boolean, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        apiCaseGet: async (reload: any, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'reload' is not null or undefined
             if (reload === null || reload === undefined) {
                 throw new RequiredError('reload','Required parameter reload was null or undefined when calling apiCaseGet.');
@@ -260,11 +258,11 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         /**
          * 
          * @summary Get Case
-         * @param {string} key 
+         * @param {any} key 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        apiCaseKeyGet: async (key: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        apiCaseKeyGet: async (key: any, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'key' is not null or undefined
             if (key === null || key === undefined) {
                 throw new RequiredError('key','Required parameter key was null or undefined when calling apiCaseKeyGet.');
@@ -343,11 +341,11 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         /**
          * 
          * @summary Get Commit
-         * @param {string} name 
+         * @param {any} name 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        apiCommitsNameGet: async (name: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        apiCommitsNameGet: async (name: any, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'name' is not null or undefined
             if (name === null || name === undefined) {
                 throw new RequiredError('name','Required parameter name was null or undefined when calling apiCommitsNameGet.');
@@ -383,12 +381,12 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         /**
          * 
          * @summary Commit Prompt
-         * @param {Array<CommitItem>} body 
-         * @param {string} name 
+         * @param {any} body 
+         * @param {any} name 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        apiCommitsNamePut: async (body: Array<CommitItem>, name: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        apiCommitsNamePut: async (body: any, name: any, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'body' is not null or undefined
             if (body === null || body === undefined) {
                 throw new RequiredError('body','Required parameter body was null or undefined when calling apiCommitsNamePut.');
@@ -466,11 +464,11 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         /**
          * 
          * @summary Get Argument
-         * @param {string} name 
+         * @param {any} name 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        apiPromptArgsNameGet: async (name: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        apiPromptArgsNameGet: async (name: any, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'name' is not null or undefined
             if (name === null || name === undefined) {
                 throw new RequiredError('name','Required parameter name was null or undefined when calling apiPromptArgsNameGet.');
@@ -507,11 +505,11 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
          * 
          * @summary Update Argument
          * @param {ArgRequest} body 
-         * @param {string} name 
+         * @param {any} name 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        apiPromptArgsNamePut: async (body: ArgRequest, name: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        apiPromptArgsNamePut: async (body: ArgRequest, name: any, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'body' is not null or undefined
             if (body === null || body === undefined) {
                 throw new RequiredError('body','Required parameter body was null or undefined when calling apiPromptArgsNamePut.');
@@ -555,11 +553,11 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         /**
          * 
          * @summary List Prompt
-         * @param {boolean} [refresh] 
+         * @param {any} [refresh] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        apiPromptGet: async (refresh?: boolean, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        apiPromptGet: async (refresh?: any, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             const localVarPath = `/api/prompt`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, 'https://example.com');
@@ -594,11 +592,11 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         /**
          * 
          * @summary Load Prompt
-         * @param {string} name 
+         * @param {any} name 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        apiPromptNameGet: async (name: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        apiPromptNameGet: async (name: any, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'name' is not null or undefined
             if (name === null || name === undefined) {
                 throw new RequiredError('name','Required parameter name was null or undefined when calling apiPromptNameGet.');
@@ -635,11 +633,11 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
          * 
          * @summary Update Profile
          * @param {UpdatePromptBody} body 
-         * @param {string} name 
+         * @param {any} name 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        apiPromptNamePut: async (body: UpdatePromptBody, name: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        apiPromptNamePut: async (body: UpdatePromptBody, name: any, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'body' is not null or undefined
             if (body === null || body === undefined) {
                 throw new RequiredError('body','Required parameter body was null or undefined when calling apiPromptNamePut.');
@@ -683,11 +681,11 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         /**
          * 
          * @summary Create Prompt
-         * @param {string} name 
+         * @param {any} name 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        apiPromptPost: async (name: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        apiPromptPost: async (name: any, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'name' is not null or undefined
             if (name === null || name === undefined) {
                 throw new RequiredError('name','Required parameter name was null or undefined when calling apiPromptPost.');
@@ -803,11 +801,11 @@ export const DefaultApiFp = function(configuration?: Configuration) {
         /**
          * 
          * @summary Clean Args
-         * @param {string} name 
+         * @param {any} name 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async apiActionArgsCleanPost(name: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => Promise<AxiosResponse<any>>> {
+        async apiActionArgsCleanPost(name: any, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => Promise<AxiosResponse<any>>> {
             const localVarAxiosArgs = await DefaultApiAxiosParamCreator(configuration).apiActionArgsCleanPost(name, options);
             return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
                 const axiosRequestArgs :AxiosRequestConfig = {...localVarAxiosArgs.options, url: basePath + localVarAxiosArgs.url};
@@ -817,12 +815,12 @@ export const DefaultApiFp = function(configuration?: Configuration) {
         /**
          * 
          * @summary Chat
-         * @param {Array<Message>} body 
-         * @param {string} [model] 
+         * @param {any} body 
+         * @param {any} [model] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async apiActionChatPost(body: Array<Message>, model?: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => Promise<AxiosResponse<any>>> {
+        async apiActionChatPost(body: any, model?: any, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => Promise<AxiosResponse<any>>> {
             const localVarAxiosArgs = await DefaultApiAxiosParamCreator(configuration).apiActionChatPost(body, model, options);
             return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
                 const axiosRequestArgs :AxiosRequestConfig = {...localVarAxiosArgs.options, url: basePath + localVarAxiosArgs.url};
@@ -847,11 +845,11 @@ export const DefaultApiFp = function(configuration?: Configuration) {
          * 
          * @summary Run Test With Source
          * @param {TestingRequestBody} body 
-         * @param {number} [repeat] 
+         * @param {any} [repeat] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async apiActionTestingPost(body: TestingRequestBody, repeat?: number, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => Promise<AxiosResponse<any>>> {
+        async apiActionTestingPost(body: TestingRequestBody, repeat?: any, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => Promise<AxiosResponse<any>>> {
             const localVarAxiosArgs = await DefaultApiAxiosParamCreator(configuration).apiActionTestingPost(body, repeat, options);
             return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
                 const axiosRequestArgs :AxiosRequestConfig = {...localVarAxiosArgs.options, url: basePath + localVarAxiosArgs.url};
@@ -861,11 +859,11 @@ export const DefaultApiFp = function(configuration?: Configuration) {
         /**
          * 
          * @summary List Case
-         * @param {boolean} reload 
+         * @param {any} reload 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async apiCaseGet(reload: boolean, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => Promise<AxiosResponse<any>>> {
+        async apiCaseGet(reload: any, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => Promise<AxiosResponse<any>>> {
             const localVarAxiosArgs = await DefaultApiAxiosParamCreator(configuration).apiCaseGet(reload, options);
             return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
                 const axiosRequestArgs :AxiosRequestConfig = {...localVarAxiosArgs.options, url: basePath + localVarAxiosArgs.url};
@@ -875,11 +873,11 @@ export const DefaultApiFp = function(configuration?: Configuration) {
         /**
          * 
          * @summary Get Case
-         * @param {string} key 
+         * @param {any} key 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async apiCaseKeyGet(key: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => Promise<AxiosResponse<any>>> {
+        async apiCaseKeyGet(key: any, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => Promise<AxiosResponse<any>>> {
             const localVarAxiosArgs = await DefaultApiAxiosParamCreator(configuration).apiCaseKeyGet(key, options);
             return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
                 const axiosRequestArgs :AxiosRequestConfig = {...localVarAxiosArgs.options, url: basePath + localVarAxiosArgs.url};
@@ -903,11 +901,11 @@ export const DefaultApiFp = function(configuration?: Configuration) {
         /**
          * 
          * @summary Get Commit
-         * @param {string} name 
+         * @param {any} name 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async apiCommitsNameGet(name: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => Promise<AxiosResponse<any>>> {
+        async apiCommitsNameGet(name: any, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => Promise<AxiosResponse<any>>> {
             const localVarAxiosArgs = await DefaultApiAxiosParamCreator(configuration).apiCommitsNameGet(name, options);
             return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
                 const axiosRequestArgs :AxiosRequestConfig = {...localVarAxiosArgs.options, url: basePath + localVarAxiosArgs.url};
@@ -917,12 +915,12 @@ export const DefaultApiFp = function(configuration?: Configuration) {
         /**
          * 
          * @summary Commit Prompt
-         * @param {Array<CommitItem>} body 
-         * @param {string} name 
+         * @param {any} body 
+         * @param {any} name 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async apiCommitsNamePut(body: Array<CommitItem>, name: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => Promise<AxiosResponse<any>>> {
+        async apiCommitsNamePut(body: any, name: any, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => Promise<AxiosResponse<any>>> {
             const localVarAxiosArgs = await DefaultApiAxiosParamCreator(configuration).apiCommitsNamePut(body, name, options);
             return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
                 const axiosRequestArgs :AxiosRequestConfig = {...localVarAxiosArgs.options, url: basePath + localVarAxiosArgs.url};
@@ -945,11 +943,11 @@ export const DefaultApiFp = function(configuration?: Configuration) {
         /**
          * 
          * @summary Get Argument
-         * @param {string} name 
+         * @param {any} name 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async apiPromptArgsNameGet(name: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => Promise<AxiosResponse<ArgumentSetting>>> {
+        async apiPromptArgsNameGet(name: any, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => Promise<AxiosResponse<ArgumentSetting>>> {
             const localVarAxiosArgs = await DefaultApiAxiosParamCreator(configuration).apiPromptArgsNameGet(name, options);
             return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
                 const axiosRequestArgs :AxiosRequestConfig = {...localVarAxiosArgs.options, url: basePath + localVarAxiosArgs.url};
@@ -960,11 +958,11 @@ export const DefaultApiFp = function(configuration?: Configuration) {
          * 
          * @summary Update Argument
          * @param {ArgRequest} body 
-         * @param {string} name 
+         * @param {any} name 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async apiPromptArgsNamePut(body: ArgRequest, name: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => Promise<AxiosResponse<any>>> {
+        async apiPromptArgsNamePut(body: ArgRequest, name: any, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => Promise<AxiosResponse<any>>> {
             const localVarAxiosArgs = await DefaultApiAxiosParamCreator(configuration).apiPromptArgsNamePut(body, name, options);
             return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
                 const axiosRequestArgs :AxiosRequestConfig = {...localVarAxiosArgs.options, url: basePath + localVarAxiosArgs.url};
@@ -974,11 +972,11 @@ export const DefaultApiFp = function(configuration?: Configuration) {
         /**
          * 
          * @summary List Prompt
-         * @param {boolean} [refresh] 
+         * @param {any} [refresh] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async apiPromptGet(refresh?: boolean, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => Promise<AxiosResponse<any>>> {
+        async apiPromptGet(refresh?: any, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => Promise<AxiosResponse<any>>> {
             const localVarAxiosArgs = await DefaultApiAxiosParamCreator(configuration).apiPromptGet(refresh, options);
             return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
                 const axiosRequestArgs :AxiosRequestConfig = {...localVarAxiosArgs.options, url: basePath + localVarAxiosArgs.url};
@@ -988,11 +986,11 @@ export const DefaultApiFp = function(configuration?: Configuration) {
         /**
          * 
          * @summary Load Prompt
-         * @param {string} name 
+         * @param {any} name 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async apiPromptNameGet(name: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => Promise<AxiosResponse<Prompt>>> {
+        async apiPromptNameGet(name: any, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => Promise<AxiosResponse<Prompt>>> {
             const localVarAxiosArgs = await DefaultApiAxiosParamCreator(configuration).apiPromptNameGet(name, options);
             return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
                 const axiosRequestArgs :AxiosRequestConfig = {...localVarAxiosArgs.options, url: basePath + localVarAxiosArgs.url};
@@ -1003,11 +1001,11 @@ export const DefaultApiFp = function(configuration?: Configuration) {
          * 
          * @summary Update Profile
          * @param {UpdatePromptBody} body 
-         * @param {string} name 
+         * @param {any} name 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async apiPromptNamePut(body: UpdatePromptBody, name: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => Promise<AxiosResponse<any>>> {
+        async apiPromptNamePut(body: UpdatePromptBody, name: any, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => Promise<AxiosResponse<any>>> {
             const localVarAxiosArgs = await DefaultApiAxiosParamCreator(configuration).apiPromptNamePut(body, name, options);
             return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
                 const axiosRequestArgs :AxiosRequestConfig = {...localVarAxiosArgs.options, url: basePath + localVarAxiosArgs.url};
@@ -1017,11 +1015,11 @@ export const DefaultApiFp = function(configuration?: Configuration) {
         /**
          * 
          * @summary Create Prompt
-         * @param {string} name 
+         * @param {any} name 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async apiPromptPost(name: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => Promise<AxiosResponse<any>>> {
+        async apiPromptPost(name: any, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => Promise<AxiosResponse<any>>> {
             const localVarAxiosArgs = await DefaultApiAxiosParamCreator(configuration).apiPromptPost(name, options);
             return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
                 const axiosRequestArgs :AxiosRequestConfig = {...localVarAxiosArgs.options, url: basePath + localVarAxiosArgs.url};
@@ -1066,22 +1064,22 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
         /**
          * 
          * @summary Clean Args
-         * @param {string} name 
+         * @param {any} name 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async apiActionArgsCleanPost(name: string, options?: AxiosRequestConfig): Promise<AxiosResponse<any>> {
+        async apiActionArgsCleanPost(name: any, options?: AxiosRequestConfig): Promise<AxiosResponse<any>> {
             return DefaultApiFp(configuration).apiActionArgsCleanPost(name, options).then((request) => request(axios, basePath));
         },
         /**
          * 
          * @summary Chat
-         * @param {Array<Message>} body 
-         * @param {string} [model] 
+         * @param {any} body 
+         * @param {any} [model] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async apiActionChatPost(body: Array<Message>, model?: string, options?: AxiosRequestConfig): Promise<AxiosResponse<any>> {
+        async apiActionChatPost(body: any, model?: any, options?: AxiosRequestConfig): Promise<AxiosResponse<any>> {
             return DefaultApiFp(configuration).apiActionChatPost(body, model, options).then((request) => request(axios, basePath));
         },
         /**
@@ -1098,31 +1096,31 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
          * 
          * @summary Run Test With Source
          * @param {TestingRequestBody} body 
-         * @param {number} [repeat] 
+         * @param {any} [repeat] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async apiActionTestingPost(body: TestingRequestBody, repeat?: number, options?: AxiosRequestConfig): Promise<AxiosResponse<any>> {
+        async apiActionTestingPost(body: TestingRequestBody, repeat?: any, options?: AxiosRequestConfig): Promise<AxiosResponse<any>> {
             return DefaultApiFp(configuration).apiActionTestingPost(body, repeat, options).then((request) => request(axios, basePath));
         },
         /**
          * 
          * @summary List Case
-         * @param {boolean} reload 
+         * @param {any} reload 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async apiCaseGet(reload: boolean, options?: AxiosRequestConfig): Promise<AxiosResponse<any>> {
+        async apiCaseGet(reload: any, options?: AxiosRequestConfig): Promise<AxiosResponse<any>> {
             return DefaultApiFp(configuration).apiCaseGet(reload, options).then((request) => request(axios, basePath));
         },
         /**
          * 
          * @summary Get Case
-         * @param {string} key 
+         * @param {any} key 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async apiCaseKeyGet(key: string, options?: AxiosRequestConfig): Promise<AxiosResponse<any>> {
+        async apiCaseKeyGet(key: any, options?: AxiosRequestConfig): Promise<AxiosResponse<any>> {
             return DefaultApiFp(configuration).apiCaseKeyGet(key, options).then((request) => request(axios, basePath));
         },
         /**
@@ -1138,22 +1136,22 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
         /**
          * 
          * @summary Get Commit
-         * @param {string} name 
+         * @param {any} name 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async apiCommitsNameGet(name: string, options?: AxiosRequestConfig): Promise<AxiosResponse<any>> {
+        async apiCommitsNameGet(name: any, options?: AxiosRequestConfig): Promise<AxiosResponse<any>> {
             return DefaultApiFp(configuration).apiCommitsNameGet(name, options).then((request) => request(axios, basePath));
         },
         /**
          * 
          * @summary Commit Prompt
-         * @param {Array<CommitItem>} body 
-         * @param {string} name 
+         * @param {any} body 
+         * @param {any} name 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async apiCommitsNamePut(body: Array<CommitItem>, name: string, options?: AxiosRequestConfig): Promise<AxiosResponse<any>> {
+        async apiCommitsNamePut(body: any, name: any, options?: AxiosRequestConfig): Promise<AxiosResponse<any>> {
             return DefaultApiFp(configuration).apiCommitsNamePut(body, name, options).then((request) => request(axios, basePath));
         },
         /**
@@ -1168,63 +1166,63 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
         /**
          * 
          * @summary Get Argument
-         * @param {string} name 
+         * @param {any} name 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async apiPromptArgsNameGet(name: string, options?: AxiosRequestConfig): Promise<AxiosResponse<ArgumentSetting>> {
+        async apiPromptArgsNameGet(name: any, options?: AxiosRequestConfig): Promise<AxiosResponse<ArgumentSetting>> {
             return DefaultApiFp(configuration).apiPromptArgsNameGet(name, options).then((request) => request(axios, basePath));
         },
         /**
          * 
          * @summary Update Argument
          * @param {ArgRequest} body 
-         * @param {string} name 
+         * @param {any} name 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async apiPromptArgsNamePut(body: ArgRequest, name: string, options?: AxiosRequestConfig): Promise<AxiosResponse<any>> {
+        async apiPromptArgsNamePut(body: ArgRequest, name: any, options?: AxiosRequestConfig): Promise<AxiosResponse<any>> {
             return DefaultApiFp(configuration).apiPromptArgsNamePut(body, name, options).then((request) => request(axios, basePath));
         },
         /**
          * 
          * @summary List Prompt
-         * @param {boolean} [refresh] 
+         * @param {any} [refresh] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async apiPromptGet(refresh?: boolean, options?: AxiosRequestConfig): Promise<AxiosResponse<any>> {
+        async apiPromptGet(refresh?: any, options?: AxiosRequestConfig): Promise<AxiosResponse<any>> {
             return DefaultApiFp(configuration).apiPromptGet(refresh, options).then((request) => request(axios, basePath));
         },
         /**
          * 
          * @summary Load Prompt
-         * @param {string} name 
+         * @param {any} name 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async apiPromptNameGet(name: string, options?: AxiosRequestConfig): Promise<AxiosResponse<Prompt>> {
+        async apiPromptNameGet(name: any, options?: AxiosRequestConfig): Promise<AxiosResponse<Prompt>> {
             return DefaultApiFp(configuration).apiPromptNameGet(name, options).then((request) => request(axios, basePath));
         },
         /**
          * 
          * @summary Update Profile
          * @param {UpdatePromptBody} body 
-         * @param {string} name 
+         * @param {any} name 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async apiPromptNamePut(body: UpdatePromptBody, name: string, options?: AxiosRequestConfig): Promise<AxiosResponse<any>> {
+        async apiPromptNamePut(body: UpdatePromptBody, name: any, options?: AxiosRequestConfig): Promise<AxiosResponse<any>> {
             return DefaultApiFp(configuration).apiPromptNamePut(body, name, options).then((request) => request(axios, basePath));
         },
         /**
          * 
          * @summary Create Prompt
-         * @param {string} name 
+         * @param {any} name 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async apiPromptPost(name: string, options?: AxiosRequestConfig): Promise<AxiosResponse<any>> {
+        async apiPromptPost(name: any, options?: AxiosRequestConfig): Promise<AxiosResponse<any>> {
             return DefaultApiFp(configuration).apiPromptPost(name, options).then((request) => request(axios, basePath));
         },
         /**
@@ -1258,24 +1256,24 @@ export class DefaultApi extends BaseAPI {
     /**
      * 
      * @summary Clean Args
-     * @param {string} name 
+     * @param {any} name 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof DefaultApi
      */
-    public async apiActionArgsCleanPost(name: string, options?: AxiosRequestConfig) : Promise<AxiosResponse<any>> {
+    public async apiActionArgsCleanPost(name: any, options?: AxiosRequestConfig) : Promise<AxiosResponse<any>> {
         return DefaultApiFp(this.configuration).apiActionArgsCleanPost(name, options).then((request) => request(this.axios, this.basePath));
     }
     /**
      * 
      * @summary Chat
-     * @param {Array<Message>} body 
-     * @param {string} [model] 
+     * @param {any} body 
+     * @param {any} [model] 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof DefaultApi
      */
-    public async apiActionChatPost(body: Array<Message>, model?: string, options?: AxiosRequestConfig) : Promise<AxiosResponse<any>> {
+    public async apiActionChatPost(body: any, model?: any, options?: AxiosRequestConfig) : Promise<AxiosResponse<any>> {
         return DefaultApiFp(this.configuration).apiActionChatPost(body, model, options).then((request) => request(this.axios, this.basePath));
     }
     /**
@@ -1293,34 +1291,34 @@ export class DefaultApi extends BaseAPI {
      * 
      * @summary Run Test With Source
      * @param {TestingRequestBody} body 
-     * @param {number} [repeat] 
+     * @param {any} [repeat] 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof DefaultApi
      */
-    public async apiActionTestingPost(body: TestingRequestBody, repeat?: number, options?: AxiosRequestConfig) : Promise<AxiosResponse<any>> {
+    public async apiActionTestingPost(body: TestingRequestBody, repeat?: any, options?: AxiosRequestConfig) : Promise<AxiosResponse<any>> {
         return DefaultApiFp(this.configuration).apiActionTestingPost(body, repeat, options).then((request) => request(this.axios, this.basePath));
     }
     /**
      * 
      * @summary List Case
-     * @param {boolean} reload 
+     * @param {any} reload 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof DefaultApi
      */
-    public async apiCaseGet(reload: boolean, options?: AxiosRequestConfig) : Promise<AxiosResponse<any>> {
+    public async apiCaseGet(reload: any, options?: AxiosRequestConfig) : Promise<AxiosResponse<any>> {
         return DefaultApiFp(this.configuration).apiCaseGet(reload, options).then((request) => request(this.axios, this.basePath));
     }
     /**
      * 
      * @summary Get Case
-     * @param {string} key 
+     * @param {any} key 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof DefaultApi
      */
-    public async apiCaseKeyGet(key: string, options?: AxiosRequestConfig) : Promise<AxiosResponse<any>> {
+    public async apiCaseKeyGet(key: any, options?: AxiosRequestConfig) : Promise<AxiosResponse<any>> {
         return DefaultApiFp(this.configuration).apiCaseKeyGet(key, options).then((request) => request(this.axios, this.basePath));
     }
     /**
@@ -1337,24 +1335,24 @@ export class DefaultApi extends BaseAPI {
     /**
      * 
      * @summary Get Commit
-     * @param {string} name 
+     * @param {any} name 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof DefaultApi
      */
-    public async apiCommitsNameGet(name: string, options?: AxiosRequestConfig) : Promise<AxiosResponse<any>> {
+    public async apiCommitsNameGet(name: any, options?: AxiosRequestConfig) : Promise<AxiosResponse<any>> {
         return DefaultApiFp(this.configuration).apiCommitsNameGet(name, options).then((request) => request(this.axios, this.basePath));
     }
     /**
      * 
      * @summary Commit Prompt
-     * @param {Array<CommitItem>} body 
-     * @param {string} name 
+     * @param {any} body 
+     * @param {any} name 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof DefaultApi
      */
-    public async apiCommitsNamePut(body: Array<CommitItem>, name: string, options?: AxiosRequestConfig) : Promise<AxiosResponse<any>> {
+    public async apiCommitsNamePut(body: any, name: any, options?: AxiosRequestConfig) : Promise<AxiosResponse<any>> {
         return DefaultApiFp(this.configuration).apiCommitsNamePut(body, name, options).then((request) => request(this.axios, this.basePath));
     }
     /**
@@ -1370,69 +1368,69 @@ export class DefaultApi extends BaseAPI {
     /**
      * 
      * @summary Get Argument
-     * @param {string} name 
+     * @param {any} name 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof DefaultApi
      */
-    public async apiPromptArgsNameGet(name: string, options?: AxiosRequestConfig) : Promise<AxiosResponse<ArgumentSetting>> {
+    public async apiPromptArgsNameGet(name: any, options?: AxiosRequestConfig) : Promise<AxiosResponse<ArgumentSetting>> {
         return DefaultApiFp(this.configuration).apiPromptArgsNameGet(name, options).then((request) => request(this.axios, this.basePath));
     }
     /**
      * 
      * @summary Update Argument
      * @param {ArgRequest} body 
-     * @param {string} name 
+     * @param {any} name 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof DefaultApi
      */
-    public async apiPromptArgsNamePut(body: ArgRequest, name: string, options?: AxiosRequestConfig) : Promise<AxiosResponse<any>> {
+    public async apiPromptArgsNamePut(body: ArgRequest, name: any, options?: AxiosRequestConfig) : Promise<AxiosResponse<any>> {
         return DefaultApiFp(this.configuration).apiPromptArgsNamePut(body, name, options).then((request) => request(this.axios, this.basePath));
     }
     /**
      * 
      * @summary List Prompt
-     * @param {boolean} [refresh] 
+     * @param {any} [refresh] 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof DefaultApi
      */
-    public async apiPromptGet(refresh?: boolean, options?: AxiosRequestConfig) : Promise<AxiosResponse<any>> {
+    public async apiPromptGet(refresh?: any, options?: AxiosRequestConfig) : Promise<AxiosResponse<any>> {
         return DefaultApiFp(this.configuration).apiPromptGet(refresh, options).then((request) => request(this.axios, this.basePath));
     }
     /**
      * 
      * @summary Load Prompt
-     * @param {string} name 
+     * @param {any} name 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof DefaultApi
      */
-    public async apiPromptNameGet(name: string, options?: AxiosRequestConfig) : Promise<AxiosResponse<Prompt>> {
+    public async apiPromptNameGet(name: any, options?: AxiosRequestConfig) : Promise<AxiosResponse<Prompt>> {
         return DefaultApiFp(this.configuration).apiPromptNameGet(name, options).then((request) => request(this.axios, this.basePath));
     }
     /**
      * 
      * @summary Update Profile
      * @param {UpdatePromptBody} body 
-     * @param {string} name 
+     * @param {any} name 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof DefaultApi
      */
-    public async apiPromptNamePut(body: UpdatePromptBody, name: string, options?: AxiosRequestConfig) : Promise<AxiosResponse<any>> {
+    public async apiPromptNamePut(body: UpdatePromptBody, name: any, options?: AxiosRequestConfig) : Promise<AxiosResponse<any>> {
         return DefaultApiFp(this.configuration).apiPromptNamePut(body, name, options).then((request) => request(this.axios, this.basePath));
     }
     /**
      * 
      * @summary Create Prompt
-     * @param {string} name 
+     * @param {any} name 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof DefaultApi
      */
-    public async apiPromptPost(name: string, options?: AxiosRequestConfig) : Promise<AxiosResponse<any>> {
+    public async apiPromptPost(name: any, options?: AxiosRequestConfig) : Promise<AxiosResponse<any>> {
         return DefaultApiFp(this.configuration).apiPromptPost(name, options).then((request) => request(this.axios, this.basePath));
     }
     /**

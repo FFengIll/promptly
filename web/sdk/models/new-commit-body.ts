@@ -11,22 +11,29 @@
  * https://github.com/swagger-api/swagger-codegen.git
  * Do not edit the class manually.
  */
+import { CommitItem } from './commit-item';
 /**
  * 
  * @export
- * @interface ArgRequest
+ * @interface NewCommitBody
  */
-export interface ArgRequest {
+export interface NewCommitBody {
     /**
      * 
-     * @type {string}
-     * @memberof ArgRequest
+     * @type {CommitItem}
+     * @memberof NewCommitBody
      */
-    key: string;
+    commit: CommitItem;
     /**
      * 
-     * @type {string}
-     * @memberof ArgRequest
+     * @type {any}
+     * @memberof NewCommitBody
      */
-    value: string;
+    name: any;
+    /**
+     * 
+     * @type {any}
+     * @memberof NewCommitBody
+     */
+    model?: any;
 }

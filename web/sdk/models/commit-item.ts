@@ -11,8 +11,6 @@
  * https://github.com/swagger-api/swagger-codegen.git
  * Do not edit the class manually.
  */
-import { Argument } from './argument';
-import { Message } from './message';
 /**
  * 
  * @export
@@ -21,44 +19,44 @@ import { Message } from './message';
 export interface CommitItem {
     /**
      * 
-     * @type {Array<Argument>}
+     * @type {any}
      * @memberof CommitItem
      */
-    args?: Array<Argument>;
+    args?: any;
     /**
      * 
-     * @type {Array<Message>}
+     * @type {any}
      * @memberof CommitItem
      */
-    messages: Array<Message>;
+    messages: any;
     /**
      * 
-     * @type {string}
+     * @type {any}
      * @memberof CommitItem
      */
-    response?: string;
+    response?: any;
     /**
      * 
-     * @type {string}
+     * @type {any}
      * @memberof CommitItem
      */
-    model?: string;
+    model?: any;
     /**
      * 
-     * @type {string}
+     * @type {any}
      * @memberof CommitItem
      */
-    md5?: string;
+    md5?: any;
     /**
      * 
-     * @type {boolean}
+     * @type {any}
      * @memberof CommitItem
      */
-    star?: boolean;
+    star?: any;
     /**
      * 
-     * @type {string}
+     * @type {any}
      * @memberof CommitItem
      */
-    tag?: string;
+    tag?: any;
 }
