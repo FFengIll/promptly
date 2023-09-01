@@ -10,43 +10,62 @@ tasks:
     cmds:
       - echo "{{.GREETING}}"
     silent: true
-
+  
   build:
-    deps:
-      - install
-      - black
-      - swagger
-      - dist
-
+    cmds:
+      - task: install
+      - task: black
+      - task: swagger
+      - task: dist
+  
   install:
     desc: "install deps for the project"
     cmds:
-      - cd promptly-vue; npm install
+      - cd web; pnpm install
       - poetry install
-
+  
   black:
     desc: "format python with black"
     cmds:
       - black .
   
+  "init-db":
+    desc: "create db via docker"
+    dir: "{{.ROOT_DIR}}"
+    cmds:
+      - mkdir -p ./data/mongodb
+      - docker run --name promptly-mongo -p 27017:27017 -p 8001:8001 -v ./data/mongodb:/data/db -d mongo
+  
+  start-db:
+    desc: "start db via docker"
+    cmds:
+      - docker start promptly-mongo
+  
+  backup-db:
+    desc: "backup db via docker"
+    cmds:
+      - |
+        docker exec -it promptly-mongo \
+        mongodump --db promptly --out /data/db/backup/
+  
   swagger:
     desc: "generate sdk via swagger"
     dir: "{{.ROOT_DIR}}"
     cmds:
-      - python swagger.py
-      - rm -rf ./promptly-vue/sdk
-      - swagger-codegen generate -i ./swagger.json -l typescript-axios -o ./promptly-vue/sdk
-      - git add ./promptly-vue/sdk
+      - rm -rf ./web/sdk
+      - python bin/swagger.py
+      - swagger-codegen generate -i ./data/swagger.json -l typescript-axios -o ./web/sdk
+      - git add ./web/sdk
   
   dist:
     desc: "build for dist"
-    dir: "{{.ROOT_DIR}}"
+    dir: "{{.ROOT_DIR}}/web"
     cmds:
-      - cd promptly-vue; pnpm run build-only
+      - pnpm run build-only
   
   front:
     desc: start front for dev
-    dir: "{{.ROOT_DIR}}/promptly-vue"
+    dir: "{{.ROOT_DIR}}/web"
     aliases:
       - "web"
       - "node"
@@ -59,11 +78,11 @@ tasks:
     aliases:
       - "py"
     cmds:
-      - uvicorn main:app --reload
+      - uvicorn bin.main:app --reload
   
   run:
     desc: run server without reload
     dir: "{{.ROOT_DIR}}"
     cmds:
-      - uvicorn main:app
+      - uvicorn bin.main:app
       
