@@ -1,12 +1,19 @@
 <script setup lang="ts">
 import type { ArgumentSetting } from 'sdk/models';
 
-
-const props = defineProps<{
+export interface Props {
     setting: ArgumentSetting,
     args: Map<string, string>,
     mask: string | string[] | undefined,
-}>()
+}
+
+const props = withDefaults(
+defineProps<Props>(),
+{
+    args: () => new Map<string, string>(),
+    mask: ""
+}
+)
 
 
 console.log(props.setting)
