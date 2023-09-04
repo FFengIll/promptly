@@ -28,5 +28,11 @@ export interface Argument {
      * @type {any}
      * @memberof Argument
      */
-    value: any;
+    value?: any;
+    /**
+     * 
+     * @type {any}
+     * @memberof Argument
+     */
+    candidates?: any;
 }

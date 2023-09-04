@@ -631,7 +631,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         },
         /**
          * 
-         * @summary Update Profile
+         * @summary Update Prompt
          * @param {UpdatePromptBody} body 
          * @param {any} name 
          * @param {*} [options] Override http request option.
@@ -999,7 +999,7 @@ export const DefaultApiFp = function(configuration?: Configuration) {
         },
         /**
          * 
-         * @summary Update Profile
+         * @summary Update Prompt
          * @param {UpdatePromptBody} body 
          * @param {any} name 
          * @param {*} [options] Override http request option.
@@ -1206,7 +1206,7 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
         },
         /**
          * 
-         * @summary Update Profile
+         * @summary Update Prompt
          * @param {UpdatePromptBody} body 
          * @param {any} name 
          * @param {*} [options] Override http request option.
@@ -1412,7 +1412,7 @@ export class DefaultApi extends BaseAPI {
     }
     /**
      * 
-     * @summary Update Profile
+     * @summary Update Prompt
      * @param {UpdatePromptBody} body 
      * @param {any} name 
      * @param {*} [options] Override http request option.

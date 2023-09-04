@@ -29,4 +29,10 @@ export interface UpdatePromptBody {
      * @memberof UpdatePromptBody
      */
     model?: any;
+    /**
+     * 
+     * @type {any}
+     * @memberof UpdatePromptBody
+     */
+    args?: any;
 }

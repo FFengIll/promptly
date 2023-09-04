@@ -41,4 +41,10 @@ export interface TestingRequestBody {
      * @memberof TestingRequestBody
      */
     args: any;
+    /**
+     * 
+     * @type {any}
+     * @memberof TestingRequestBody
+     */
+    model?: any;
 }

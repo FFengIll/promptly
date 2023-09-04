@@ -34,6 +34,12 @@ export interface Prompt {
      * @type {any}
      * @memberof Prompt
      */
+    defaultModel?: any;
+    /**
+     * 
+     * @type {any}
+     * @memberof Prompt
+     */
     messages: any;
     /**
      * 
@@ -41,4 +47,10 @@ export interface Prompt {
      * @memberof Prompt
      */
     history?: any;
+    /**
+     * 
+     * @type {any}
+     * @memberof Prompt
+     */
+    args?: any;
 }

@@ -30,10 +30,4 @@ export interface NewCommitBody {
      * @memberof NewCommitBody
      */
     name: any;
-    /**
-     * 
-     * @type {any}
-     * @memberof NewCommitBody
-     */
-    model?: any;
 }
