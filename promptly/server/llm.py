@@ -29,7 +29,7 @@ async def chat(messages, model=""):
     response = openai.ChatCompletion.create(
         model=model,
         messages=messages,
-        headers={"HTTP-Referer": "test", "X-Title": "test"},
+        headers={"HTTP-Referer": "https://test.com", "X-Title": "test"},
     )
 
     log.info(response)
