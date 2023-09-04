@@ -35,7 +35,8 @@ class Message(BaseModel):
 
 class Argument(BaseModel):
     key: str
-    value: str
+    value: str = ""
+    candidates: List[str] = []
 
 
 @autocomplete
@@ -69,15 +70,17 @@ class CommitItem(BaseModel):
 
 class ArgumentSetting(BaseModel):
     name: str
-    args: Dict[str, List[str]] = Field(default_factory=dict)
+    args: List[Argument] = Field(default_factory=list)
 
 
 @autocomplete
 class Prompt(BaseModel):
     name: str = ...
     model: str = Field(default="")
+    default_model: str = Field(default="")
     messages: List[Message] = ...
     history: List[str] = Field(default_factory=list)
+    args: List[Argument] = Field(default_factory=list)
 
     def __init__(self, **kwargs):
         messages = kwargs.pop("messages", list())
