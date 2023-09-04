@@ -46,16 +46,21 @@ class MongoArgumentManager:
         self.index = set()
 
     def add_value(self, name, key, value):
-        flatten_key = "args.{}".format(key)
-
-        res = self.collection.update_one(
-            {"name": name},
-            {
-                "$addToSet": {flatten_key: value},
-                # "$set": {flatten_key: {"$ifNull": [flatten_key, []]}},
-            },
-            upsert=True,
-        )
+        res = self.collection.find_one({"name": name, "args.key": key})
+        if not res:
+            res = self.collection.update_one(
+                {"name": name},
+                {
+                    "$push": {"args": {"key": key, "value": "", "candidates": [value]}},
+                },
+            )
+        else:
+            res = self.collection.update_one(
+                {"name": name, "args.key": key},
+                {
+                    "$addToSet": {"args.$.candidates": value},
+                },
+            )
         return res
 
     def save_setting(self, s: ArgumentSetting):
@@ -63,7 +68,7 @@ class MongoArgumentManager:
             {
                 "name": s.name,
             },
-            {"$set": s.dict()},
+            {"$set": s.model_dump()},
             upsert=True,
         )
         return res
@@ -93,7 +98,7 @@ class MongoCommitManager:
 
     def append_commit(self, name, commit: CommitItem):
         res = self.collection.update_one(
-            {"name": name}, {"$push": {"commits": commit.dict()}}, upsert=True
+            {"name": name}, {"$push": {"commits": commit.model_dump()}}, upsert=True
         )
         return res
 
@@ -103,7 +108,7 @@ class MongoCommitManager:
             {
                 "$push": {
                     "commits": {
-                        "$each": [commit.dict()],
+                        "$each": [commit.model_dump()],
                         "$position": 0,
                     }
                 }
@@ -115,7 +120,7 @@ class MongoCommitManager:
     def add_args(self, name, args: List[Argument]):
         res = self.collection.update_one(
             {"name": name},
-            {"$push": {"cases": [a.dict() for a in args]}},
+            {"$push": {"cases": [a.model_dump() for a in args]}},
         )
 
         return res
@@ -123,14 +128,14 @@ class MongoCommitManager:
     def update_args(self, name, args: List[Argument]):
         res = self.collection.update_one(
             {"name": name},
-            {"$set": {"args": [a.dict() for a in args]}},
+            {"$set": {"args": [a.model_dump() for a in args]}},
         )
         return res
 
     def push(self, name: str, *args: CommitItem):
         data = dict(name=name)
         if args:
-            data["commits"] = [c.dict() for c in args]
+            data["commits"] = [c.model_dump() for c in args]
 
         res = self.collection.update_one(dict(name=name), {"$set": data}, upsert=True)
 
@@ -174,7 +179,7 @@ class MongoHistoryManager:
         self.collection = col
 
     def push(self, item: CommitItem):
-        self.collection.insert_one(item.dict())
+        self.collection.insert_one(item.model_dump())
 
 
 class MongoPromptManger(BaseProfileManager):
@@ -202,20 +207,20 @@ class MongoPromptManger(BaseProfileManager):
 
     def update_args(self, key, args: List[Argument]):
         self.collection.update_one(
-            {"name": key}, {"$set": {"args": [a.dict() for a in args]}}
+            {"name": key}, {"$set": {"args": [a.model_dump() for a in args]}}
         )
 
     def update_history(self, p: Prompt):
         self.collection.update_one({"name": p.name}, {"$set": {"history": p.history}})
 
     def update_message(self, p: Prompt):
-        messages = [m.dict() for m in p.messages]
+        messages = [m.model_dump() for m in p.messages]
         for idx, m in enumerate(messages):
             m["id"] = idx
-        return self.collection.update_one({"name": p.name}, {"$set": p.dict()})
+        return self.collection.update_one({"name": p.name}, {"$set": p.model_dump()})
 
     def add_profile(self, p: Prompt):
-        self.collection.insert_one(p.dict())
+        self.collection.insert_one(p.model_dump())
 
     def rename(self, left, right):
         res = self.collection.update_one({"name": left}, {"$set": {"name": right}})
