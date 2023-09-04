@@ -4,7 +4,7 @@ import fastapi
 import loguru
 import pydantic
 from pydantic import BaseModel
-
+from promptly.schema import autocomplete
 from promptly.model.prompt import Argument, ArgumentSetting, CommitItem, Message, Prompt
 from promptly.server.api.util import check_mongo_result
 from promptly.server.app import app, mongo
@@ -28,11 +28,21 @@ def shutdown_event():
     pass
 
 
-@app.get("/api/prompt")
+@autocomplete
+class ListPromptResponse(BaseModel):
+    data: Dict[str, List]
+
+
+@app.get("/api/prompt", response_model=ListPromptResponse)
 def list_prompt(refresh: bool = False):
     if refresh:
         manager.reload()
-    return dict(keys=manager.keys())
+
+    data = {}
+    for k, v in manager.index().items():
+        data[k] = list(v)
+
+    return ListPromptResponse(data=data)
 
 
 @app.post("/api/prompt")

@@ -1,4 +1,6 @@
-from typing import List
+import collections
+from collections.abc import Set
+from typing import List, Dict, MutableSet
 
 import loguru
 from pymongo import MongoClient
@@ -186,7 +188,7 @@ class MongoPromptManger(BaseProfileManager):
     def __init__(self, col: Collection):
         self.collection = col
 
-        self.index = set()
+        self.group: Dict[str, set] = collections.defaultdict(lambda: set())
 
         self.reload()
 
@@ -194,12 +196,13 @@ class MongoPromptManger(BaseProfileManager):
         pass
 
     def reload(self):
-        self.index.clear()
-        for i in self.collection.find({}, {"name": 1}):
-            self.index.add(i["name"])
+        self.group.clear()
+        for i in self.collection.find({}, {"name": 1, "group": 1}):
+            s: set = self.group[i.get("group", "")]
+            s.add(i["name"])
 
-    def keys(self):
-        return list(self.index)
+    def index(self):
+        return self.group
 
     def get(self, key):
         for i in self.collection.find({"name": key}):

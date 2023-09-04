@@ -15,7 +15,7 @@ class BaseProfileManager(ABC):
         pass
 
     @abstractmethod
-    def keys(self):
+    def index(self):
         pass
 
     @abstractmethod
