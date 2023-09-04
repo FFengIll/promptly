@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import PromptInput from "@/components/PromptInput.vue";
 import router from "@/router";
-import { BackendHelper, backend } from "@/scripts/backend";
+import { backend, BackendHelper } from "@/scripts/backend";
 import { RouteHelper } from "@/scripts/router";
 import { useSnapshotStore } from "@/stores/snapshot";
 import { storeToRefs } from "pinia";
@@ -26,6 +26,8 @@ const key = ref<string>(route.params.key.toString())
 //
 const autoSave = ref<boolean>(true)
 const { source } = storeToRefs(store)
+
+const starOnly = ref<boolean>(true)
 
 const commits = ref<CommitItem[]>(
     []
@@ -180,21 +182,29 @@ function selectArg(key: string, value: string) {
 
 <template>
     <a-row :gutter="[16, 16]">
+
+        <a-col :span="10" class="gutter-row">
+            <a-space direction="vertical">
+                <a-space direction="horizontal">
+                    <a-input-group compact>
+                        <a-button type="primary" @click="getCommit(key)">Refresh</a-button>
+                        <a-button type="primary" @click="saveCommits(key, commits)">Save</a-button>
+                    </a-input-group>
+                    <a-checkbox v-model:checked="autoSave">Auto Save</a-checkbox>
+                    <a-divider type="vertical"></a-divider>
+                    <a-checkbox v-model:checked="starOnly">Star Only</a-checkbox>
+                </a-space>
+
+
+            </a-space>
+
+        </a-col>
+
         <a-col :span="10">
             <CaseInput :setting="argSetting" :args="args" @select="selectArg">
             </CaseInput>
         </a-col>
 
-        <a-col :span="10" class="gutter-row">
-            <a-space direction="horizontal">
-                <a-input-group compact>
-                    <a-input v-model:value="key" style="width: 200px" />
-                    <a-button type="primary" @click="getCommit(key)">Get</a-button>
-                    <a-button type="primary" @click="saveCommits(key, commits)">Save</a-button>
-                </a-input-group>
-                <a-checkbox v-model:checked="autoSave">Auto Save</a-checkbox>
-            </a-space>
-        </a-col>
         <!-- <a-col>
             <a-button @click="newArg()">
                 <template #icon>
@@ -215,7 +225,7 @@ function selectArg(key: string, value: string) {
     <a-row :gutter="[16, 16]">
 
         <a-col :span="8" v-for="(  commit, index  ) in    commits   " align="center" :key="index">
-            <a-card>
+            <a-card v-if="(starOnly && (commit.star ?? false)) || (!starOnly)">
                 <!--        response-->
                 <a-card :title="commit.model || 'GPT-3.5'">
 

@@ -80,16 +80,8 @@
 
                     <template #extra>
                         <ModelSelect :model="model" :defaultModel="(() => { return prompt.defaultModel })()"
-                            v-on:select="(value) => { model = value }" v-on:default="(value) => {
-                                    let body: UpdatePromptBody = <UpdatePromptBody>({ defaultModel: value })
-                                    backend.apiPromptNamePut(body, prompt.name)
-                                        .then(() => {
-                                            console.log(value)
-                                            prompt.defaultModel = value
-                                        })
-
-                                }
-                                " style="width: 200px">
+                            v-on:select="(value) => { model = value }" v-on:default="updateDefaultModel(value)"
+                            style="width: 200px">
 
                         </ModelSelect>
                         <a-button @click="fetchArgument(key)">
@@ -211,14 +203,17 @@ import { useSnapshotStore } from '@/stores/snapshot';
 import CaseInput from '@/components/CaseInput.vue';
 import ModelSelect from '@/components/ModelSelect.vue';
 import PromptInput from "@/components/PromptInput.vue";
-import { BackendHelper, backend } from "@/scripts/backend";
+import { backend, BackendHelper } from "@/scripts/backend";
+import { openNotification } from "@/scripts/notice";
 import { RouteHelper } from '@/scripts/router';
-import type { NotificationPlacement } from "ant-design-vue";
-import { notification } from 'ant-design-vue';
+import { notification } from "ant-design-vue";
 import type { ArgRequest, Argument, ArgumentSetting, Message, NewCommitBody, Prompt, UpdatePromptBody } from "../../sdk";
 import PromptCard from '../components/PromptCard.vue';
 
-const [notification_api, contextHolder] = notification.useNotification();
+
+const [notificationApi, contextHolder] = notification.useNotification();
+
+
 
 // use
 const store = useSnapshotStore()
@@ -261,9 +256,20 @@ const prompt = ref<Prompt>(
 onMounted(
     () => {
         fetchPrompt(key)
-
     }
 )
+
+function updateDefaultModel(model: string) {
+    let body: UpdatePromptBody = <UpdatePromptBody>({ defaultModel: model })
+    backend.apiPromptNamePut(body, prompt.value.name)
+        .then(() => {
+            console.log(model)
+            prompt.value.defaultModel = model
+        })
+        .catch(err => {
+            openNotification(notificationApi, err, 'error')
+        })
+}
 
 
 function selectArg(key: string, value: string) {
@@ -289,6 +295,9 @@ async function newArg() {
     await backend.apiPromptArgsNamePut(body, key)
         .then(response => {
             selectArg(argKey.value, argValue.value)
+        })
+        .catch(err => {
+            openNotification(notificationApi, err.toString(), "error")
         })
 
     await fetchArgument(key)
@@ -330,9 +339,13 @@ async function doCommit() {
             model: model.value,
         },
     }
-    backend.apiCommitPost(body).then(() => {
+    backend.apiCommitPost(body)
+        .then(() => {
 
-    })
+        })
+        .catch(err => {
+            openNotification(notificationApi, err.toString(), "error")
+        })
 }
 
 function addPrompt(index: number, content: string) {
@@ -365,8 +378,9 @@ async function fetchArgument(name: string) {
 
             console.log('response', argSetting.value)
 
-        }).catch(error => {
-            console.log(error)
+        })
+        .catch(err => {
+            openNotification(notificationApi, err.toString(), "error")
         })
 
 }
@@ -386,25 +400,15 @@ async function fetchPrompt(name: string) {
             console.log(args.value)
 
         })
-        .catch(error => {
-            console.error(error);
-            return null;
-        });
+        .catch(err => {
+            openNotification(notificationApi, err.toString(), "error")
+        })
 }
 
 function reload() {
     fetchPrompt(key);
 }
 
-
-function openNotification(message: string, status: string) {
-    let placement: NotificationPlacement = 'bottomRight'
-    notification[status]({
-        message: status,
-        description: message,
-        placement,
-    });
-}
 
 async function chat() {
     console.log("model", model.value)
@@ -414,14 +418,27 @@ async function chat() {
         model: model.value,
         args: args.value,
     }
-    await backend.apiPromptNamePut(body, key)
+    await backend.apiPromptNamePut(body, key).catch((err) => {
+        console.log(err)
+        openNotification(notificationApi, err.toString(), "error")
+    })
 
-    loading.value = true
 
-    response.value = ''
-    let res = await BackendHelper.doChat(model.value, prompt.value.messages, args.value)
-    response.value = res.data;
+    try {
+        loading.value = true
+        response.value = ''
+        await BackendHelper.doChat(model.value, prompt.value.messages, args.value)
+            .then(
+                (res) => {
+                    response.value = res.data;
+                }
+            )
 
-    loading.value = false
+    } catch (err) {
+        console.log(err)
+        openNotification(notificationApi, err.toString(), "error")
+    } finally {
+        loading.value = false
+    }
 }
 </script>

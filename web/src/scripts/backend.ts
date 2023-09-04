@@ -2,6 +2,7 @@ import type { Argument, Message } from "sdk/models";
 import * as defaultApi from "../../sdk/apis/default-api";
 import { format } from "./template";
 
+
 function ApiFactory() {
     let baseURL = import.meta.env.VITE_BASE_API
     return defaultApi.DefaultApiFactory(undefined, baseURL)
@@ -25,11 +26,6 @@ export class BackendHelper {
         })
         console.log("will chat with messages", another)
 
-        return backend.apiActionChatPost(another, model).then(
-            (response) => {
-                return response
-            }
-        )
-
+        return backend.apiActionChatPost(another, model)
     }
 }
