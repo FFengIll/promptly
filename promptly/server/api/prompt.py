@@ -1,11 +1,11 @@
-from typing import List, Dict
+from typing import Dict, List
 
 import fastapi
 import loguru
 import pydantic
 from pydantic import BaseModel
 
-from promptly.model.prompt import ArgumentSetting, CommitItem, Message, Prompt, Argument
+from promptly.model.prompt import Argument, ArgumentSetting, CommitItem, Message, Prompt
 from promptly.server.api.util import check_mongo_result
 from promptly.server.app import app, mongo
 
@@ -42,23 +42,24 @@ def create_prompt(name: str):
         return
 
     p = Prompt(name=name)
-    manager.add_profile(p)
+    manager.add_prompt(p)
     manager.reload()
     return
 
 
-@app.get("/api/prompt/{name}", response_model=Prompt)
+@app.get("/api/prompt/{name}")
 def load_prompt(name: str):
     prompt = manager.get(key=name)
     if not prompt:
         raise fastapi.HTTPException(status_code=404)
-    return prompt.dict()
+    return prompt.model_dump(by_alias=True)
 
 
 class UpdatePromptBody(BaseModel):
-    messages: List[Message]
-    model: str = pydantic.Field(default="")
+    messages: List[Message] = pydantic.Field(default="")
+    model: str = ""
     args: List[Argument] = pydantic.Field(default_factory=list)
+    default_model: str = pydantic.Field(default="", alias="defaultModel")
 
 
 @app.put("/api/prompt/{name}")
@@ -66,12 +67,15 @@ def update_prompt(
     body: UpdatePromptBody,
     name: str,
 ):
-    p = manager.get(name)
-    p.messages = body.messages
-    p.model = body.model
-    p.args = body.args
+    log.info(body)
 
-    manager.update_message(p)
+    p = manager.get(name)
+    p.messages = body.messages or p.messages
+    p.model = body.model or p.model
+    p.args = body.args or p.args
+    p.default_model = body.default_model or p.default_model
+
+    manager.update_prompt(p)
 
     p = manager.get(name)
     return p

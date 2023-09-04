@@ -79,7 +79,17 @@
                 <a-card title="Model">
 
                     <template #extra>
-                        <ModelSelect :model="model" v-on:select="(value) => { model = value }" style="width: 200px">
+                        <ModelSelect :model="model" :defaultModel="(() => { return prompt.defaultModel })()"
+                            v-on:select="(value) => { model = value }" v-on:default="(value) => {
+                                    let body: UpdatePromptBody = <UpdatePromptBody>({ defaultModel: value })
+                                    backend.apiPromptNamePut(body, prompt.name)
+                                        .then(() => {
+                                            console.log(value)
+                                            prompt.defaultModel = value
+                                        })
+
+                                }
+                                " style="width: 200px">
 
                         </ModelSelect>
                         <a-button @click="fetchArgument(key)">

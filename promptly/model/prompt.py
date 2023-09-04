@@ -77,7 +77,7 @@ class ArgumentSetting(BaseModel):
 class Prompt(BaseModel):
     name: str = ...
     model: str = Field(default="")
-    default_model: str = Field(default="")
+    default_model: str = Field(default="", alias="defaultModel")
     messages: List[Message] = ...
     history: List[str] = Field(default_factory=list)
     args: List[Argument] = Field(default_factory=list)

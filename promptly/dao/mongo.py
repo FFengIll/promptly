@@ -206,20 +206,21 @@ class MongoPromptManger(BaseProfileManager):
             return Prompt(**i)
 
     def update_args(self, key, args: List[Argument]):
-        self.collection.update_one(
+        return self.collection.update_one(
             {"name": key}, {"$set": {"args": [a.model_dump() for a in args]}}
         )
 
     def update_history(self, p: Prompt):
-        self.collection.update_one({"name": p.name}, {"$set": {"history": p.history}})
+        return self.collection.update_one(
+            {"name": p.name}, {"$set": {"history": p.history}}
+        )
 
-    def update_message(self, p: Prompt):
-        messages = [m.model_dump() for m in p.messages]
-        for idx, m in enumerate(messages):
-            m["id"] = idx
-        return self.collection.update_one({"name": p.name}, {"$set": p.model_dump()})
+    def update_prompt(self, p: Prompt):
+        return self.collection.update_one(
+            {"name": p.name}, {"$set": p.model_dump(by_alias=True)}
+        )
 
-    def add_profile(self, p: Prompt):
+    def add_prompt(self, p: Prompt):
         self.collection.insert_one(p.model_dump())
 
     def rename(self, left, right):
@@ -237,7 +238,7 @@ def test_mongo_manager():
     p.remove(p.messages[-1].id)
     print(p)
 
-    m.update_message(p)
+    m.update_prompt(p)
 
     p = m.get("chat")
     print(p)

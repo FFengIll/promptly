@@ -22,7 +22,7 @@ export interface UpdatePromptBody {
      * @type {any}
      * @memberof UpdatePromptBody
      */
-    messages: any;
+    messages?: any;
     /**
      * 
      * @type {any}
@@ -35,4 +35,10 @@ export interface UpdatePromptBody {
      * @memberof UpdatePromptBody
      */
     args?: any;
+    /**
+     * 
+     * @type {any}
+     * @memberof UpdatePromptBody
+     */
+    defaultModel?: any;
 }
