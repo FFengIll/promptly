@@ -15,6 +15,13 @@
                         @select="(key, value) => { args.set(key, value) }">
                     </CaseInput>
 
+
+                    <a-divider></a-divider>
+
+                    <ModelSelect :model="model" v-on:select="(value) => { model = value }" style="width: 200px">
+
+                    </ModelSelect>
+
                     <a-divider></a-divider>
 
 
@@ -166,6 +173,7 @@ import router from "@/router";
 import { ArgumentHelper } from '@/scripts/argument';
 import { backend } from '@/scripts/backend';
 import type { ArgumentSetting, TestingRequestBody } from 'sdk/models';
+import ModelSelect from "@/components/ModelSelect.vue";
 
 
 const store = useSnapshotStore()
@@ -174,6 +182,8 @@ const store = useSnapshotStore()
 const repeat = ref<number>(1);
 
 const useCase = ref<boolean>(false)
+
+const model = ref<string>("")
 
 const argSetting = ref<ArgumentSetting>(
     {
@@ -335,7 +345,8 @@ async function runTestWithCase() {
             messages: res,
             key: caseKey.value,
             sources: [source],
-            args: ArgumentHelper.toArgumentList(args.value)
+            args: ArgumentHelper.toArgumentList(args.value),
+            model: model.value,
         }
 
         doRunTest(body)
@@ -351,7 +362,8 @@ async function runTest(repeat: number) {
         messages: res,
         key: caseKey.value,
         sources: [''],
-        args: ArgumentHelper.toArgumentList(args.value)
+        args: ArgumentHelper.toArgumentList(args.value),
+        model: model.value,
     }
 
     for (let i = 0; i < repeat; i++) {
