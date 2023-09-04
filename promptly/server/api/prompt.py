@@ -1,14 +1,13 @@
-from typing import List
+from typing import List, Dict
 
 import fastapi
 import loguru
 import pydantic
 from pydantic import BaseModel
-from pymongo import results
 
-from promptly.model.prompt import ArgumentSetting, CommitItem, Message, Prompt
-from promptly.server.app import app, mongo
+from promptly.model.prompt import ArgumentSetting, CommitItem, Message, Prompt, Argument
 from promptly.server.api.util import check_mongo_result
+from promptly.server.app import app, mongo
 
 log = loguru.logger
 
@@ -59,16 +58,18 @@ def load_prompt(name: str):
 class UpdatePromptBody(BaseModel):
     messages: List[Message]
     model: str = pydantic.Field(default="")
+    args: List[Argument] = pydantic.Field(default_factory=list)
 
 
 @app.put("/api/prompt/{name}")
-def update_profile(
+def update_prompt(
     body: UpdatePromptBody,
     name: str,
 ):
     p = manager.get(name)
     p.messages = body.messages
     p.model = body.model
+    p.args = body.args
 
     manager.update_message(p)
 
@@ -90,7 +91,6 @@ def update_argument(item: ArgRequest, name: str):
 class NewCommitBody(BaseModel):
     commit: CommitItem
     name: str
-    model: str = pydantic.Field(default="")
 
 
 @app.post("/api/commit")

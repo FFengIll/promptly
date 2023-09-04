@@ -19,13 +19,14 @@ class TestingRequestBody(BaseModel):
     messages: List[Message]
     key: str
     args: List[Argument]
+    model: str = ""
 
 
 def to_placeholder(key):
     return "${" + key + "}"
 
 
-async def batch_test(messages, key, data):
+async def batch_test(messages, key, data, model):
     res = []
     for idx, source in enumerate(data):
         replaced_ms = copy.deepcopy(messages)
@@ -36,7 +37,7 @@ async def batch_test(messages, key, data):
 
         log.info("debug with\n{}", ms)
 
-        target = await llm.chat(ms)
+        target = await llm.chat(ms, model=model)
         log.info("response: {}", target)
         mongo.history.push(CommitItem(messages=ms, response=target))
 
@@ -51,6 +52,7 @@ async def run_test_with_source(body: TestingRequestBody, repeat: int = 1):
     sources = body.sources
     key = body.key
     args = body.args
+    model = body.model
 
     for m in messages:
         for arg in args:
@@ -60,7 +62,7 @@ async def run_test_with_source(body: TestingRequestBody, repeat: int = 1):
 
     res = []
     for _ in range(repeat):
-        res += await batch_test(messages, key, sources)
+        res += await batch_test(messages, key, sources, model)
 
     return res
 
