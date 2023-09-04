@@ -1,19 +1,19 @@
 <script setup lang="ts">
 import PromptInput from "@/components/PromptInput.vue";
 import router from "@/router";
-import {BackendHelper, backend} from "@/scripts/backend";
-import {RouteHelper} from "@/scripts/router";
-import {useSnapshotStore} from "@/stores/snapshot";
-import {storeToRefs} from "pinia";
-import type {ArgumentSetting, CommitItem} from "sdk/models";
-import {onMounted, ref} from "vue";
-import {useRoute} from 'vue-router';
+import { BackendHelper, backend } from "@/scripts/backend";
+import { RouteHelper } from "@/scripts/router";
+import { useSnapshotStore } from "@/stores/snapshot";
+import { storeToRefs } from "pinia";
+import type { ArgumentSetting, CommitItem } from "sdk/models";
+import { onMounted, ref } from "vue";
+import { useRoute } from 'vue-router';
 
-import {HeartOutlined, HeartFilled, HeartTwoTone} from "@ant-design/icons-vue"
+import { HeartOutlined, HeartTwoTone } from "@ant-design/icons-vue";
 
 import CaseInput from '@/components/CaseInput.vue';
-import {ArgumentHelper} from "@/scripts/argument";
-import type {Argument} from "../../sdk/models";
+import { ArgumentHelper } from "@/scripts/argument";
+import type { Argument } from "../../sdk/models";
 
 //
 const store = useSnapshotStore()
@@ -25,7 +25,7 @@ const key = ref<string>(route.params.key.toString())
 
 //
 const autoSave = ref<boolean>(true)
-const {source} = storeToRefs(store)
+const { source } = storeToRefs(store)
 
 const commits = ref<CommitItem[]>(
     []
@@ -33,10 +33,10 @@ const commits = ref<CommitItem[]>(
 const argSetting = ref<ArgumentSetting>(
     {
         name: "",
-        args: {}
+        args: []
     }
 )
-const args = ref<Map<string, string>>(new Map())
+const args = ref<Argument[]>(new Array<Argument>())
 
 
 console.log("store source", source.value)
@@ -46,19 +46,7 @@ onMounted(
         backend.apiPromptArgsNameGet(key.value)
             .then(response => {
                 argSetting.value = response.data
-
                 console.log('setting', argSetting.value)
-                let tmp = argSetting.value.args
-                for (let key in tmp) {
-                    if (tmp.hasOwnProperty(key)) {
-                        const values = tmp[key];
-                        console.log(tmp, key, values)
-                        args.value.set(key, values[0])
-                    }
-                }
-
-                console.log("arguments", args.value)
-
             })
         getCommit(source.value.name)
     }
@@ -177,19 +165,30 @@ async function changeStar(commit: CommitItem) {
     })
 }
 
+
+function selectArg(key: string, value: string) {
+    for (const item of args.value) {
+        if (item.key == key) {
+            item.value = value
+            return
+        }
+    }
+    args.value.push({ key: key, value: value })
+}
+
 </script>
 
 <template>
     <a-row :gutter="[16, 16]">
         <a-col :span="10">
-            <CaseInput :setting="argSetting" :args="args" @select="(key, value) => { args.set(key, value) }">
+            <CaseInput :setting="argSetting" :args="args" @select="selectArg">
             </CaseInput>
         </a-col>
 
         <a-col :span="10" class="gutter-row">
             <a-space direction="horizontal">
                 <a-input-group compact>
-                    <a-input v-model:value="key" style="width: 200px"/>
+                    <a-input v-model:value="key" style="width: 200px" />
                     <a-button type="primary" @click="getCommit(key)">Get</a-button>
                     <a-button type="primary" @click="saveCommits(key, commits)">Save</a-button>
                 </a-input-group>
@@ -223,8 +222,8 @@ async function changeStar(commit: CommitItem) {
                     <template #extra>
                         <a-button @click="changeStar(commit)">
                             <template #icon>
-                                <HeartTwoTone v-if="commit.star" two-tone-color="#eb2f96"/>
-                                <HeartOutlined v-else/>
+                                <HeartTwoTone v-if="commit.star" two-tone-color="#eb2f96" />
+                                <HeartOutlined v-else />
                             </template>
                         </a-button>
                     </template>

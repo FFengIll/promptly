@@ -41,7 +41,7 @@
                         </a-button>
                     </template>
 
-                    <CaseInput :setting="argSetting" :args="args" @select="(key, value) => { args.set(key, value) }">
+                    <CaseInput :setting="argSetting" :args="args" @select=selectArg>
                         <template #extra>
                             <a-row justify="center">
                                 <a-space direction="horizontal">
@@ -201,12 +201,11 @@ import { useSnapshotStore } from '@/stores/snapshot';
 import CaseInput from '@/components/CaseInput.vue';
 import ModelSelect from '@/components/ModelSelect.vue';
 import PromptInput from "@/components/PromptInput.vue";
-import { ArgumentHelper } from '@/scripts/argument';
 import { BackendHelper, backend } from "@/scripts/backend";
 import { RouteHelper } from '@/scripts/router';
 import type { NotificationPlacement } from "ant-design-vue";
 import { notification } from 'ant-design-vue';
-import type { ArgRequest, ArgumentSetting, Message, NewCommitBody, Prompt, UpdatePromptBody } from "../../sdk";
+import type { ArgRequest, Argument, ArgumentSetting, Message, NewCommitBody, Prompt, UpdatePromptBody } from "../../sdk";
 import PromptCard from '../components/PromptCard.vue';
 
 const [notification_api, contextHolder] = notification.useNotification();
@@ -236,9 +235,9 @@ const argSetting = ref<ArgumentSetting>(
         args: {}
     }
 )
-const args = ref<Map<string, string>>(new Map())
+const args = ref<Argument[]>([])
 const prompt = ref<Prompt>(
-    {
+    <Prompt>{
         "history": [],
         "messages": <Message[]>[
             { role: "角色1", content: "内容1", enable: true },
@@ -251,11 +250,21 @@ const prompt = ref<Prompt>(
 // created
 onMounted(
     () => {
-        fetchProfile(key)
+        fetchPrompt(key)
 
     }
 )
 
+
+function selectArg(key: string, value: string) {
+    for (const item of args.value) {
+        if (item.key == key) {
+            item.value = value
+            return
+        }
+    }
+    args.value.push({ key: key, value: value })
+}
 
 async function newArg() {
     let body: ArgRequest = {
@@ -269,7 +278,7 @@ async function newArg() {
 
     await backend.apiPromptArgsNamePut(body, key)
         .then(response => {
-            args.value.set(body.key, body.value)
+            selectArg(argKey.value, argValue.value)
         })
 
     await fetchArgument(key)
@@ -307,9 +316,9 @@ async function doCommit() {
         commit: {
             messages: prompt.value.messages,
             response: response.value,
-            args: ArgumentHelper.toArgumentList(args.value),
+            args: args.value,
+            model: model.value,
         },
-        model: model.value,
     }
     backend.apiCommitPost(body).then(() => {
 
@@ -352,18 +361,8 @@ async function fetchArgument(name: string) {
 
 }
 
-async function fetchProfile(name: string) {
+async function fetchPrompt(name: string) {
     await fetchArgument(name)
-
-    let tmp = argSetting.value.args
-    for (let key in tmp) {
-        if (tmp.hasOwnProperty(key)) {
-            const values = tmp[key];
-            console.log(tmp, key, values)
-            args.value.set(key, values[0])
-        }
-    }
-    console.log(args.value)
 
     await backend.apiPromptNameGet(name)
         .then(response => {
@@ -372,6 +371,10 @@ async function fetchProfile(name: string) {
 
             model.value = prompt.value.model
             console.log(model.value)
+
+            args.value = prompt.value.args
+            console.log(args.value)
+
         })
         .catch(error => {
             console.error(error);
@@ -380,7 +383,7 @@ async function fetchProfile(name: string) {
 }
 
 function reload() {
-    fetchProfile(key);
+    fetchPrompt(key);
 }
 
 
@@ -398,21 +401,15 @@ async function chat() {
     console.log(prompt.value.messages)
     let body: UpdatePromptBody = {
         messages: prompt.value.messages!!,
-        model: model.value
+        model: model.value,
+        args: args.value,
     }
     await backend.apiPromptNamePut(body, key)
-
-    let argList = []
-    for (const [key, value] of args.value) {
-        argList.push({ key: key, value: value })
-    }
-
-    console.log("arg list", argList)
 
     loading.value = true
 
     response.value = ''
-    let res = await BackendHelper.doChat(model.value, prompt.value.messages, argList)
+    let res = await BackendHelper.doChat(model.value, prompt.value.messages, args.value)
     response.value = res.data;
 
     loading.value = false

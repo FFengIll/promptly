@@ -1,18 +1,18 @@
 <script setup lang="ts">
-import type { ArgumentSetting } from 'sdk/models';
+import type { Argument, ArgumentSetting } from 'sdk/models';
 
 export interface Props {
     setting: ArgumentSetting,
-    args: Map<string, string>,
-    mask: string | string[] | undefined,
+    args: Argument[],
+    mask: string[],
 }
 
 const props = withDefaults(
-defineProps<Props>(),
-{
-    args: () => new Map<string, string>(),
-    mask: ""
-}
+    defineProps<Props>(),
+    {
+        args: () => new Array<Argument>(),
+        mask: () => new Array<string>()
+    }
 )
 
 
@@ -42,15 +42,9 @@ function data() {
 function isDisable(key: string) {
     console.log(props.mask)
 
-    if (typeof props.mask === "string") {
-        if (key == props.mask) {
-            return true
-        }
-    } else if (typeof props.mask === 'object') {
-        if (props.mask.findIndex(key) >= 0) {
-            return true
-        }
-    }
+    // if (props.mask.findIndex(key) >= 0) {
+    //     return true
+    // }
 
     return false
 }
@@ -73,6 +67,15 @@ const columns = [
     },
 ];
 
+function getSelect(key: string) {
+    for (const item of props.args) {
+        if (item.key == key) {
+            return item.value
+        }
+    }
+    return ""
+}
+
 </script>
 
 <template>
@@ -82,22 +85,22 @@ const columns = [
         <!-- <a-table :columns="columns" :data-source="data"> -->
         <!-- </a-table> -->
 
-        <a-list-item v-for="(values, key) in  setting.args " :key="key">
+        <a-list-item v-for="(arg, index) in  setting.args " :key="index">
 
             <a-input-group>
                 <a-space direction="horizontal">
                     <a-typography-text>
-                        {{ key }}
+                        {{ arg.key }}
                     </a-typography-text>
 
-                    <a-select :disabled="isDisable(key)" ref="select" :value="args.get(key)" style="width: 300px"
-                        @select="(value, option) => onSelect(key, value)">
+                    <a-select :disabled="isDisable(arg.key)" ref="select" :value="getSelect(arg.key)" style="width: 300px"
+                        @select="(value, option) => onSelect(arg.key, value)">
 
                         <a-select-option :key="''">
                         </a-select-option>
 
-                        <a-select-option v-for=" (v, index) in values" :key="v">
-                            <a-popover :title="key">
+                        <a-select-option v-for=" (v, index) in arg.candidates" :key="v">
+                            <a-popover :title="v">
                                 <template #content>
                                     <p> {{ v }}</p>
                                 </template>
