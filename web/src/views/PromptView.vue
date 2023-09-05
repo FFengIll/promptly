@@ -41,7 +41,7 @@
                         </a-button>
                     </template>
 
-                    <CaseInput :setting="argSetting" :args="args" @select=selectArg>
+                    <ArgumentPanel :setting="argSetting" :args="args" @select=selectArg>
                         <template #extra>
                             <a-row justify="center">
                                 <a-space direction="horizontal">
@@ -68,11 +68,9 @@
                             </a-row>
 
                         </template>
-                    </CaseInput>
-
+                    </ArgumentPanel>
 
                 </a-card>
-
 
                 <a-divider></a-divider>
 
@@ -200,7 +198,7 @@ import { useRoute } from 'vue-router';
 
 import { useSnapshotStore } from '@/stores/snapshot';
 
-import CaseInput from '@/components/CaseInput.vue';
+import ArgumentPanel from '@/components/ArgumentPanel.vue';
 import ModelSelect from '@/components/ModelSelect.vue';
 import PromptInput from "@/components/PromptInput.vue";
 import { backend, BackendHelper } from "@/scripts/backend";

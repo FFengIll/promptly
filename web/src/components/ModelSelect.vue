@@ -1,10 +1,15 @@
 <script setup lang="ts">
 import { HeartOutlined, HeartTwoTone } from "@ant-design/icons-vue";
 
-const props = defineProps<{
+interface Props {
     model: string,
     defaultModel: string,
-}>()
+}
+
+const props = withDefaults(defineProps<Props>(), {
+    model: "",
+    defaultModel: ""
+})
 
 
 const emit = defineEmits<{

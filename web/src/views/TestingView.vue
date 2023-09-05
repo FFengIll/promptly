@@ -11,9 +11,9 @@
             <a-col :span="12">
                 <a-card :title="`Prompt Snapshot [ name = ${store.source.name} ]`">
 
-                    <CaseInput :setting="argSetting" :mask="caseKey" :args="args"
+                    <ArgumentPanel :setting="argSetting" :mask="caseKey" :args="args"
                         @select="(key, value) => { args.set(key, value) }">
-                    </CaseInput>
+                    </ArgumentPanel>
 
 
                     <a-divider></a-divider>
@@ -167,13 +167,13 @@ import type { TableColumnType } from 'ant-design-vue';
 
 import { useSnapshotStore } from "@/stores/snapshot";
 
-import CaseInput from '@/components/CaseInput.vue';
+import ArgumentPanel from '@/components/ArgumentPanel.vue';
 
+import ModelSelect from "@/components/ModelSelect.vue";
 import router from "@/router";
 import { ArgumentHelper } from '@/scripts/argument';
 import { backend } from '@/scripts/backend';
 import type { ArgumentSetting, TestingRequestBody } from 'sdk/models';
-import ModelSelect from "@/components/ModelSelect.vue";
 
 
 const store = useSnapshotStore()

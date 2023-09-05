@@ -11,7 +11,7 @@ import { useRoute } from 'vue-router';
 
 import { HeartOutlined, HeartTwoTone } from "@ant-design/icons-vue";
 
-import CaseInput from '@/components/CaseInput.vue';
+import ArgumentPanel from '@/components/ArgumentPanel.vue';
 import { ArgumentHelper } from "@/scripts/argument";
 import type { Argument } from "../../sdk/models";
 
@@ -201,8 +201,8 @@ function selectArg(key: string, value: string) {
         </a-col>
 
         <a-col :span="10">
-            <CaseInput :setting="argSetting" :args="args" @select="selectArg">
-            </CaseInput>
+            <ArgumentPanel :setting="argSetting" :args="args" @select="selectArg">
+            </ArgumentPanel>
         </a-col>
 
         <!-- <a-col>

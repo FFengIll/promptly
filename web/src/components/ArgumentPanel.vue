@@ -15,7 +15,6 @@ const props = withDefaults(
     }
 )
 
-
 console.log(props.setting)
 
 const emit = defineEmits<{
@@ -26,7 +25,6 @@ function onSelect(key, value) {
     console.log(key, value)
     emit('select', key, value)
 }
-
 
 function data() {
     return [{ key: 1, values: 2 }]
