@@ -5,15 +5,16 @@ import { backend, BackendHelper } from "@/scripts/backend";
 import { RouteHelper } from "@/scripts/router";
 import { useSnapshotStore } from "@/stores/snapshot";
 import { storeToRefs } from "pinia";
-import type { ArgumentSetting, CommitItem } from "sdk/models";
+import type { ArgumentSetting, CommitItem, UpdatePromptBody } from "sdk/models";
 import { onMounted, ref } from "vue";
 import { useRoute } from 'vue-router';
 
 import { HeartOutlined, HeartTwoTone } from "@ant-design/icons-vue";
 
 import ArgumentPanel from '@/components/ArgumentPanel.vue';
-import { ArgumentHelper } from "@/scripts/argument";
+import { openNotification } from "@/scripts/notice";
 import type { Argument } from "../../sdk/models";
+import { defaultLLM } from "@/scripts/llm";
 
 //
 const store = useSnapshotStore()
@@ -114,37 +115,45 @@ function dropCommit(commit: CommitItem, index: number) {
 }
 
 
-async function replay(key: string, commit: CommitItem) {
+async function replay(commit: CommitItem) {
     commit.response = ""
-    let response = await BackendHelper.doChat("", commit.messages!!, commit.args!!)
+    let response = await BackendHelper.doChat(commit.model, commit.messages, commit.args)
     console.log('response', response)
     commit.response = response.data
 
     console.log(commits.value)
 }
 
-async function doChat(key: string, commit: CommitItem) {
+async function doChat(commit: CommitItem) {
     commit.response = ""
-    let response = await BackendHelper.doChat("", commit.messages!!, ArgumentHelper.toArgumentList(args.value))
-    console.log('response', response)
-    commit.response = response.data
+    await BackendHelper.doChat(commit.model, commit.messages, args.value)
+        .then((res) => {
+            console.log('response', res)
+            commit.response = res.data
 
-    console.log(commits.value)
+            console.log(commits.value)
+        })
+        .catch((err) => {
+            openNotification(err.toString(), 'error')
+        })
 }
 
 async function gotoPrompt(commit: CommitItem) {
 
     let name = key.value
-
-    await backend.apiPromptNamePut(commit.messages!!, name)
-
-    console.log("args", args.value)
-
-    let items = ArgumentHelper.toArgumentList(args.value)
-
-    store.sendSource(name, commit.messages!!, items)
-
-    RouteHelper.toPrompt(name)
+    let body: UpdatePromptBody = {
+        messages: commit.messages,
+        args: args.value
+    }
+    await backend.apiPromptNamePut(body, name)
+        .then(
+            () => {
+                RouteHelper.toPrompt(name)
+            }
+        )
+        .catch((err) => {
+            openNotification(err.toString(), 'error')
+        })
 }
 
 const pagination = {
@@ -165,6 +174,9 @@ async function changeStar(commit: CommitItem) {
     ).then(response => {
         commit.star = value
     })
+        .catch((err) => {
+            openNotification(err.toString(), 'error')
+        })
 }
 
 
@@ -177,6 +189,7 @@ function selectArg(key: string, value: string) {
     }
     args.value.push({ key: key, value: value })
 }
+
 
 </script>
 
@@ -227,7 +240,7 @@ function selectArg(key: string, value: string) {
         <a-col :span="8" v-for="(  commit, index  ) in    commits   " align="center" :key="index">
             <a-card v-if="(starOnly && (commit.star ?? false)) || (!starOnly)">
                 <!--        response-->
-                <a-card :title="commit.model || 'GPT-3.5'">
+                <a-card :title="commit.model || defaultLLM">
 
                     <template #extra>
                         <a-button @click="changeStar(commit)">
@@ -245,8 +258,8 @@ function selectArg(key: string, value: string) {
 
 
                 <!--        button-->
-                <a-button @click="doChat(key, commit)">Request</a-button>
-                <a-button @click="replay(key, commit)">Replay</a-button>
+                <a-button @click="doChat(commit)">Request</a-button>
+                <a-button @click="replay(commit)">Replay</a-button>
                 <a-button @click="gotoTest(commit, args)">Goto Test</a-button>
                 <a-button @click="gotoPrompt(commit)">Goto Prompt</a-button>
                 <a-button @click="dropCommit(commit, index)">Drop</a-button>

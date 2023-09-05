@@ -265,7 +265,7 @@ function updateDefaultModel(model: string) {
             prompt.value.defaultModel = model
         })
         .catch(err => {
-            openNotification(notificationApi, err, 'error')
+            openNotification(err, 'error')
         })
 }
 
@@ -295,7 +295,7 @@ async function newArg() {
             selectArg(argKey.value, argValue.value)
         })
         .catch(err => {
-            openNotification(notificationApi, err.toString(), "error")
+            openNotification(err.toString(), "error")
         })
 
     await fetchArgument(key)
@@ -342,7 +342,7 @@ async function doCommit() {
 
         })
         .catch(err => {
-            openNotification(notificationApi, err.toString(), "error")
+            openNotification(err.toString(), "error")
         })
 }
 
@@ -378,7 +378,7 @@ async function fetchArgument(name: string) {
 
         })
         .catch(err => {
-            openNotification(notificationApi, err.toString(), "error")
+            openNotification(err.toString(), "error")
         })
 
 }
@@ -399,7 +399,7 @@ async function fetchPrompt(name: string) {
 
         })
         .catch(err => {
-            openNotification(notificationApi, err.toString(), "error")
+            openNotification(err.toString(), "error")
         })
 }
 
@@ -418,7 +418,7 @@ async function chat() {
     }
     await backend.apiPromptNamePut(body, key).catch((err) => {
         console.log(err)
-        openNotification(notificationApi, err.toString(), "error")
+        openNotification(err.toString(), "error")
     })
 
 
@@ -434,7 +434,7 @@ async function chat() {
 
     } catch (err) {
         console.log(err)
-        openNotification(notificationApi, err.toString(), "error")
+        openNotification(err.toString(), "error")
     } finally {
         loading.value = false
     }

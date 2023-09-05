@@ -11,8 +11,7 @@
             <a-col :span="12">
                 <a-card :title="`Prompt Snapshot [ name = ${store.source.name} ]`">
 
-                    <ArgumentPanel :setting="argSetting" :mask="caseKey" :args="args"
-                        @select="(key, value) => { args.set(key, value) }">
+                    <ArgumentPanel :setting="argSetting" :mask="caseKey" :args="args" @select="selectArg">
                     </ArgumentPanel>
 
 
@@ -171,17 +170,14 @@ import ArgumentPanel from '@/components/ArgumentPanel.vue';
 
 import ModelSelect from "@/components/ModelSelect.vue";
 import router from "@/router";
-import { ArgumentHelper } from '@/scripts/argument';
 import { backend } from '@/scripts/backend';
-import type { ArgumentSetting, TestingRequestBody } from 'sdk/models';
+import { openNotification } from '@/scripts/notice';
+import type { Argument, ArgumentSetting, TestingRequestBody, UpdatePromptBody } from 'sdk/models';
 
 
 const store = useSnapshotStore()
 
-
 const repeat = ref<number>(1);
-
-const useCase = ref<boolean>(false)
 
 const model = ref<string>("")
 
@@ -191,7 +187,7 @@ const argSetting = ref<ArgumentSetting>(
         args: {}
     }
 )
-const args = ref<Map<string, string>>(new Map())
+const args = ref<Argument[]>(new Array())
 
 interface ResultItem {
     id: number,
@@ -216,7 +212,6 @@ const caseList = ref(
     ],
 )
 
-
 onMounted(
     () => {
         listCase(false)
@@ -228,14 +223,6 @@ onMounted(
 
                 console.log('response', argSetting.value)
 
-                let tmp = argSetting.value.args
-                for (let key in tmp) {
-                    if (tmp.hasOwnProperty(key)) {
-                        const values = tmp[key];
-                        console.log(tmp, key, values)
-                        args.value.set(key, values[0])
-                    }
-                }
             }).catch(error => {
                 console.log(error)
             })
@@ -249,9 +236,8 @@ function toTestcase() {
     })
 }
 
-const caseKey = ref("")
+const caseKey = ref([""])
 
-const testcase = ref(toTestcase())
 
 
 const columns: TableColumnType[] = [
@@ -285,14 +271,18 @@ interface Params {
 
 function sendBack(source: string) {
 
-    let res = store.source.messages.map(item => {
+    let messages = store.source.messages.map(item => {
         let copied = { ...item };
         copied.content = copied.content.replace('{{}}', source)
         console.log(copied)
         return copied
     })
 
-    backend.apiPromptNamePut(res, store.source.name)
+    let body: UpdatePromptBody = {
+        messages: messages
+    }
+
+    backend.apiPromptNamePut(body, store.source.name)
         .then(
             response => {
                 console.log(response)
@@ -318,23 +308,31 @@ async function debugOne(source: string) {
         messages: res,
         key: caseKey.value,
         sources: [source],
-        args: ArgumentHelper.toArgumentList(args.value)
+        args: args.value
     }
 
-    await backend.apiActionTestingPost(body, repeat.value).then(
-        (response) => {
-            let element = response.data[0]
-            result.value.splice(0, 0, element)
-        }
-    )
+    await backend.apiActionTestingPost(body, repeat.value)
+        .then(
+            (response) => {
+                let element = response.data[0]
+                result.value.splice(0, 0, element)
+            }
+        )
+        .catch(err => {
+            openNotification(err, 'error')
+        })
 }
 
 async function doRunTest(body: TestingRequestBody) {
-    await backend.apiActionTestingPost(body, 1).then(
-        (response) => {
-            result.value.splice(0, 0, ...response.data)
-        }
-    )
+    await backend.apiActionTestingPost(body, 1)
+        .then(
+            (response) => {
+                result.value.splice(0, 0, ...response.data)
+            }
+        )
+        .catch(err => {
+            openNotification(err, 'error')
+        })
 }
 
 async function runTestWithCase() {
@@ -345,7 +343,7 @@ async function runTestWithCase() {
             messages: res,
             key: caseKey.value,
             sources: [source],
-            args: ArgumentHelper.toArgumentList(args.value),
+            args: args.value,
             model: model.value,
         }
 
@@ -362,7 +360,7 @@ async function runTest(repeat: number) {
         messages: res,
         key: caseKey.value,
         sources: [''],
-        args: ArgumentHelper.toArgumentList(args.value),
+        args: (args.value),
         model: model.value,
     }
 
@@ -378,16 +376,29 @@ async function listCase(refresh: boolean) {
             console.log(caseList.value)
         }
     )
+        .catch(err => {
+            openNotification(err, 'error')
+        })
 }
 
 async function getCase(id: string) {
     await backend.apiCaseKeyGet(id).then((response) => {
-
         console.log(response.data)
-
         config.value = response.data
     })
+        .catch(err => {
+            openNotification(err, 'error')
+        })
 }
 
+function selectArg(key: string, value: string) {
+    for (const item of args.value) {
+        if (item.key == key) {
+            item.value = value
+            return
+        }
+    }
+    args.value.push({ key: key, value: value })
+}
 
 </script>
