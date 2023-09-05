@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { LLM } from "@/scripts/llm";
 import { HeartOutlined, HeartTwoTone } from "@ant-design/icons-vue";
 
 interface Props {
@@ -28,18 +29,11 @@ function onDefault(value: string) {
     emit('default', value)
 }
 
-const models = [
-    "gpt-3.5-turbo-0613",
-    "gpt-4-0613",
-    'anthropic/claude-instant-v1',
-    "local/codellama-7b",
-]
-
 </script>
 
 <template>
     <a-select ref="select" v-model:value="props.model" style="width: 120px" @change="onSelect">
-        <a-select-option v-for="value in models" :value="value">
+        <a-select-option v-for="value in LLM" :value="value">
             <a-button @click="onDefault(value)">
                 <template #icon>
                     <HeartTwoTone v-if="value == defaultModel" two-tone-color="#eb2f96" />
