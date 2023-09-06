@@ -4,8 +4,9 @@ import fastapi
 import loguru
 import pydantic
 from pydantic import BaseModel
-from promptly.schema import autocomplete
+
 from promptly.model.prompt import Argument, ArgumentSetting, CommitItem, Message, Prompt
+from promptly.schema import autocomplete
 from promptly.server.api.util import check_mongo_result
 from promptly.server.app import app, mongo
 
@@ -45,13 +46,21 @@ def list_prompt(refresh: bool = False):
     return ListPromptResponse(data=data)
 
 
+class UpdatePromptBody(BaseModel):
+    messages: List[Message] = pydantic.Field(default="")
+    model: str = ""
+    args: List[Argument] = pydantic.Field(default_factory=list)
+    default_model: str = pydantic.Field(default="", alias="defaultModel")
+    group: str = ""
+
+
 @app.post("/api/prompt")
-def create_prompt(name: str):
+def create_prompt(body: UpdatePromptBody, name: str):
     if manager.get(name):
         log.warning("existed profile")
         return
 
-    p = Prompt(name=name)
+    p = Prompt(name=name, group=body.group)
     manager.add_prompt(p)
     manager.reload()
     return
@@ -63,13 +72,6 @@ def load_prompt(name: str):
     if not prompt:
         raise fastapi.HTTPException(status_code=404)
     return prompt.model_dump(by_alias=True)
-
-
-class UpdatePromptBody(BaseModel):
-    messages: List[Message] = pydantic.Field(default="")
-    model: str = ""
-    args: List[Argument] = pydantic.Field(default_factory=list)
-    default_model: str = pydantic.Field(default="", alias="defaultModel")
 
 
 @app.put("/api/prompt/{name}")
