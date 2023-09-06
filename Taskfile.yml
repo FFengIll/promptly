@@ -84,5 +84,6 @@ tasks:
     desc: run server without reload
     dir: "{{.ROOT_DIR}}"
     cmds:
+      - task: start-db
       - uvicorn bin.main:app
       
