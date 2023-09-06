@@ -176,8 +176,8 @@
 
                             <a-divider></a-divider>
 
-                            <a-textarea v-model:value="response" :auto-size="{ minRows: 20 }"
-                                placeholder="textarea with clear icon" allow-clear />
+                            <vue-markdown :source="response" :options="{}"></vue-markdown>
+
                         </div>
                     </a-skeleton>
 
@@ -205,6 +205,7 @@ import { backend, BackendHelper } from "@/scripts/backend";
 import { openNotification } from "@/scripts/notice";
 import { RouteHelper } from '@/scripts/router';
 import { notification } from "ant-design-vue";
+import VueMarkdown from 'vue-markdown-render';
 import type { ArgRequest, Argument, ArgumentSetting, Message, NewCommitBody, Prompt, UpdatePromptBody } from "../../sdk";
 import PromptCard from '../components/PromptCard.vue';
 

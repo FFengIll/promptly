@@ -12,9 +12,10 @@ import { useRoute } from 'vue-router';
 import { HeartOutlined, HeartTwoTone } from "@ant-design/icons-vue";
 
 import ArgumentPanel from '@/components/ArgumentPanel.vue';
-import { openNotification } from "@/scripts/notice";
-import type { Argument } from "../../sdk/models";
 import { defaultLLM } from "@/scripts/llm";
+import { openNotification } from "@/scripts/notice";
+import VueMarkdown from "vue-markdown-render";
+import type { Argument } from "../../sdk/models";
 
 //
 const store = useSnapshotStore()
@@ -28,7 +29,7 @@ const key = ref<string>(route.params.key.toString())
 const autoSave = ref<boolean>(true)
 const { source } = storeToRefs(store)
 
-const starOnly = ref<boolean>(true)
+const starOnly = ref<boolean>(false)
 
 const commits = ref<CommitItem[]>(
     []
@@ -237,7 +238,7 @@ function selectArg(key: string, value: string) {
     <a-divider></a-divider>
     <a-row :gutter="[16, 16]">
 
-        <a-col :span="8" v-for="(  commit, index  ) in    commits   " align="center" :key="index">
+        <a-col :span="8" v-for="(  commit, index  ) in    commits   " :key="index">
             <a-card v-if="(starOnly && (commit.star ?? false)) || (!starOnly)">
                 <!--        response-->
                 <a-card :title="commit.model || defaultLLM">
@@ -250,9 +251,8 @@ function selectArg(key: string, value: string) {
                             </template>
                         </a-button>
                     </template>
-                    <a-textarea v-model:value="commit.response" :auto-size="{ minRows: 6, maxRows: 6 }">
-
-                    </a-textarea>
+                    <vue-markdown :source="commit.response" :options="{}"
+                        style="height: 100px; overflow-y: scroll;"></vue-markdown>
                 </a-card>
                 <a-divider></a-divider>
 
