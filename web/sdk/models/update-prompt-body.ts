@@ -41,4 +41,10 @@ export interface UpdatePromptBody {
      * @memberof UpdatePromptBody
      */
     defaultModel?: any;
+    /**
+     * 
+     * @type {any}
+     * @memberof UpdatePromptBody
+     */
+    group?: any;
 }

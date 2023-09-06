@@ -19,8 +19,8 @@ import { BASE_PATH, COLLECTION_FORMATS, RequestArgs, BaseAPI, RequiredError } fr
 import { ArgRequest } from '../models';
 import { ArgumentSetting } from '../models';
 import { HTTPValidationError } from '../models';
+import { ListPromptResponse } from '../models';
 import { NewCommitBody } from '../models';
-import { Prompt } from '../models';
 import { StarBody } from '../models';
 import { TestingRequestBody } from '../models';
 import { UpdatePromptBody } from '../models';
@@ -681,11 +681,16 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         /**
          * 
          * @summary Create Prompt
+         * @param {UpdatePromptBody} body 
          * @param {any} name 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        apiPromptPost: async (name: any, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        apiPromptPost: async (body: UpdatePromptBody, name: any, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'body' is not null or undefined
+            if (body === null || body === undefined) {
+                throw new RequiredError('body','Required parameter body was null or undefined when calling apiPromptPost.');
+            }
             // verify required parameter 'name' is not null or undefined
             if (name === null || name === undefined) {
                 throw new RequiredError('name','Required parameter name was null or undefined when calling apiPromptPost.');
@@ -705,6 +710,8 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
                 localVarQueryParameter['name'] = name;
             }
 
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
             const query = new URLSearchParams(localVarUrlObj.search);
             for (const key in localVarQueryParameter) {
                 query.set(key, localVarQueryParameter[key]);
@@ -715,6 +722,8 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             localVarUrlObj.search = (new URLSearchParams(query)).toString();
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            const needsSerialization = (typeof body !== "string") || localVarRequestOptions.headers['Content-Type'] === 'application/json';
+            localVarRequestOptions.data =  needsSerialization ? JSON.stringify(body !== undefined ? body : {}) : (body || "");
 
             return {
                 url: localVarUrlObj.pathname + localVarUrlObj.search + localVarUrlObj.hash,
@@ -976,7 +985,7 @@ export const DefaultApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async apiPromptGet(refresh?: any, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => Promise<AxiosResponse<any>>> {
+        async apiPromptGet(refresh?: any, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => Promise<AxiosResponse<ListPromptResponse>>> {
             const localVarAxiosArgs = await DefaultApiAxiosParamCreator(configuration).apiPromptGet(refresh, options);
             return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
                 const axiosRequestArgs :AxiosRequestConfig = {...localVarAxiosArgs.options, url: basePath + localVarAxiosArgs.url};
@@ -990,7 +999,7 @@ export const DefaultApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async apiPromptNameGet(name: any, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => Promise<AxiosResponse<Prompt>>> {
+        async apiPromptNameGet(name: any, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => Promise<AxiosResponse<any>>> {
             const localVarAxiosArgs = await DefaultApiAxiosParamCreator(configuration).apiPromptNameGet(name, options);
             return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
                 const axiosRequestArgs :AxiosRequestConfig = {...localVarAxiosArgs.options, url: basePath + localVarAxiosArgs.url};
@@ -1015,12 +1024,13 @@ export const DefaultApiFp = function(configuration?: Configuration) {
         /**
          * 
          * @summary Create Prompt
+         * @param {UpdatePromptBody} body 
          * @param {any} name 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async apiPromptPost(name: any, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => Promise<AxiosResponse<any>>> {
-            const localVarAxiosArgs = await DefaultApiAxiosParamCreator(configuration).apiPromptPost(name, options);
+        async apiPromptPost(body: UpdatePromptBody, name: any, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => Promise<AxiosResponse<any>>> {
+            const localVarAxiosArgs = await DefaultApiAxiosParamCreator(configuration).apiPromptPost(body, name, options);
             return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
                 const axiosRequestArgs :AxiosRequestConfig = {...localVarAxiosArgs.options, url: basePath + localVarAxiosArgs.url};
                 return axios.request(axiosRequestArgs);
@@ -1191,7 +1201,7 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async apiPromptGet(refresh?: any, options?: AxiosRequestConfig): Promise<AxiosResponse<any>> {
+        async apiPromptGet(refresh?: any, options?: AxiosRequestConfig): Promise<AxiosResponse<ListPromptResponse>> {
             return DefaultApiFp(configuration).apiPromptGet(refresh, options).then((request) => request(axios, basePath));
         },
         /**
@@ -1201,7 +1211,7 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async apiPromptNameGet(name: any, options?: AxiosRequestConfig): Promise<AxiosResponse<Prompt>> {
+        async apiPromptNameGet(name: any, options?: AxiosRequestConfig): Promise<AxiosResponse<any>> {
             return DefaultApiFp(configuration).apiPromptNameGet(name, options).then((request) => request(axios, basePath));
         },
         /**
@@ -1218,12 +1228,13 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
         /**
          * 
          * @summary Create Prompt
+         * @param {UpdatePromptBody} body 
          * @param {any} name 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async apiPromptPost(name: any, options?: AxiosRequestConfig): Promise<AxiosResponse<any>> {
-            return DefaultApiFp(configuration).apiPromptPost(name, options).then((request) => request(axios, basePath));
+        async apiPromptPost(body: UpdatePromptBody, name: any, options?: AxiosRequestConfig): Promise<AxiosResponse<any>> {
+            return DefaultApiFp(configuration).apiPromptPost(body, name, options).then((request) => request(axios, basePath));
         },
         /**
          * 
@@ -1396,7 +1407,7 @@ export class DefaultApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof DefaultApi
      */
-    public async apiPromptGet(refresh?: any, options?: AxiosRequestConfig) : Promise<AxiosResponse<any>> {
+    public async apiPromptGet(refresh?: any, options?: AxiosRequestConfig) : Promise<AxiosResponse<ListPromptResponse>> {
         return DefaultApiFp(this.configuration).apiPromptGet(refresh, options).then((request) => request(this.axios, this.basePath));
     }
     /**
@@ -1407,7 +1418,7 @@ export class DefaultApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof DefaultApi
      */
-    public async apiPromptNameGet(name: any, options?: AxiosRequestConfig) : Promise<AxiosResponse<Prompt>> {
+    public async apiPromptNameGet(name: any, options?: AxiosRequestConfig) : Promise<AxiosResponse<any>> {
         return DefaultApiFp(this.configuration).apiPromptNameGet(name, options).then((request) => request(this.axios, this.basePath));
     }
     /**
@@ -1425,13 +1436,14 @@ export class DefaultApi extends BaseAPI {
     /**
      * 
      * @summary Create Prompt
+     * @param {UpdatePromptBody} body 
      * @param {any} name 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof DefaultApi
      */
-    public async apiPromptPost(name: any, options?: AxiosRequestConfig) : Promise<AxiosResponse<any>> {
-        return DefaultApiFp(this.configuration).apiPromptPost(name, options).then((request) => request(this.axios, this.basePath));
+    public async apiPromptPost(body: UpdatePromptBody, name: any, options?: AxiosRequestConfig) : Promise<AxiosResponse<any>> {
+        return DefaultApiFp(this.configuration).apiPromptPost(body, name, options).then((request) => request(this.axios, this.basePath));
     }
     /**
      * 
