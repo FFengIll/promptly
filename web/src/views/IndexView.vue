@@ -7,14 +7,15 @@
 <template>
     <a-card title="Project List">
         <a-space direction="horizontal">
+            <a-input v-model:value="newGroup" placeholder="input group" size="large">
+            </a-input>
+            <a-input v-model:value="newName" placeholder="input name" size="large">
+            </a-input>
+            <a-button @click="create_profile(newGroup, newName)">
+                Create
+            </a-button>
 
 
-            <a-input-search v-model:value="store.source.name" placeholder="input search text" size="large"
-                            @search="create_profile">
-                <template #enterButton>
-                    <a-button>Create</a-button>
-                </template>
-            </a-input-search>
 
             <a-button @click="fetchList(true)">
                 <template #icon>
@@ -27,7 +28,7 @@
 
         <a-divider></a-divider>
 
-        <a-card v-for="(values,key) in group" :title="key || '[default]'">
+        <a-card v-for="(values, key) in group" :title="key || '[default]'">
             <a-list :data-source="values.sort()" size="small" :grid="{ gutter: 16, column: 4 }">
                 <template #renderItem="{ item }">
                     <a-list-item>
@@ -44,10 +45,10 @@
 <script lang="ts" setup>
 import router from "@/router";
 
-import {backend} from "@/scripts/backend";
-import {useSnapshotStore} from "@/stores/snapshot";
-import {SyncOutlined} from "@ant-design/icons-vue";
-import {onMounted, ref} from 'vue';
+import { backend } from "@/scripts/backend";
+import { useSnapshotStore } from "@/stores/snapshot";
+import { SyncOutlined } from "@ant-design/icons-vue";
+import { onMounted, ref } from 'vue';
 
 
 // field
@@ -58,11 +59,14 @@ const group = ref({
 
 const store = useSnapshotStore()
 
+const newName = ref<string>("")
+const newGroup = ref<string>("")
+
 // created
 onMounted(
-() => {
-    fetchList(false)
-}
+    () => {
+        fetchList(false)
+    }
 )
 
 
@@ -71,23 +75,23 @@ function openPrompt(key: string) {
 }
 
 
-async function create_profile(name: string) {
-    await backend.apiPromptPost(name)
+async function create_profile(group: string, name: string) {
+    await backend.apiPromptPost({ group: group }, name)
     fetchList(true)
 }
 
 
 async function fetchList(refresh: boolean) {
     return backend.apiPromptGet(refresh).then(
-    response => {
-        group.value = response.data['data']
-        console.log(response.data)
-        return response.data
-    }
+        response => {
+            group.value = response.data['data']
+            console.log(response.data)
+            return response.data
+        }
     ).catch(
-    error => {
-        console.error(error)
-    }
+        error => {
+            console.error(error)
+        }
     )
 }
 
