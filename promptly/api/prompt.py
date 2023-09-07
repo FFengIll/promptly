@@ -5,14 +5,16 @@ import loguru
 import pydantic
 from pydantic import BaseModel
 
+from promptly.dao import MongoManager
 from promptly.model.prompt import Argument, ArgumentSetting, CommitItem, Message, Prompt
 from promptly.schema import autocomplete
-from promptly.server.api.util import check_mongo_result
-from promptly.server.app import app, mongo
+from .util import check_mongo_result
 
 log = loguru.logger
 
+mongo = MongoManager.default()
 manager = mongo.prompt
+router = fastapi.APIRouter()
 
 
 class CommitRequest(BaseModel):
@@ -24,7 +26,7 @@ class ArgRequest(BaseModel):
     value: str
 
 
-@app.on_event("shutdown")
+@router.on_event("shutdown")
 def shutdown_event():
     pass
 
@@ -34,7 +36,7 @@ class ListPromptResponse(BaseModel):
     data: Dict[str, List]
 
 
-@app.get("/api/prompt", response_model=ListPromptResponse)
+@router.get("/api/prompt", response_model=ListPromptResponse)
 def list_prompt(refresh: bool = False):
     if refresh:
         manager.reload()
@@ -54,7 +56,7 @@ class UpdatePromptBody(BaseModel):
     group: str = ""
 
 
-@app.post("/api/prompt")
+@router.post("/api/prompt")
 def create_prompt(body: UpdatePromptBody, name: str):
     if manager.get(name):
         log.warning("existed profile")
@@ -66,7 +68,7 @@ def create_prompt(body: UpdatePromptBody, name: str):
     return
 
 
-@app.get("/api/prompt/{name}")
+@router.get("/api/prompt/{name}")
 def load_prompt(name: str):
     prompt: Prompt = manager.get(key=name)
     if not prompt:
@@ -74,7 +76,7 @@ def load_prompt(name: str):
     return prompt.dict(by_alias=True)
 
 
-@app.put("/api/prompt/{name}")
+@router.put("/api/prompt/{name}")
 def update_prompt(
     body: UpdatePromptBody,
     name: str,
@@ -93,13 +95,13 @@ def update_prompt(
     return p
 
 
-@app.get("/api/prompt/args/{name}", response_model=ArgumentSetting)
+@router.get("/api/prompt/args/{name}", response_model=ArgumentSetting)
 def get_argument(name: str):
     res = mongo.argument.get_setting(name)
     return res
 
 
-@app.put("/api/prompt/args/{name}")
+@router.put("/api/prompt/args/{name}")
 def update_argument(item: ArgRequest, name: str):
     mongo.argument.add_value(name, item.key, item.value)
 
@@ -109,7 +111,7 @@ class NewCommitBody(BaseModel):
     name: str
 
 
-@app.post("/api/commit")
+@router.post("/api/commit")
 def new_commit(body: NewCommitBody):
     res = mongo.commit.add_commit(
         name=body.name,
@@ -118,7 +120,7 @@ def new_commit(body: NewCommitBody):
     return check_mongo_result(res)
 
 
-@app.get("/api/commits/{name}")
+@router.get("/api/commits/{name}")
 def get_commit(name: str):
     res = mongo.commit.get(name)
     if not res:
@@ -126,7 +128,7 @@ def get_commit(name: str):
     return res
 
 
-@app.put("/api/commits/{name}")
+@router.put("/api/commits/{name}")
 def commit_prompt(
     commits: List[CommitItem],
     name: str,

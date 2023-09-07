@@ -5,7 +5,7 @@ import loguru
 from fastapi import FastAPI
 from fastapi.routing import APIRoute
 
-from promptly.server import app
+from promptly import app
 
 
 def use_route_names_as_operation_ids(app: FastAPI) -> None:

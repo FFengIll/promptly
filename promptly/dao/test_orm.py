@@ -2,7 +2,7 @@ import datetime
 
 from sqlmodel import Session, select
 
-from promptly.dao.mongo import Profile, client
+from promptly.dao.mongo import client
 from promptly.dao.sql import Message, create_db_and_tables, engine
 
 

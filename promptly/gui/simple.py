@@ -7,7 +7,6 @@ import pandas as pd
 import PySimpleGUI as sg
 
 from gui.helper import EventLoop
-from promptly.server import llm
 from promptly.model.event import UpdateEvent
 from promptly.model.prompt import Profile, ProfileManager
 

@@ -1,17 +1,21 @@
 import copy
 from typing import List
 
+import fastapi
 import loguru
 from pydantic import BaseModel
 
+from promptly import llm
+from promptly.dao import MongoManager
+from promptly.llm import to_message
 from promptly.model.case import CaseResult
 from promptly.model.prompt import Argument, CommitItem, Message, ArgumentSetting
-from promptly.server import llm
-from promptly.server.app import app, mongo
-from promptly.server.llm import to_message
-from promptly.server.api.util import check_mongo_result
+from .util import check_mongo_result
 
 log = loguru.logger
+
+router = fastapi.APIRouter()
+mongo = MongoManager.default()
 
 
 class TestingRequestBody(BaseModel):
@@ -46,7 +50,7 @@ async def batch_test(messages, key, data, model):
     return res
 
 
-@app.post("/api/action/testing")
+@router.post("/api/action/testing")
 async def run_test_with_source(body: TestingRequestBody, repeat: int = 1):
     messages: List[Message] = body.messages
     sources = body.sources
@@ -73,13 +77,13 @@ class StarBody(BaseModel):
     value: bool
 
 
-@app.post("/api/action/star")
+@router.post("/api/action/star")
 def new_commit(body: StarBody):
     res = mongo.commit.star(body.name, body.md5, body.value)
     return check_mongo_result(res)
 
 
-@app.post("/api/action/chat")
+@router.post("/api/action/chat")
 async def chat(ms: List[Message], model: str = ""):
     ms = to_message(ms)
     log.info(ms)
@@ -91,7 +95,7 @@ async def chat(ms: List[Message], model: str = ""):
     return content
 
 
-@app.post(
+@router.post(
     "/api/action/args/clean",
 )
 async def clean_args(name: str):
