@@ -115,7 +115,7 @@
                     <a-row justify="space-around">
                         <PromptInput :messages="prompt.messages" with-copy with-control
                             @order-up="index => order(index, -1)" @order-down="index => order(index, 1)"
-                            @remove="index => deletePrompt(index)" @add="index => addPrompt(index, '')">
+                            @remove="index => deletePrompt(index)" @add="index => addPrompt(index,'user', '')">
                         </PromptInput>
                     </a-row>
 
@@ -306,7 +306,7 @@ async function newArg() {
 
 // methods
 function responseToPrompt() {
-    addPrompt(prompt.value.messages.length - 1, response.value)
+    addPrompt(prompt.value.messages.length - 1, 'assistant', response.value)
 }
 
 function deletePrompt(index: number) {
@@ -347,8 +347,8 @@ async function doCommit() {
         })
 }
 
-function addPrompt(index: number, content: string) {
-    let m: Message = { content: content, role: 'user', enable: true, }
+function addPrompt(index: number,role:string, content: string) {
+    let m: Message = { content: content, role: role, enable: true, }
     prompt.value.messages.splice(index, 0, m)
 
     console.log(prompt.value.messages)
