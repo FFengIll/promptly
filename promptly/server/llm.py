@@ -30,11 +30,12 @@ async def chat(messages, model=""):
         model=model,
         messages=messages,
         headers={"HTTP-Referer": "https://test.com", "X-Title": "test"},
+        timeout=3,
     )
 
-    log.info(response)
+    log.info("response: {}", response)
 
     res = response["choices"][0]["message"]["content"]
-    log.info(res)
+    log.info("res:{}", res)
 
     return res

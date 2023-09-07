@@ -68,10 +68,10 @@ def create_prompt(body: UpdatePromptBody, name: str):
 
 @app.get("/api/prompt/{name}")
 def load_prompt(name: str):
-    prompt = manager.get(key=name)
+    prompt: Prompt = manager.get(key=name)
     if not prompt:
         raise fastapi.HTTPException(status_code=404)
-    return prompt.model_dump(by_alias=True)
+    return prompt.dict(by_alias=True)
 
 
 @app.put("/api/prompt/{name}")
