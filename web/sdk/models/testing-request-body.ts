@@ -11,6 +11,8 @@
  * https://github.com/swagger-api/swagger-codegen.git
  * Do not edit the class manually.
  */
+import { Argument } from './argument';
+import { Message } from './message';
 /**
  * 
  * @export
@@ -19,32 +21,32 @@
 export interface TestingRequestBody {
     /**
      * 
-     * @type {any}
+     * @type {Array<string>}
      * @memberof TestingRequestBody
      */
-    sources: any;
+    sources: Array<string>;
     /**
      * 
-     * @type {any}
+     * @type {Array<Message>}
      * @memberof TestingRequestBody
      */
-    messages: any;
+    messages: Array<Message>;
     /**
      * 
-     * @type {any}
+     * @type {string}
      * @memberof TestingRequestBody
      */
-    key: any;
+    key: string;
     /**
      * 
-     * @type {any}
+     * @type {Array<Argument>}
      * @memberof TestingRequestBody
      */
-    args: any;
+    args: Array<Argument>;
     /**
      * 
-     * @type {any}
+     * @type {string}
      * @memberof TestingRequestBody
      */
-    model?: any;
+    model?: string;
 }

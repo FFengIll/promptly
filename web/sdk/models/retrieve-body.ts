@@ -11,23 +11,23 @@
  * https://github.com/swagger-api/swagger-codegen.git
  * Do not edit the class manually.
  */
-import { Argument } from './argument';
+import { Message } from './message';
 /**
  * 
  * @export
- * @interface ArgumentSetting
+ * @interface RetrieveBody
  */
-export interface ArgumentSetting {
+export interface RetrieveBody {
     /**
      * 
      * @type {string}
-     * @memberof ArgumentSetting
+     * @memberof RetrieveBody
      */
     name: string;
     /**
      * 
-     * @type {Array<Argument>}
-     * @memberof ArgumentSetting
+     * @type {Array<Message>}
+     * @memberof RetrieveBody
      */
-    args?: Array<Argument>;
+    messages: Array<Message>;
 }

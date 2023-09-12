@@ -19,20 +19,20 @@
 export interface Argument {
     /**
      * 
-     * @type {any}
+     * @type {string}
      * @memberof Argument
      */
-    key: any;
+    key: string;
     /**
      * 
-     * @type {any}
+     * @type {string}
      * @memberof Argument
      */
-    value?: any;
+    value?: string;
     /**
      * 
-     * @type {any}
+     * @type {Array<string>}
      * @memberof Argument
      */
-    candidates?: any;
+    candidates?: Array<string>;
 }

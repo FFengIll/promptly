@@ -26,8 +26,8 @@ export interface NewCommitBody {
     commit: CommitItem;
     /**
      * 
-     * @type {any}
+     * @type {string}
      * @memberof NewCommitBody
      */
-    name: any;
+    name: string;
 }

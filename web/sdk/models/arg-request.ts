@@ -19,14 +19,14 @@
 export interface ArgRequest {
     /**
      * 
-     * @type {any}
+     * @type {string}
      * @memberof ArgRequest
      */
-    key: any;
+    key: string;
     /**
      * 
-     * @type {any}
+     * @type {string}
      * @memberof ArgRequest
      */
-    value: any;
+    value: string;
 }

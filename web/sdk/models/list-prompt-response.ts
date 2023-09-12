@@ -19,8 +19,8 @@
 export interface ListPromptResponse {
     /**
      * 
-     * @type {any}
+     * @type {{ [key: string]: Array<any>; }}
      * @memberof ListPromptResponse
      */
-    data: any;
+    data: { [key: string]: Array<any>; };
 }

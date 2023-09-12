@@ -19,20 +19,20 @@
 export interface StarBody {
     /**
      * 
-     * @type {any}
+     * @type {string}
      * @memberof StarBody
      */
-    name: any;
+    name: string;
     /**
      * 
-     * @type {any}
+     * @type {string}
      * @memberof StarBody
      */
-    md5: any;
+    md5: string;
     /**
      * 
-     * @type {any}
+     * @type {boolean}
      * @memberof StarBody
      */
-    value: any;
+    value: boolean;
 }

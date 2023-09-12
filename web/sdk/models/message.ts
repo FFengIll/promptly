@@ -19,20 +19,20 @@
 export interface Message {
     /**
      * 
-     * @type {any}
+     * @type {string}
      * @memberof Message
      */
-    role: any;
+    role: string;
     /**
      * 
-     * @type {any}
+     * @type {string}
      * @memberof Message
      */
-    content: any;
+    content: string;
     /**
      * 
-     * @type {any}
+     * @type {boolean}
      * @memberof Message
      */
-    enable?: any;
+    enable?: boolean;
 }

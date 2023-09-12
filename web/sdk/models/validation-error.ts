@@ -19,20 +19,20 @@
 export interface ValidationError {
     /**
      * 
-     * @type {any}
+     * @type {Array<string | number>}
      * @memberof ValidationError
      */
-    loc: any;
+    loc: Array<string | number>;
     /**
      * 
-     * @type {any}
+     * @type {string}
      * @memberof ValidationError
      */
-    msg: any;
+    msg: string;
     /**
      * 
-     * @type {any}
+     * @type {string}
      * @memberof ValidationError
      */
-    type: any;
+    type: string;
 }

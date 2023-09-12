@@ -11,48 +11,22 @@
  * https://github.com/swagger-api/swagger-codegen.git
  * Do not edit the class manually.
  */
-import { Argument } from './argument';
-import { Message } from './message';
 /**
  * Intended for use as a base class for externally-facing models.  Any models that inherit from this class will: * accept fields using snake_case or camelCase keys * use camelCase keys in the generated OpenAPI spec * have orm_mode on by default     * Because of this, FastAPI will automatically attempt to parse returned orm instances into the model
  * @export
- * @interface UpdatePromptBody
+ * @interface RenameBody
  */
-export interface UpdatePromptBody {
-    /**
-     * 
-     * @type {Array<Message>}
-     * @memberof UpdatePromptBody
-     */
-    messages?: Array<Message>;
+export interface RenameBody {
     /**
      * 
      * @type {string}
-     * @memberof UpdatePromptBody
+     * @memberof RenameBody
      */
-    model?: string;
-    /**
-     * 
-     * @type {Array<Argument>}
-     * @memberof UpdatePromptBody
-     */
-    args?: Array<Argument>;
+    source: string;
     /**
      * 
      * @type {string}
-     * @memberof UpdatePromptBody
+     * @memberof RenameBody
      */
-    defaultModel?: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof UpdatePromptBody
-     */
-    group?: string;
-    /**
-     * 
-     * @type {Array<string>}
-     * @memberof UpdatePromptBody
-     */
-    plugins?: Array<string>;
+    target: string;
 }
