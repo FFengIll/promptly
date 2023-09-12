@@ -6,6 +6,7 @@ export * from './httpvalidation-error';
 export * from './list-prompt-response';
 export * from './message';
 export * from './new-commit-body';
+export * from './prompt';
 export * from './rename-body';
 export * from './retrieve-body';
 export * from './star-body';

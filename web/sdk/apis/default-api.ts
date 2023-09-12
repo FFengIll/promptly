@@ -23,6 +23,7 @@ import { HTTPValidationError } from '../models';
 import { ListPromptResponse } from '../models';
 import { Message } from '../models';
 import { NewCommitBody } from '../models';
+import { Prompt } from '../models';
 import { RenameBody } from '../models';
 import { RetrieveBody } from '../models';
 import { StarBody } from '../models';
@@ -1180,7 +1181,7 @@ export const DefaultApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async apiPromptNameGet(name: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => Promise<AxiosResponse<any>>> {
+        async apiPromptNameGet(name: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => Promise<AxiosResponse<Prompt>>> {
             const localVarAxiosArgs = await DefaultApiAxiosParamCreator(configuration).apiPromptNameGet(name, options);
             return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
                 const axiosRequestArgs :AxiosRequestConfig = {...localVarAxiosArgs.options, url: basePath + localVarAxiosArgs.url};
@@ -1423,7 +1424,7 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async apiPromptNameGet(name: string, options?: AxiosRequestConfig): Promise<AxiosResponse<any>> {
+        async apiPromptNameGet(name: string, options?: AxiosRequestConfig): Promise<AxiosResponse<Prompt>> {
             return DefaultApiFp(configuration).apiPromptNameGet(name, options).then((request) => request(axios, basePath));
         },
         /**
@@ -1664,7 +1665,7 @@ export class DefaultApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof DefaultApi
      */
-    public async apiPromptNameGet(name: string, options?: AxiosRequestConfig) : Promise<AxiosResponse<any>> {
+    public async apiPromptNameGet(name: string, options?: AxiosRequestConfig) : Promise<AxiosResponse<Prompt>> {
         return DefaultApiFp(this.configuration).apiPromptNameGet(name, options).then((request) => request(this.axios, this.basePath));
     }
     /**
