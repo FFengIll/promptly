@@ -82,6 +82,7 @@ class Prompt(BaseModel):
     history: List[str] = Field(default_factory=list)
     args: List[Argument] = Field(default_factory=list)
     group: str = ""
+    plugins: List[str] = []
 
     def __init__(self, **kwargs):
         messages = kwargs.pop("messages", list())

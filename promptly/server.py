@@ -4,7 +4,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from starlette.staticfiles import StaticFiles
 
-from promptly.api import case, action, prompt, static
+from promptly.api import case, action, prompt, static, embed
 from promptly.dao.mongo import MongoManager
 
 __all__ = ["app"]
@@ -17,6 +17,7 @@ api_router = fastapi.APIRouter()
 api_router.include_router(case.router)
 api_router.include_router(action.router)
 api_router.include_router(prompt.router)
+api_router.include_router(embed.router)
 api_router.include_router(static.router)
 
 app = FastAPI()

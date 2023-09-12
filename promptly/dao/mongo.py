@@ -1,11 +1,11 @@
 import collections
-from collections.abc import Set
-from typing import Dict, List, MutableSet
+from typing import Dict, List
 
 import loguru
 from pymongo import MongoClient
 from pymongo.collection import Collection
 
+from promptly.model.embed import EmbedData
 from promptly.dao.base import BaseCaseManager, BaseProfileManager
 from promptly.model.case import Case
 from promptly.model.prompt import Argument, ArgumentSetting, CommitItem, Prompt
@@ -26,6 +26,7 @@ class MongoManager:
         self.history: MongoHistoryManager = MongoHistoryManager(self.db["history"])
         self.commit: MongoCommitManager = MongoCommitManager(self.db["commit"])
         self.argument: MongoArgumentManager = MongoArgumentManager(self.db["argument"])
+        self.embed: MongoEmbedManager = MongoEmbedManager(self.db["prompt"])
 
     @staticmethod
     def default():
@@ -39,6 +40,17 @@ class MongoManager:
         self.prompt.rename(left, right)
         self.commit.rename(left, right)
         self.argument.rename(left, right)
+
+
+class MongoEmbedManager:
+    def __init__(self, col: Collection):
+        self.collection = col
+
+        self.index = set()
+
+    def get(self, name):
+        res = self.collection.find_one({"name": name})
+        return EmbedData(**res)
 
 
 class MongoArgumentManager:
@@ -78,6 +90,8 @@ class MongoArgumentManager:
     def get_setting(self, name):
         res = self.collection.find_one({"name": name})
         log.info(res)
+        if not res:
+            return ArgumentSetting(name=name)
         return ArgumentSetting(**res)
 
     def rename(self, left, right):
