@@ -20,14 +20,23 @@ const emit = defineEmits<{
 }>()
 
 
-const props = defineProps<{
+
+export interface Props {
     messages: Message[],
     withControl?: boolean,
     withCopy?: boolean
     withSidebar?: boolean
     title?: string
-}>(
+    withEnable?: boolean
+}
 
+const props = withDefaults(defineProps<Props>(), {
+    withControl: false,
+    withCopy: false,
+    withSidebar: false,
+    title: "",
+    withEnable: false,
+}
 )
 
 
@@ -64,12 +73,25 @@ function color(role: string) {
     }
 }
 
+const dragData = () => {
+    let res = []
+    for (let i = 0; i < props.messages.length; i++) {
+        res.push(i)
+    }
+    return res
+}
+
 </script>
 
 <template>
-    <a-card :title="title">
-        <!-- <template #extra><a href="#">more</a></template> -->
-        <div v-for="(item, index) in messages" :key="index">
+    <!-- <draggable v-model="props.messages" key="content">
+        <template #item="{ element }">
+            <div> {{ element.content }} </div>
+        </template>
+    </draggable> -->
+
+    <div v-for="(item, index) in messages" :key="index">
+        <div v-if="(withEnable && item.enable) || (!withEnable)">
             <a-row v-if="withControl">
                 <a-divider>
                     <a-space>
@@ -140,11 +162,8 @@ function color(role: string) {
                 </a-col>
 
             </a-row>
-            <a-divider></a-divider>
         </div>
-
-
-    </a-card>
+    </div>
 </template>
 
 <style scoped></style>
