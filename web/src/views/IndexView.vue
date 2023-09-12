@@ -28,13 +28,32 @@
 
         <a-divider></a-divider>
 
+
+
         <a-card v-for="(values, key) in group" :title="key || '[default]'">
-            <a-list :data-source="values.sort()" size="small" :grid="{ gutter: 16, column: 4 }">
+
+            <a-modal v-model:open="open" title="Rename" @ok="handleOk">
+                source name: <p>{{ sourceKey }}</p>
+                target name: <p><a-input v-model:value="targetKey"></a-input></p>
+            </a-modal>
+
+            <a-list :data-source="values.sort()" size="small" :grid="{ gutter: 16, column: 3 }">
                 <template #renderItem="{ item }">
                     <a-list-item>
-                        <a-typography-link class="large-font" @click="openPrompt(item)">
-                            {{ item }}
-                        </a-typography-link>
+                        <a-space>
+                            <a-button type="primary" @click="showModal(item)">
+                                <template #icon>
+                                    <EditFilled />
+                                </template>
+                            </a-button>
+
+                            <a-typography-link class="large-font" @click="openPrompt(item)">
+                                {{ item }}
+                            </a-typography-link>
+
+
+                        </a-space>
+
                     </a-list-item>
                 </template>
             </a-list>
@@ -47,7 +66,7 @@ import router from "@/router";
 
 import { backend } from "@/scripts/backend";
 import { useSnapshotStore } from "@/stores/snapshot";
-import { SyncOutlined } from "@ant-design/icons-vue";
+import { EditFilled, SyncOutlined } from "@ant-design/icons-vue";
 import { onMounted, ref } from 'vue';
 
 
@@ -55,6 +74,26 @@ import { onMounted, ref } from 'vue';
 const group = ref({
     "": []
 })
+
+const open = ref<boolean>(false);
+const sourceKey = ref<string>("");
+const targetKey = ref<string>("");
+
+const showModal = (item) => {
+    open.value = true;
+    sourceKey.value = item
+    targetKey.value = item
+};
+
+const handleOk = (e: MouseEvent) => {
+    console.log(e);
+    open.value = false;
+    backend.apiActionRenamePost({
+        source: sourceKey.value,
+        target: targetKey.value
+    })
+};
+
 
 
 const store = useSnapshotStore()
