@@ -13,9 +13,8 @@ tasks:
   
   build:
     cmds:
-      - task: install
       - task: black
-      - task: swagger
+      - task: gen
       - task: dist
   
   install:
@@ -29,26 +28,34 @@ tasks:
     cmds:
       - black .
   
-  "init-db":
+  db-init:
     desc: "create db via docker"
     dir: "{{.ROOT_DIR}}"
     cmds:
       - mkdir -p ./data/mongodb
       - docker run --name promptly-mongo -p 27017:27017 -p 8001:8001 -v ./data/mongodb:/data/db -d mongo
   
-  start-db:
+  db-restart:
+    desc: "resest db via docker"
+    dir: "{{.ROOT_DIR}}"
+    cmds:
+      - mkdir -p ./data/mongodb
+      - docker stop promptly-mongo || docker container remove promptly-mongo || echo "done"
+      - task: db-init
+  
+  db:
     desc: "start db via docker"
     cmds:
       - docker start promptly-mongo
   
-  backup-db:
+  db-backup:
     desc: "backup db via docker"
     cmds:
       - |
         docker exec -it promptly-mongo \
         mongodump --db promptly --out /data/db/backup/
   
-  swagger:
+  gen:
     desc: "generate sdk via swagger"
     dir: "{{.ROOT_DIR}}"
     cmds:
@@ -84,6 +91,6 @@ tasks:
     desc: run server without reload
     dir: "{{.ROOT_DIR}}"
     cmds:
-      - task: start-db
+      - task: db
       - uvicorn bin.main:app
       
