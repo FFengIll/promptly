@@ -192,6 +192,9 @@ function selectArg(key: string, value: string) {
 }
 
 
+const simpleOnly = ref(false)
+
+
 </script>
 
 <template>
@@ -207,6 +210,7 @@ function selectArg(key: string, value: string) {
                     <a-checkbox v-model:checked="autoSave">Auto Save</a-checkbox>
                     <a-divider type="vertical"></a-divider>
                     <a-checkbox v-model:checked="starOnly">Star Only</a-checkbox>
+                    <a-checkbox v-model:checked="simpleOnly">Simple</a-checkbox>
                 </a-space>
 
 
@@ -240,8 +244,33 @@ function selectArg(key: string, value: string) {
 
         <a-col :span="8" v-for="(  commit, index  ) in    commits   " :key="index">
             <a-card v-if="(starOnly && (commit.star ?? false)) || (!starOnly)">
-                <!--        response-->
-                <a-card :title="commit.model || defaultLLM">
+
+                <div v-if="!simpleOnly">
+                    <!--        button-->
+                    <a-button @click="doChat(commit)">Request</a-button>
+                    <a-button @click="replay(commit)">Replay</a-button>
+                    <a-button @click="gotoTest(commit, args)">Goto Test</a-button>
+                    <a-button @click="gotoPrompt(commit)">Goto Prompt</a-button>
+                    <a-button @click="dropCommit(commit, index)">Drop</a-button>
+
+                    <a-divider></a-divider>
+                </div>
+
+
+                <!-- args -->
+
+                <a-card title="Args">
+                    <a-space v-for="( item, index ) in  commit.args " :key="index">
+                        <a-typography-text :content="item.key">
+                        </a-typography-text>
+                        <a-input :value="item.value">
+                        </a-input>
+                    </a-space>
+                </a-card>
+                <a-divider></a-divider>
+
+                <!--response-->
+                <a-card :title="commit.model || defaultLLM" class="highlight-ant-card-head ">
 
                     <template #extra>
                         <a-button @click="changeStar(commit)">
@@ -257,30 +286,10 @@ function selectArg(key: string, value: string) {
                 <a-divider></a-divider>
 
 
-                <!--        button-->
-                <a-button @click="doChat(commit)">Request</a-button>
-                <a-button @click="replay(commit)">Replay</a-button>
-                <a-button @click="gotoTest(commit, args)">Goto Test</a-button>
-                <a-button @click="gotoPrompt(commit)">Goto Prompt</a-button>
-                <a-button @click="dropCommit(commit, index)">Drop</a-button>
-
-                <a-divider></a-divider>
-
-                <!-- args -->
-
-                <a-card title="Args">
-                    <a-space v-for="( item, index ) in  commit.args " :key="index">
-                        <a-typography-text :content="item.key">
-                        </a-typography-text>
-                        <a-input :value="item.value">
-                        </a-input>
-                    </a-space>
-                </a-card>
-                <a-divider></a-divider>
-
 
                 <!-- prompt -->
-                <PromptInput :title="'Prompt'" :messages="commit.messages!!" with-copy with-sidebar>
+                <PromptInput :title="'Prompt'" :messages="commit.messages!!" with-copy with-sidebar
+                    :with-enable="simpleOnly">
 
                 </PromptInput>
 
@@ -289,4 +298,12 @@ function selectArg(key: string, value: string) {
     </a-row>
 </template>
 
-<style></style>
+<style>
+.highlight-ant-card-head {
+    background-color: #2feb55b6
+}
+
+.ant-card-head {
+    background-color: #2feb55
+}
+</style>
