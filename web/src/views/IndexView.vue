@@ -65,7 +65,7 @@
 import router from "@/router";
 
 import { backend } from "@/scripts/backend";
-import { useSnapshotStore } from "@/stores/snapshot";
+
 import { EditFilled, SyncOutlined } from "@ant-design/icons-vue";
 import { onMounted, ref } from 'vue';
 
@@ -96,7 +96,6 @@ const handleOk = (e: MouseEvent) => {
 
 
 
-const store = useSnapshotStore()
 
 const newName = ref<string>("")
 const newGroup = ref<string>("")

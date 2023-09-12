@@ -77,45 +77,44 @@ function getSelect(key: string) {
 </script>
 
 <template>
-    <slot name="extra"></slot>
-
     <a-list item-layout="horizontal">
         <!-- <a-table :columns="columns" :data-source="data"> -->
         <!-- </a-table> -->
+        <slot name="extra"></slot>
 
         <a-list-item v-for="(arg, index) in  setting.args " :key="index">
 
-            <a-input-group>
-                <a-space direction="horizontal">
-                    <a-typography-text>
-                        {{ arg.key }}
-                    </a-typography-text>
+            <a-space direction="horizontal" align="baseline">
+                <a-typography-text>
+                    {{ arg.key }}
+                </a-typography-text>
 
-                    <a-select :disabled="isDisable(arg.key)" ref="select" :value="getSelect(arg.key)" style="width: 300px"
-                        @select="(value, option) => onSelect(arg.key, value)">
+                <a-select :disabled="isDisable(arg.key)" ref="select" :value="getSelect(arg.key)" style="width: 300px"
+                    @select="(value, option) => onSelect(arg.key, value)">
 
-                        <a-select-option :key="''">
-                        </a-select-option>
+                    <a-select-option :key="''">
+                    </a-select-option>
 
-                        <a-select-option v-for=" (v, index) in arg.candidates" :key="v">
-                            <a-popover :title="v">
-                                <template #content>
-                                    <p> {{ v }}</p>
-                                </template>
-                                {{ v }}
-                            </a-popover>
+                    <a-select-option v-for=" (v, index) in arg.candidates" :key="v">
+                        <a-popover :title="v">
+                            <template #content>
+                                <p> {{ v }}</p>
+                            </template>
+                            {{ v }}
+                        </a-popover>
 
-                        </a-select-option>
+                    </a-select-option>
 
-                    </a-select>
+                </a-select>
 
-                </a-space>
+            </a-space>
 
-            </a-input-group>
         </a-list-item>
 
 
     </a-list>
+
+    <a-divider></a-divider>
 </template>
 
 <style scoped></style>

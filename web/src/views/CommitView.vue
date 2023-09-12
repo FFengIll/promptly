@@ -3,7 +3,7 @@ import PromptInput from "@/components/PromptInput.vue";
 import router from "@/router";
 import { backend, BackendHelper } from "@/scripts/backend";
 import { RouteHelper } from "@/scripts/router";
-import { useSnapshotStore } from "@/stores/snapshot";
+
 import { storeToRefs } from "pinia";
 import type { ArgumentSetting, CommitItem, UpdatePromptBody } from "sdk/models";
 import { onMounted, ref } from "vue";
@@ -14,11 +14,12 @@ import { HeartOutlined, HeartTwoTone } from "@ant-design/icons-vue";
 import ArgumentPanel from '@/components/ArgumentPanel.vue';
 import { defaultLLM } from "@/scripts/llm";
 import { openNotification } from "@/scripts/notice";
+import { useConfigStore } from "@/stores/global-config";
 import VueMarkdown from "vue-markdown-render";
 import type { Argument } from "../../sdk/models";
 
 //
-const store = useSnapshotStore()
+const store = useConfigStore()
 
 // 
 const route = useRoute()
@@ -307,3 +308,4 @@ const simpleOnly = ref(false)
     background-color: #2feb55
 }
 </style>
+@/stores/global-config

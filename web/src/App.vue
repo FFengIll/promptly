@@ -1,15 +1,27 @@
 <script setup lang="ts">
-import { ref } from "vue";
+import { onMounted, ref } from "vue";
 import { RouterView, useRouter } from 'vue-router';
 
 import { MenuFoldOutlined, MenuUnfoldOutlined } from "@ant-design/icons-vue";
-import { useSnapshotStore } from './stores/snapshot';
+import { backend } from "./scripts/backend";
+import { useConfigStore } from "./stores/global-config";
+
 
 const router = useRouter()
 
 const collapsed = ref(false)
 
-const store = useSnapshotStore()
+const store = useConfigStore()
+
+onMounted(
+    () => {
+        backend.apiGlobalArgsGet()
+            .then((res) => {
+                store.updateArgs(res.data.args ?? [])
+            })
+
+    }
+)
 
 function routerTo(key: string) {
     let path = `/view/${key}`
@@ -75,4 +87,4 @@ function routerTo(key: string) {
 .site-layout .site-layout-background {
     background: #fff;
 }
-</style>
+</style>./stores/global-config

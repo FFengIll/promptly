@@ -164,7 +164,7 @@ import { onMounted, ref } from 'vue';
 
 import type { TableColumnType } from 'ant-design-vue';
 
-import { useSnapshotStore } from "@/stores/snapshot";
+
 
 import ArgumentPanel from '@/components/ArgumentPanel.vue';
 
