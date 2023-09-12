@@ -48,12 +48,16 @@ def list_prompt(refresh: bool = False):
     return ListPromptResponse(data=data)
 
 
-class UpdatePromptBody(BaseModel):
+from fastapi_utils.api_model import APIModel
+
+
+class UpdatePromptBody(APIModel):
     messages: List[Message] = pydantic.Field(default="")
     model: str = ""
     args: List[Argument] = pydantic.Field(default_factory=list)
     default_model: str = pydantic.Field(default="", alias="defaultModel")
     group: str = ""
+    plugins: List[str] = []
 
 
 @router.post("/api/prompt")
@@ -68,12 +72,12 @@ def create_prompt(body: UpdatePromptBody, name: str):
     return
 
 
-@router.get("/api/prompt/{name}")
+@router.get("/api/prompt/{name}", response_model=Prompt, response_model_by_alias=True)
 def load_prompt(name: str):
     prompt: Prompt = manager.get(key=name)
     if not prompt:
         raise fastapi.HTTPException(status_code=404)
-    return prompt.dict(by_alias=True)
+    return prompt
 
 
 @router.put("/api/prompt/{name}")
@@ -88,6 +92,7 @@ def update_prompt(
     p.model = body.model or p.model
     p.args = body.args or p.args
     p.default_model = body.default_model or p.default_model
+    p.plugins = body.plugins
 
     manager.update_prompt(p)
 
