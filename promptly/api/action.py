@@ -3,13 +3,15 @@ from typing import List
 
 import fastapi
 import loguru
+from fastapi_utils.api_model import APIModel
 from pydantic import BaseModel
 
 from promptly import llm
 from promptly.dao import MongoManager
 from promptly.llm import to_message
 from promptly.model.case import CaseResult
-from promptly.model.prompt import Argument, CommitItem, Message, ArgumentSetting
+from promptly.model.prompt import Argument, ArgumentSetting, CommitItem, Message
+
 from .util import check_mongo_result
 
 log = loguru.logger
@@ -105,4 +107,27 @@ async def clean_args(name: str):
         pending.add(i)
     arg_setting.args = list(pending)
     mongo.argument.save_setting(arg_setting)
+    return True
+
+
+class RenameBody(APIModel):
+    source: str
+    target: str
+
+
+@router.post(
+    "/api/action/rename",
+)
+async def rename(body: RenameBody):
+    target = mongo.prompt.get(body.target)
+    if target:
+        log.info(target)
+        raise fastapi.HTTPException(401)
+
+    source = mongo.prompt.get(body.source)
+    if not source:
+        raise fastapi.HTTPException(404)
+
+    res = mongo.rename(body.source, body.target)
+    # return check_mongo_result(res)
     return True
