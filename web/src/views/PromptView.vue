@@ -76,6 +76,7 @@
 
                 <a-card title="Model">
 
+
                     <template #extra>
                         <ModelSelect :model="model" :defaultModel="(() => { return prompt.defaultModel })()"
                             v-on:select="(value) => { model = value }" v-on:default="updateDefaultModel(value)"
@@ -89,6 +90,17 @@
                         </a-button>
                     </template>
 
+                    <a-divider></a-divider>
+
+                    <a-checkbox v-model:checked="withEmbed" @change="(e) => {
+                        if (e.target.checked) {
+                            let idx = prompt.plugins!!.findIndex(it => { return it == 'embed' })
+                            if (idx >= 0) {
+                                return
+                            }
+                            prompt.plugins!!.push('embed')
+                        }
+                    }">Use Embed</a-checkbox>
                 </a-card>
 
                 <a-divider></a-divider>
@@ -104,6 +116,10 @@
                     </template>
 
                     <a-row justify="end">
+                        <a-button
+                            @click="() => { copy(JSON.stringify({ name: key, prompt: prompt.messages.filter((item: Message) => { return item.enable }) }, null, 2)) }">
+                            Copy To JSON
+                        </a-button>
                         <a-button @click="() => { prompt.messages.forEach((item) => item.enable = false) }">Disable
                             All
                         </a-button>
@@ -115,7 +131,7 @@
                     <a-row justify="space-around">
                         <PromptInput :messages="prompt.messages" with-copy with-control
                             @order-up="index => order(index, -1)" @order-down="index => order(index, 1)"
-                            @remove="index => deletePrompt(index)" @add="index => addPrompt(index,'user', '')">
+                            @remove="index => deletePrompt(index)" @add="index => addPrompt(index, 'user', '')">
                         </PromptInput>
                     </a-row>
 
@@ -166,6 +182,7 @@
                             <a-space direction="horizontal">
                                 <a-button>Good</a-button>
                                 <a-button>Bad</a-button>
+                                <a-button @click="() => copy(response)">Copy</a-button>
                             </a-space>
 
                             <a-divider type="vertical"></a-divider>
@@ -213,7 +230,6 @@ import PromptCard from '../components/PromptCard.vue';
 const [notificationApi, contextHolder] = notification.useNotification();
 
 
-
 // use
 const store = useSnapshotStore()
 const r = useRoute()
@@ -230,24 +246,28 @@ console.log(store.source.args)
 const loading = ref(false)
 const model = ref<string>("")
 
+const withEmbed = ref<boolean>(false)
+
 const argValue = ref<string>("")
 const argKey = ref<string>("")
 const response = ref(<string>"")
 const argSetting = ref<ArgumentSetting>(
     {
         name: "",
-        args: {}
+        args: []
     }
 )
 const args = ref<Argument[]>([])
 const prompt = ref<Prompt>(
     <Prompt>{
+        "name": "",
         "history": [],
         "messages": <Message[]>[
             { role: "角色1", content: "内容1", enable: true },
             // 其他数据项
         ],
         model: "",
+        plugins: [""]
     }
 )
 
@@ -306,7 +326,7 @@ async function newArg() {
 
 // methods
 function responseToPrompt() {
-    addPrompt(prompt.value.messages.length - 1, 'assistant', response.value)
+    addPrompt(prompt.value.messages.length, 'assistant', response.value)
 }
 
 function deletePrompt(index: number) {
@@ -347,8 +367,17 @@ async function doCommit() {
         })
 }
 
-function addPrompt(index: number,role:string, content: string) {
+function addPrompt(index: number, role: string, content: string) {
     let m: Message = { content: content, role: role, enable: true, }
+    let ms = prompt.value.messages
+    while (1) {
+        if (ms[index - 1].role == 'system') {
+            index -= 1
+        } else {
+            break
+        }
+    }
+
     prompt.value.messages.splice(index, 0, m)
 
     console.log(prompt.value.messages)
@@ -392,12 +421,17 @@ async function fetchPrompt(name: string) {
             console.log(response.data)
             prompt.value = response.data;
 
-            model.value = prompt.value.model
+            model.value = prompt.value.model!!
             console.log(model.value)
 
-            args.value = prompt.value.args
+            args.value = prompt.value.args!!
             console.log(args.value)
 
+            let idx = prompt.value.plugins?.findIndex(it => { return it == 'embed' })
+            console.info(idx)
+            if (idx !== undefined && idx >= 0) {
+                withEmbed.value = true
+            }
         })
         .catch(err => {
             openNotification(err.toString(), "error")
@@ -410,6 +444,65 @@ function reload() {
 
 
 async function chat() {
+    if (withEmbed.value) {
+        await chatWithRAG()
+    } else {
+        await chatWithPrompt()
+    }
+}
+
+async function chatWithRAG() {
+    try {
+        let messages = prompt.value.messages
+
+        console.log(messages)
+
+        // assert(messages[0].role, 'system',"")
+        // assert(messages[-1].role, 'user',"")
+
+        // // replace first system prompt
+        // await backend.apiActionRetrievePost({ name: key, message: messages[-1].content })
+        //     .then((res) => {
+        //         messages[0].content = res.data
+        //     })
+
+
+        let body: UpdatePromptBody = {
+            messages: prompt.value.messages!!,
+            model: model.value,
+            args: args.value,
+            plugins: [
+                'embed'
+            ]
+        }
+        await backend.apiPromptNamePut(body, key).catch((err) => {
+            console.log(err)
+            openNotification(err.toString(), "error")
+        })
+
+        loading.value = true
+        response.value = ''
+
+        await backend.apiActionRetrieveGeneratePost(
+            {
+                name: key,
+                messages: messages?.filter((item: Message) => item.enable)
+            },
+        )
+            .then(
+                (res) => {
+                    response.value = res.data;
+                }
+            )
+    } catch (err) {
+        console.log(err)
+        openNotification(err.toString(), "error")
+    } finally {
+        loading.value = false
+    }
+}
+
+async function chatWithPrompt() {
     console.log("model", model.value)
     console.log(prompt.value.messages)
     let body: UpdatePromptBody = {
