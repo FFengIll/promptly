@@ -77,6 +77,25 @@ class MongoArgumentManager:
             )
         return res
 
+    def set_values(self, name, key, *values):
+        res = self.collection.find_one({"name": name, "args.key": key})
+        if not res:
+            res = self.collection.update_one(
+                {"name": name},
+                {
+                    "$set": {"args": [{"key": key, "value": "", "candidates": values}]},
+                },
+                upsert=True,
+            )
+        else:
+            res = self.collection.update_one(
+                {"name": name, "args.key": key},
+                {
+                    "$set": {"args.$.candidates": values},
+                },
+            )
+        return res
+
     def save_setting(self, s: ArgumentSetting):
         res = self.collection.update_one(
             {
