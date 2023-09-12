@@ -41,33 +41,34 @@
                         </a-button>
                     </template>
 
+
+
                     <ArgumentPanel :setting="argSetting" :args="args" @select=selectArg>
                         <template #extra>
-                            <a-row justify="center">
-                                <a-space direction="horizontal">
+                            <a-space direction="horizontal">
+                                <a-select ref="select" v-model:value="argKey" style="width: 120px" show-search>
+                                    <a-select-option v-for="k in args" :key="k.key">{{ k.key }}</a-select-option>
+                                </a-select>
 
+                                <a-input v-model:value="argKey">
+                                </a-input>
 
-                                    <a-select ref="select" v-model:value="argKey" style="width: 120px" show-search>
-                                        <a-select-option v-for="k in args.keys()" :key="k">{{ k }}</a-select-option>
-                                    </a-select>
+                                <a-input v-model:value="argValue">
+                                </a-input>
 
-                                    <a-input v-model:value="argKey">
-                                    </a-input>
-
-                                    <a-input v-model:value="argValue">
-                                    </a-input>
-
-                                    <a-button @click="newArg()">
-                                        <template #icon>
-                                            <PlusOutlined />
-                                        </template>
-                                        New
-                                    </a-button>
-                                </a-space>
-
-                            </a-row>
+                                <a-button @click="newArg()">
+                                    <template #icon>
+                                        <PlusOutlined />
+                                    </template>
+                                    New
+                                </a-button>
+                            </a-space>
 
                         </template>
+                    </ArgumentPanel>
+
+
+                    <ArgumentPanel :setting="store.globalArgs" :args="args" @select=selectArg>
                     </ArgumentPanel>
 
                 </a-card>
@@ -213,25 +214,20 @@ import { CopyOutlined, PlusOutlined, SyncOutlined } from '@ant-design/icons-vue'
 
 import { useRoute } from 'vue-router';
 
-import { useSnapshotStore } from '@/stores/snapshot';
-
 import ArgumentPanel from '@/components/ArgumentPanel.vue';
 import ModelSelect from '@/components/ModelSelect.vue';
 import PromptInput from "@/components/PromptInput.vue";
 import { backend, BackendHelper } from "@/scripts/backend";
 import { openNotification } from "@/scripts/notice";
 import { RouteHelper } from '@/scripts/router';
-import { notification } from "ant-design-vue";
+import { useConfigStore } from "@/stores/global-config";
 import VueMarkdown from 'vue-markdown-render';
 import type { ArgRequest, Argument, ArgumentSetting, Message, NewCommitBody, Prompt, UpdatePromptBody } from "../../sdk";
 import PromptCard from '../components/PromptCard.vue';
 
-
-const [notificationApi, contextHolder] = notification.useNotification();
-
+const store = useConfigStore()
 
 // use
-const store = useSnapshotStore()
 const r = useRoute()
 const { text, copy, copied, isSupported } = useClipboard({})
 
@@ -241,8 +237,6 @@ const key = r.params.key.toString()
 const props = defineProps<{}>()
 
 // field
-console.log(store.source.args)
-
 const loading = ref(false)
 const model = ref<string>("")
 
@@ -338,12 +332,10 @@ function deletePrompt(index: number) {
 function gotoCommit() {
     console.log(key)
 
-    store.sendSource(key, prompt.value.messages, [])
     RouteHelper.toCommit(key)
 }
 
 function gotoTesting() {
-    store.sendSource(key, prompt.value.messages, [])
     RouteHelper.toTesting(key)
 }
 
@@ -515,7 +507,6 @@ async function chatWithPrompt() {
         openNotification(err.toString(), "error")
     })
 
-
     try {
         loading.value = true
         response.value = ''
@@ -534,3 +525,4 @@ async function chatWithPrompt() {
     }
 }
 </script>
+@/stores/global-config
