@@ -1,15 +1,15 @@
+from enum import auto
 from typing import List
 
 import fastapi
 import loguru
 from pydantic import BaseModel
+from strenum import StrEnum
 
 from promptly import llm
 from promptly.dao import MongoManager
-from promptly.embed import retrieve
 from promptly.llm import to_message
-from promptly.model.embed import EmbedData
-from promptly.model.prompt import CommitItem, Message
+from promptly.model.prompt import CommitItem, Message, Prompt
 
 log = loguru.logger
 
@@ -17,6 +17,12 @@ mongo = MongoManager.default()
 manager = mongo.embed
 router = fastapi.APIRouter()
 
+class RoleEnum(StrEnum):
+    user = auto()
+    assistant = auto()
+    system = auto()
+
+RELATED_CONTENT_ROLE = RoleEnum.assistant
 
 class RetrieveBody(BaseModel):
     name: str
@@ -25,7 +31,7 @@ class RetrieveBody(BaseModel):
 
 @router.post("/api/action/retrieve")
 def action_retrieve(body: RetrieveBody):
-    data: EmbedData = manager.get(body.name)
+    data: Prompt = manager.get(body.name)
     res = retrieve(body.messages[-1].content, data.docs)
     return to_retrieved(res)
 
@@ -93,20 +99,6 @@ If you CANNOT answer, you can try the question with `Last` response.
     )
 
 
-from enum import auto
-
-from fastapi_utils.enums import StrEnum
-
-
-class RoleEnum(StrEnum):
-    user = auto()
-    assistant = auto()
-    system = auto()
-
-
-RELATED_CONTENT_ROLE = RoleEnum.assistant.value
-
-
 @router.post("/api/action/retrieve/generate")
 async def generate(body: RetrieveBody, model: str = ""):
     assistant = ""
@@ -116,17 +108,20 @@ async def generate(body: RetrieveBody, model: str = ""):
     for idx, m in enumerate(body.messages):
         if not m.enable:
             continue
-        if m.role == RoleEnum.user.value:
+        if m.role == RoleEnum.user:
             user = m.content
             uid = idx
-        elif m.role == RoleEnum.assistant.value:
+        elif m.role == RoleEnum.assistant:
             assistant = m.content
 
     body.messages[uid].content = to_rag_message(user, assistant)
     ms = to_message(body.messages)
 
-    data: EmbedData = manager.get(body.name)
-    res = retrieve(user, data.docs)
+    data: Prompt = manager.get(body.name)
+    # TODO: no retrieve in fact and just get all docs
+    # from promptly.embed import retrieve
+    # res = retrieve(user, data.docs)
+    res = data.docs
     retrieved = to_retrieved(res)
 
     ms.insert(0, dict(role=RELATED_CONTENT_ROLE, content=retrieved))
