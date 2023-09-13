@@ -3,7 +3,7 @@ from typing import List
 
 import fastapi
 import loguru
-from promptly.fastapi_utils import APIModel
+from fastapi_restful.api_model import APIModel
 from pydantic import BaseModel
 
 from promptly import llm
@@ -11,7 +11,6 @@ from promptly.dao import MongoManager
 from promptly.llm import to_message
 from promptly.model.case import CaseResult
 from promptly.model.prompt import Argument, ArgumentSetting, CommitItem, Message
-
 from .util import check_mongo_result
 
 log = loguru.logger

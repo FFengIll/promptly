@@ -3,13 +3,12 @@ from typing import Dict, List
 import fastapi
 import loguru
 import pydantic
+from fastapi_restful.api_model import APIModel
 from pydantic import BaseModel
 
 from promptly.dao import MongoManager
-from promptly.fastapi_utils import APIModel
 from promptly.model.prompt import Argument, ArgumentSetting, CommitItem, Message, Prompt
 from promptly.schema import autocomplete
-
 from .util import check_mongo_result
 
 log = loguru.logger
