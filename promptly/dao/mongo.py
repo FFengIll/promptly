@@ -2,17 +2,18 @@ import collections
 from typing import Dict, List
 
 import loguru
+from pydantic_mongo import AbstractRepository
 from pymongo import MongoClient
 from pymongo.collection import Collection
 
-from promptly.model.embed import EmbedData
 from promptly.dao.base import BaseCaseManager, BaseProfileManager
 from promptly.model.case import Case
+from promptly.model.embed import EmbedData
 from promptly.model.prompt import Argument, ArgumentSetting, CommitItem, Prompt
 
 url = "mongodb://localhost:27017/"
 
-client = MongoClient(url)
+client = MongoClient(url, timeoutMS=1000)
 log = loguru.logger
 
 
@@ -21,7 +22,7 @@ class MongoManager:
         self.client = client
         self.db = client["promptly"]
 
-        self.prompt: MongoPromptManger = MongoPromptManger(self.db["prompt"])
+        self.prompt: MongoPromptManger = MongoPromptManger(self.db["prompt"], self.db)
         self.case: MongoCaseManager = MongoCaseManager(self.db["case"])
         self.history: MongoHistoryManager = MongoHistoryManager(self.db["history"])
         self.commit: MongoCommitManager = MongoCommitManager(self.db["commit"])
@@ -217,11 +218,19 @@ class MongoHistoryManager:
         self.collection.insert_one(item.dict())
 
 
+class PromptODM(AbstractRepository[Prompt]):
+    class Meta:
+        collection_name = "prompt"
+
+
 class MongoPromptManger(BaseProfileManager):
-    def __init__(self, col: Collection):
+    def __init__(self, col: Collection, database):
         self.collection = col
 
+        self.odm = PromptODM(database=database)
+
         self.group: Dict[str, set] = collections.defaultdict(lambda: set())
+        self.values = []
 
         self.reload()
 
@@ -230,7 +239,7 @@ class MongoPromptManger(BaseProfileManager):
 
     def reload(self):
         self.group.clear()
-        for i in self.collection.find({}, {"name": 1, "group": 1}):
+        for i in self.collection.find({}, {"_id": 1, "name": 1, "group": 1}):
             s: set = self.group[i.get("group", "")]
             s.add(i["name"])
 
@@ -238,8 +247,7 @@ class MongoPromptManger(BaseProfileManager):
         return self.group
 
     def get(self, key):
-        for i in self.collection.find({"name": key}):
-            return Prompt(**i)
+        return self.odm.find_one_by({"name": key})
 
     def update_args(self, key, args: List[Argument]):
         return self.collection.update_one(
@@ -262,19 +270,3 @@ class MongoPromptManger(BaseProfileManager):
     def rename(self, left, right):
         res = self.collection.update_one({"name": left}, {"$set": {"name": right}})
         log.info(res)
-
-
-def test_mongo_manager():
-    m = MongoPromptManger(client)
-    print(m.index)
-
-    p = m.get("chat")
-    print(p)
-
-    p.remove(p.messages[-1].id)
-    print(p)
-
-    m.update_prompt(p)
-
-    p = m.get("chat")
-    print(p)

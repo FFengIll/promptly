@@ -3,6 +3,7 @@ from typing import Dict, List
 import fastapi
 import loguru
 import pydantic
+from fastapi_utils.api_model import APIModel
 from pydantic import BaseModel
 
 from promptly.dao import MongoManager
@@ -46,9 +47,6 @@ def list_prompt(refresh: bool = False):
         data[k] = list(v)
 
     return ListPromptResponse(data=data)
-
-
-from fastapi_utils.api_model import APIModel
 
 
 class UpdatePromptBody(APIModel):
