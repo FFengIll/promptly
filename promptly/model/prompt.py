@@ -1,11 +1,14 @@
 from hashlib import md5
-from typing import Any, Dict, List
+from typing import Any, List
 from uuid import uuid1
 
 import loguru
-from pydantic import BaseModel, Field
+from pydantic import BaseModel
+from pydantic import Field
+from pydantic_mongo import ObjectIdField
 
 from promptly.schema import autocomplete
+
 
 log = loguru.logger
 
@@ -75,6 +78,8 @@ class ArgumentSetting(BaseModel):
 
 @autocomplete
 class Prompt(BaseModel):
+    id: ObjectIdField = None
+
     name: str = ...
     model: str = Field(default="")
     default_model: str = Field(default="", alias="defaultModel")
