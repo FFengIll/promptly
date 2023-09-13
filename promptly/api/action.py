@@ -3,7 +3,7 @@ from typing import List
 
 import fastapi
 import loguru
-from fastapi_utils.api_model import APIModel
+from promptly.fastapi_utils import APIModel
 from pydantic import BaseModel
 
 from promptly import llm
