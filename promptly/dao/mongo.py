@@ -6,9 +6,7 @@ from pydantic_mongo import AbstractRepository
 from pymongo import MongoClient
 from pymongo.collection import Collection
 
-from promptly.dao.base import BaseCaseManager, BaseProfileManager
 from promptly.model.case import Case
-from promptly.model.embed import EmbedData
 from promptly.model.prompt import Argument, ArgumentSetting, CommitItem, Prompt
 
 url = "mongodb://localhost:27017/"
@@ -188,7 +186,7 @@ class MongoCommitManager:
         log.info(res)
 
 
-class MongoCaseManager(BaseCaseManager):
+class MongoCaseManager():
     def __init__(self, col: Collection):
         self.collection = col
 
@@ -223,7 +221,7 @@ class PromptODM(AbstractRepository[Prompt]):
         collection_name = "prompt"
 
 
-class MongoPromptManger(BaseProfileManager):
+class MongoPromptManger:
     def __init__(self, col: Collection, database):
         self.collection = col
 
