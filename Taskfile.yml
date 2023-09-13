@@ -19,8 +19,10 @@ tasks:
   
   install:
     desc: "install deps for the project"
+    dir: "{{.ROOT_DIR}}"
     cmds:
       - cd web; pnpm install
+      - pip install poetry
       - poetry install
   
   black:
