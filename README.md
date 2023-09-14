@@ -23,8 +23,8 @@ The prompt engineering tools.
 
 # features
 
-- build a prompt
-- run a prompt (with available model service)
-- using arguments for prompt
-- commit prompt into history to save snapshot
-- testing a prompt (with loop and cases)
+- build a prompt.
+- run a prompt (with available model service).
+- using arguments for prompt.
+- commit prompt into commit repository to save a snapshot.
+- testing a prompt (with loop or cases).
