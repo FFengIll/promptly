@@ -87,6 +87,7 @@ tasks:
     aliases:
       - "py"
     cmds:
+      - task: db
       - uvicorn bin.main:app --reload
   
   run:
