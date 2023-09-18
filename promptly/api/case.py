@@ -17,10 +17,10 @@ def list_case(reload: bool):
     return manager.keys()
 
 
-@router.get("/api/case/{key}")
+@router.get("/api/case/{key}", response_model=Case)
 async def get_case(key: str):
     c: Case = manager.get(key)
     log.info(c)
     if not c:
         raise fastapi.HTTPException(404)
-    return c.dict()
+    return c

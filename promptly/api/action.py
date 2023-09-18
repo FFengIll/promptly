@@ -19,10 +19,10 @@ router = fastapi.APIRouter()
 mongo = MongoManager.default()
 
 
-class TestingRequestBody(BaseModel):
+class TestingRequestBody(APIModel):
     sources: List[str]
     messages: List[Message]
-    key: str
+    arg_key: str
     args: List[Argument]
     model: str = ""
 
@@ -55,7 +55,7 @@ async def batch_test(messages, key, data, model):
 async def run_test_with_source(body: TestingRequestBody, repeat: int = 1):
     messages: List[Message] = body.messages
     sources = body.sources
-    key = body.key
+    key = body.arg_key
     args = body.args
     model = body.model
 

@@ -9,6 +9,7 @@ from pydantic import BaseModel
 from promptly.dao import MongoManager
 from promptly.model.prompt import Argument, ArgumentSetting, CommitItem, Message, Prompt
 from promptly.schema import autocomplete
+
 from .util import check_mongo_result
 
 log = loguru.logger
@@ -71,14 +72,14 @@ def create_prompt(body: UpdatePromptBody, name: str):
 
 
 @router.get("/api/prompt/{name}", response_model=Prompt, response_model_by_alias=True)
-def load_prompt(name: str):
+def load_prompt(name: str) -> Prompt:
     prompt: Prompt = manager.get(key=name)
     if not prompt:
         raise fastapi.HTTPException(status_code=404)
     return prompt
 
 
-@router.put("/api/prompt/{name}")
+@router.put("/api/prompt/{name}", response_model=Prompt)
 def update_prompt(
     body: UpdatePromptBody,
     name: str,
@@ -129,7 +130,7 @@ def new_commit(body: NewCommitBody):
     return check_mongo_result(res)
 
 
-@router.get("/api/commits/{name}")
+@router.get("/api/commits/{name}", response_model=List[CommitItem])
 def get_commit(name: str):
     res = mongo.commit.get(name)
     if not res:

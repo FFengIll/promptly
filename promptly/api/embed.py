@@ -17,12 +17,15 @@ mongo = MongoManager.default()
 manager = mongo.embed
 router = fastapi.APIRouter()
 
+
 class RoleEnum(StrEnum):
     user = auto()
     assistant = auto()
     system = auto()
 
+
 RELATED_CONTENT_ROLE = RoleEnum.assistant
+
 
 class RetrieveBody(BaseModel):
     name: str
