@@ -11,7 +11,7 @@ export class RouteHelper {
     }
 
     static toTesting(key: string) {
-        router.push('/view/testing')
+        router.push(`/view/testing/${key}`)
     }
 }
 
