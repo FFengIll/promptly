@@ -33,8 +33,9 @@ use_route_names_as_operation_ids(app)
 if __name__ == "__main__":
     with open("./data/swagger.json", "w") as fd:
         use_route_names_as_operation_ids(app)
-        schema = app.openapi()
         # though the fastapi support 3.1.0, but swagger-codegen not
         # force downgrade it since compatibility
-        schema["openapi"] = "3.0.2"
+        app.openapi_version = "3.0.2"
+        schema = app.openapi()
+        # schema["openapi"] = "3.0.2"
         json.dump(schema, fd, indent=4, ensure_ascii=False)
