@@ -9,7 +9,7 @@
         <!-- prompt view -->
         <a-row :gutter="12">
             <a-col :span="12">
-                <a-card :title="`Prompt Snapshot [ name = ${store.source.name} ]`">
+                <a-card :title="`Prompt Snapshot [ name = ${prompt.name} ]`">
 
                     <ArgumentPanel :setting="argSetting" :mask="caseKey" :args="args" @select="selectArg">
                     </ArgumentPanel>
@@ -48,8 +48,8 @@
 
 
                     <a-space direction="vertical" :style="{ width: '100%' }">
-                        <!-- <PromptCard :messages="store.source.messages.filter(item => item.enable)"></PromptCard> -->
-                        <div v-for="(item, index) in store.source.messages" :key="index">
+                        <!-- <PromptCard :messages="prompt.messages.filter(item => item.enable)"></PromptCard> -->
+                        <div v-for="(item, index) in prompt.messages" :key="index">
                             <div v-if="item.enable">
                                 <span :style="{ color: 'blue' }">{{ item.role }} </span><span>:&nbsp;</span>
                                 <span>
@@ -106,7 +106,7 @@
                         <a-list-item>
                             <a-button @click="debugOne(item)">Request</a-button>
                             <a-button @click="sendBack(item)">Send Back</a-button>
-                            <a-button @click="gotoSource(store.source.name)"> Go To Source</a-button>
+                            <a-button @click="gotoSource(prompt.name)"> Go To Source</a-button>
                             <a-typography-text :ellipsis="true" :copyable="true" :content="item"></a-typography-text>
                             <a-divider />
                         </a-list-item>
@@ -129,7 +129,7 @@
                             <span>
                                 <a-button @click="debugOne(record.source)">Request</a-button>
                                 <a-button @click="sendBack(record.source)">Send Back</a-button>
-                                <a-button @click="gotoSource(store.source.name)"> Go To Source</a-button>
+                                <a-button @click="gotoSource(prompt.name)"> Go To Source</a-button>
 
                             </span>
                         </template>
@@ -172,10 +172,15 @@ import ModelSelect from "@/components/ModelSelect.vue";
 import router from "@/router";
 import { backend } from '@/scripts/backend';
 import { openNotification } from '@/scripts/notice';
-import type { Argument, ArgumentSetting, TestingRequestBody, UpdatePromptBody } from 'sdk/models';
+import { useConfigStore } from '@/stores/global-config';
+import type { Argument, ArgumentSetting, Message, Prompt, TestingRequestBody, UpdatePromptBody } from 'sdk/models';
+import { useRoute } from 'vue-router';
+const r = useRoute()
 
 
-const store = useSnapshotStore()
+const key = r.params.key.toString()
+
+const store = useConfigStore()
 
 const repeat = ref<number>(1);
 
@@ -184,10 +189,23 @@ const model = ref<string>("")
 const argSetting = ref<ArgumentSetting>(
     {
         name: "",
-        args: {}
+        args: []
     }
 )
 const args = ref<Argument[]>(new Array())
+
+const prompt = ref<Prompt>(
+    <Prompt>{
+        "name": "",
+        "history": [],
+        "messages": <Message[]>[
+            { role: "角色1", content: "内容1", enable: true },
+            // 其他数据项
+        ],
+        model: "",
+        plugins: [""]
+    }
+)
 
 interface ResultItem {
     id: number,
@@ -213,11 +231,17 @@ const caseList = ref(
 )
 
 onMounted(
-    () => {
+    async () => {
         listCase(false)
 
-        let key = store.source.name
-        backend.apiPromptArgsNameGet(key)
+        await backend.apiPromptNameGet(key)
+            .then(response => {
+                console.log(response.data)
+                prompt.value = response.data;
+            })
+
+
+        await backend.apiPromptArgsNameGet(key)
             .then(response => {
                 argSetting.value = response.data
 
@@ -236,7 +260,7 @@ function toTestcase() {
     })
 }
 
-const caseKey = ref([""])
+const caseKey = ref("")
 
 
 
@@ -271,7 +295,7 @@ interface Params {
 
 function sendBack(source: string) {
 
-    let messages = store.source.messages.map(item => {
+    let messages = prompt.value.messages.map((item: any) => {
         let copied = { ...item };
         copied.content = copied.content.replace('{{}}', source)
         console.log(copied)
@@ -282,7 +306,7 @@ function sendBack(source: string) {
         messages: messages
     }
 
-    backend.apiPromptNamePut(body, store.source.name)
+    backend.apiPromptNamePut(body, prompt.value.name)
         .then(
             response => {
                 console.log(response)
@@ -299,14 +323,14 @@ function gotoSource(source: string) {
 
 async function debugOne(source: string) {
 
-    var res = store.source.messages.filter(item => {
+    var res = prompt.value.messages.filter((item: { enable: boolean; }) => {
         return item.enable == true
     })
 
 
     let body: TestingRequestBody = {
         messages: res,
-        key: caseKey.value,
+        argKey: caseKey.value,
         sources: [source],
         args: args.value
     }
@@ -336,12 +360,12 @@ async function doRunTest(body: TestingRequestBody) {
 }
 
 async function runTestWithCase() {
-    var res = store.source.messages.map(item => item)
+    var res = prompt.value.messages.map((item: any) => item)
 
     config.value.data.forEach(source => {
         let body: TestingRequestBody = {
             messages: res,
-            key: caseKey.value,
+            argKey: caseKey.value,
             sources: [source],
             args: args.value,
             model: model.value,
@@ -354,11 +378,11 @@ async function runTestWithCase() {
 
 
 async function runTest(repeat: number) {
-    var res = store.source.messages.map(item => item)
+    var res = prompt.value.messages.map((item: any) => item)
 
     let body: TestingRequestBody = {
         messages: res,
-        key: caseKey.value,
+        argKey: caseKey.value,
         sources: [''],
         args: (args.value),
         model: model.value,
