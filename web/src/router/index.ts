@@ -22,7 +22,7 @@ const router = createRouter({
 
         },
         {
-            path: '/view/testing',
+            path: '/view/testing/:key',
             name: 'prompt testing',
             component: () => import('../views/TestingView.vue'),
             props: true,

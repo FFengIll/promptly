@@ -33,14 +33,14 @@ function onDefault(value: string) {
 
 <template>
     <a-select ref="select" v-model:value="props.model" style="width: 120px" @change="onSelect">
-        <a-select-option v-for="value in LLM" :value="value">
+        <a-select-option v-for="value, key in LLM" :value="value">
             <a-button @click="onDefault(value)">
                 <template #icon>
                     <HeartTwoTone v-if="value == defaultModel" two-tone-color="#eb2f96" />
                     <HeartOutlined v-else />
                 </template>
             </a-button>
-            {{ value }}
+            {{ key }}
         </a-select-option>
 
     </a-select>
