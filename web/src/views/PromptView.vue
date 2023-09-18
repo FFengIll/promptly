@@ -335,7 +335,18 @@ function gotoCommit() {
     RouteHelper.toCommit(key)
 }
 
-function gotoTesting() {
+async function gotoTesting() {
+    let body: UpdatePromptBody = {
+        messages: prompt.value.messages!!,
+        model: model.value,
+        args: args.value,
+    }
+
+    await backend.apiPromptNamePut(body, key).catch((err) => {
+        console.log(err)
+        openNotification(err.toString(), "error")
+    })
+
     RouteHelper.toTesting(key)
 }
 
