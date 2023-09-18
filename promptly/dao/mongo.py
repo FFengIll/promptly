@@ -186,7 +186,7 @@ class MongoCommitManager:
         log.info(res)
 
 
-class MongoCaseManager():
+class MongoCaseManager:
     def __init__(self, col: Collection):
         self.collection = col
 
@@ -225,7 +225,8 @@ class MongoPromptManger:
     def __init__(self, col: Collection, database):
         self.collection = col
 
-        self.odm = PromptODM(database=database)
+        # FIXME: DO NOT use it since `swagger-codegen` error.
+        # self.odm = PromptODM(database=database)
 
         self.group: Dict[str, set] = collections.defaultdict(lambda: set())
         self.values = []
@@ -245,7 +246,11 @@ class MongoPromptManger:
         return self.group
 
     def get(self, key):
-        return self.odm.find_one_by({"name": key})
+        res = self.collection.find_one(
+            {"name": key},
+        )
+        return Prompt(**res)
+        # return self.odm.find_one_by({"name": key})
 
     def update_args(self, key, args: List[Argument]):
         return self.collection.update_one(

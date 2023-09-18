@@ -78,8 +78,6 @@ class ArgumentSetting(BaseModel):
 
 @autocomplete
 class Prompt(BaseModel):
-    id: ObjectIdField = None
-
     name: str = ...
     model: str = Field(default="")
     default_model: str = Field(default="", alias="defaultModel")
