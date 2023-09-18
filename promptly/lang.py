@@ -32,4 +32,3 @@ langs = [
     },
     {"locale": "ja", "code": "Japanese", "title": "\u65E5\u672C\u8A9E"},
 ]
-
