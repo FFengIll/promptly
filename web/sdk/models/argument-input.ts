@@ -11,23 +11,28 @@
  * https://github.com/swagger-api/swagger-codegen.git
  * Do not edit the class manually.
  */
-import { MessageInput } from './message-input';
 /**
  * 
  * @export
- * @interface RetrieveBody
+ * @interface ArgumentInput
  */
-export interface RetrieveBody {
+export interface ArgumentInput {
     /**
      * 
      * @type {string}
-     * @memberof RetrieveBody
+     * @memberof ArgumentInput
      */
-    name: string;
+    key: string;
     /**
      * 
-     * @type {Array<MessageInput>}
-     * @memberof RetrieveBody
+     * @type {string}
+     * @memberof ArgumentInput
      */
-    messages: Array<MessageInput>;
+    value?: string;
+    /**
+     * 
+     * @type {Array<string>}
+     * @memberof ArgumentInput
+     */
+    candidates?: Array<string>;
 }

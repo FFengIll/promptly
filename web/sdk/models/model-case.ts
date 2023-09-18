@@ -14,25 +14,31 @@
 /**
  * 
  * @export
- * @interface Argument
+ * @interface ModelCase
  */
-export interface Argument {
+export interface ModelCase {
+    /**
+     * 
+     * @type {number}
+     * @memberof ModelCase
+     */
+    id: number;
     /**
      * 
      * @type {string}
-     * @memberof Argument
+     * @memberof ModelCase
      */
-    key: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof Argument
-     */
-    value?: string;
+    name: string;
     /**
      * 
      * @type {Array<string>}
-     * @memberof Argument
+     * @memberof ModelCase
      */
-    candidates?: Array<string>;
+    data: Array<string>;
+    /**
+     * 
+     * @type {string}
+     * @memberof ModelCase
+     */
+    description: string;
 }

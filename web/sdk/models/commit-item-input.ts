@@ -16,43 +16,49 @@ import { MessageInput } from './message-input';
 /**
  * 
  * @export
- * @interface UpdatePromptBody
+ * @interface CommitItemInput
  */
-export interface UpdatePromptBody {
-    /**
-     * 
-     * @type {Array<MessageInput>}
-     * @memberof UpdatePromptBody
-     */
-    messages?: Array<MessageInput>;
-    /**
-     * 
-     * @type {string}
-     * @memberof UpdatePromptBody
-     */
-    model?: string;
+export interface CommitItemInput {
     /**
      * 
      * @type {Array<ArgumentInput>}
-     * @memberof UpdatePromptBody
+     * @memberof CommitItemInput
      */
     args?: Array<ArgumentInput>;
     /**
      * 
-     * @type {string}
-     * @memberof UpdatePromptBody
+     * @type {Array<MessageInput>}
+     * @memberof CommitItemInput
      */
-    defaultModel?: string;
+    messages: Array<MessageInput>;
     /**
      * 
      * @type {string}
-     * @memberof UpdatePromptBody
+     * @memberof CommitItemInput
      */
-    group?: string;
+    response?: string;
     /**
      * 
-     * @type {Array<string>}
-     * @memberof UpdatePromptBody
+     * @type {string}
+     * @memberof CommitItemInput
      */
-    plugins?: Array<string>;
+    model?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof CommitItemInput
+     */
+    md5?: string;
+    /**
+     * 
+     * @type {boolean}
+     * @memberof CommitItemInput
+     */
+    star?: boolean;
+    /**
+     * 
+     * @type {string}
+     * @memberof CommitItemInput
+     */
+    tag?: string;
 }

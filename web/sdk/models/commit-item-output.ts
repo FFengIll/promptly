@@ -11,54 +11,54 @@
  * https://github.com/swagger-api/swagger-codegen.git
  * Do not edit the class manually.
  */
-import { Argument } from './argument';
-import { Message } from './message';
+import { ArgumentOutput } from './argument-output';
+import { MessageOutput } from './message-output';
 /**
  * 
  * @export
- * @interface CommitItem
+ * @interface CommitItemOutput
  */
-export interface CommitItem {
+export interface CommitItemOutput {
     /**
      * 
-     * @type {Array<Argument>}
-     * @memberof CommitItem
+     * @type {Array<ArgumentOutput>}
+     * @memberof CommitItemOutput
      */
-    args?: Array<Argument>;
+    args: Array<ArgumentOutput>;
     /**
      * 
-     * @type {Array<Message>}
-     * @memberof CommitItem
+     * @type {Array<MessageOutput>}
+     * @memberof CommitItemOutput
      */
-    messages: Array<Message>;
-    /**
-     * 
-     * @type {string}
-     * @memberof CommitItem
-     */
-    response?: string;
+    messages: Array<MessageOutput>;
     /**
      * 
      * @type {string}
-     * @memberof CommitItem
+     * @memberof CommitItemOutput
      */
-    model?: string;
+    response: string;
     /**
      * 
      * @type {string}
-     * @memberof CommitItem
+     * @memberof CommitItemOutput
      */
-    md5?: string;
+    model: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof CommitItemOutput
+     */
+    md5: string;
     /**
      * 
      * @type {boolean}
-     * @memberof CommitItem
+     * @memberof CommitItemOutput
      */
-    star?: boolean;
+    star: boolean;
     /**
      * 
      * @type {string}
-     * @memberof CommitItem
+     * @memberof CommitItemOutput
      */
-    tag?: string;
+    tag: string;
 }

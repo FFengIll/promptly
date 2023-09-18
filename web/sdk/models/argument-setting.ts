@@ -11,7 +11,7 @@
  * https://github.com/swagger-api/swagger-codegen.git
  * Do not edit the class manually.
  */
-import { Argument } from './argument';
+import { ArgumentOutput } from './argument-output';
 /**
  * 
  * @export
@@ -26,8 +26,8 @@ export interface ArgumentSetting {
     name: string;
     /**
      * 
-     * @type {Array<Argument>}
+     * @type {Array<ArgumentOutput>}
      * @memberof ArgumentSetting
      */
-    args?: Array<Argument>;
+    args: Array<ArgumentOutput>;
 }

@@ -14,25 +14,25 @@
 /**
  * 
  * @export
- * @interface Message
+ * @interface ArgumentOutput
  */
-export interface Message {
+export interface ArgumentOutput {
     /**
      * 
      * @type {string}
-     * @memberof Message
+     * @memberof ArgumentOutput
      */
-    role: string;
+    key: string;
     /**
      * 
      * @type {string}
-     * @memberof Message
+     * @memberof ArgumentOutput
      */
-    content: string;
+    value: string;
     /**
      * 
-     * @type {boolean}
-     * @memberof Message
+     * @type {Array<string>}
+     * @memberof ArgumentOutput
      */
-    enable?: boolean;
+    candidates: Array<string>;
 }
