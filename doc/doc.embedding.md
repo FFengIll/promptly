@@ -1,30 +1,53 @@
 # document with embedding
 
-# prompt
-## add to top
+# messages
+
+在用户视角，他们只能看到自己的`指令`和服务的`响应`。[示例](#user-prompt-and-response)
+
+但在服务视角，
+1. 所有的`指令`需要经过[转换](#transform-user-messages)
+1. 每一个`指令`都会经过embedding分析，获取到相关文档，并附加在整个chat的最前面，作为[相关信息/上下文](#add-to-top)
+
+即如果用户请求如下
 ```json
 {
-    "role": "assistant",
-    "content": "===Related===\n{context}"
+    "messages": [    
+        {
+        "role": "user",
+        "content": "content",
+        "enable": true
+        },
+    ]
 }
 ```
 
-
-## transform user prompt
+则服务最后发起的请求是
 
 ```json
 {
-    "role": "user",
-    "content": "You are a helpful AI assistant.\n\nIf `Instruction` is a question:\n- Use `Related` to answer the `Question`.\n- If you don't know the answer, just say you don't know. DO NOT try to make up an answer.\n- If the question is not related to the context, politely respond that you are tuned to only answer questions that are related to the context.\n- Answer start with `according to your reading article`.\n\nIf `Instruction` is a task:\n- Try to complete the task with `Last Response`.\n\n===Last Response===\n{last}\n\n===Instruction===\n{content}"
+    "messages": [
+        {
+        "role": "assistant",
+        "content": "附加的相关文档，即context",
+        "enable": true
+        },
+        {
+        "role": "user",
+        "content": "经过转换的指令，包含 latestReply 和 content",
+        "enable": true
+        },
+    ]
 }
 ```
 
-## user prompt and answer
+## user prompt and response
+
+> 下例链接：https://www.matterhackers.com/articles/3d-printing-essentials-first-layer
 
 ```json
 {
   "name": "3d_article",
-  "prompt": [
+  "messages": [
     {
       "role": "user",
       "content": "首层的意义？",
@@ -81,5 +104,25 @@
       "enable": true
     }
   ]
+}
+```
+
+## add to top
+
+
+```json
+{
+    "role": "assistant",
+    "content": "===Related===\n{context}"
+}
+```
+
+
+## transform user messages
+
+```json
+{
+    "role": "user",
+    "content": "You are a helpful AI assistant.\n\nIf `Instruction` is a question:\n- Use `Related` to answer the `Question`.\n- If you don't know the answer, just say you don't know. DO NOT try to make up an answer.\n- If the question is not related to the context, politely respond that you are tuned to only answer questions that are related to the context.\n- Answer start with `according to your reading article`.\n\nIf `Instruction` is a task:\n- Try to complete the task with `Last Response`.\n\n===Last Response===\n{latestReply}\n\n===Instruction===\n{content}"
 }
 ```
