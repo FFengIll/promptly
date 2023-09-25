@@ -22,10 +22,8 @@
                                 </template>
                             </a-button>
                             <p>{{ h }}</p>
-                            <!-- <a-textarea v-bind="h"> </a-textarea> -->
 
 
-                            <!-- <button v-on:click="setContent(item.index, h)">Set</button> -->
 
                         </a-space>
                     </a-collapse-panel>
@@ -80,7 +78,7 @@
 
                     <template #extra>
                         <ModelSelect :model="model" :defaultModel="(() => { return prompt.defaultModel })()"
-                            v-on:select="(value) => { model = value }" v-on:default="updateDefaultModel(value)"
+                            v-on:select="(value) => { model = value }" v-on:default="(value) => updateDefaultModel(value)"
                             style="width: 200px">
 
                         </ModelSelect>
@@ -184,6 +182,7 @@
                                 <a-button>Good</a-button>
                                 <a-button>Bad</a-button>
                                 <a-button @click="() => copy(response)">Copy</a-button>
+
                             </a-space>
 
                             <a-divider type="vertical"></a-divider>
@@ -194,7 +193,17 @@
 
                             <a-divider></a-divider>
 
-                            <vue-markdown :source="response" :options="{}"></vue-markdown>
+
+                            <a-tabs v-model:activeKey="responseMode">
+                                <a-tab-pane key="1" tab="Markown"> <vue-markdown :source="response"
+                                        :options="{}"></vue-markdown></a-tab-pane>
+                                <a-tab-pane key="2" tab="Text" force-render>
+                                    <a-textarea v-model:value="response" :auto-size="{ maxRows: 16 }">
+                                    </a-textarea>
+                                </a-tab-pane>
+                            </a-tabs>
+
+
 
                         </div>
                     </a-skeleton>
@@ -207,10 +216,9 @@
 </template>
 
 <script lang="ts" setup>
-import { useClipboard } from '@vueuse/core';
-import { onMounted, ref } from 'vue';
-
 import { CopyOutlined, PlusOutlined, SyncOutlined } from '@ant-design/icons-vue';
+import { useClipboard } from '@vueuse/core';
+import { onMounted, reactive, ref } from 'vue';
 
 import { useRoute } from 'vue-router';
 
@@ -222,16 +230,17 @@ import { openNotification } from "@/scripts/notice";
 import { RouteHelper } from '@/scripts/router';
 import { useConfigStore } from "@/stores/global-config";
 import VueMarkdown from 'vue-markdown-render';
-import type { ArgRequest, Argument, ArgumentSetting, Message, NewCommitBody, Prompt, UpdatePromptBody } from "../../sdk";
+import type { ArgRequest, ArgumentOutput as Argument, ArgumentSetting, MessageOutput as Message, NewCommitBody, Prompt, UpdatePromptBody } from "../../sdk";
 import PromptCard from '../components/PromptCard.vue';
 
 const store = useConfigStore()
-
 // use
 const r = useRoute()
 const { text, copy, copied, isSupported } = useClipboard({})
 
 const key = r.params.key.toString()
+
+const responseMode = ref()
 
 // props
 const props = defineProps<{}>()
@@ -240,11 +249,13 @@ const props = defineProps<{}>()
 const loading = ref(false)
 const model = ref<string>("")
 
+
+
 const withEmbed = ref<boolean>(false)
 
 const argValue = ref<string>("")
 const argKey = ref<string>("")
-const response = ref(<string>"")
+const response = ref(<string>"test")
 const argSetting = ref<ArgumentSetting>(
     {
         name: "",
@@ -252,18 +263,9 @@ const argSetting = ref<ArgumentSetting>(
     }
 )
 const args = ref<Argument[]>([])
-const prompt = ref<Prompt>(
-    <Prompt>{
-        "name": "",
-        "history": [],
-        "messages": <Message[]>[
-            { role: "角色1", content: "内容1", enable: true },
-            // 其他数据项
-        ],
-        model: "",
-        plugins: [""]
-    }
-)
+const prompt = ref<Prompt>(<Prompt>{})
+
+
 
 // created
 onMounted(
@@ -292,7 +294,7 @@ function selectArg(key: string, value: string) {
             return
         }
     }
-    args.value.push({ key: key, value: value })
+    args.value.push({ key: key, value: value, candidates: [] })
 }
 
 async function newArg() {
@@ -498,7 +500,6 @@ async function chatWithRAG() {
                 }
             )
     } catch (err) {
-        console.log(err)
         openNotification(err.toString(), "error")
     } finally {
         loading.value = false
