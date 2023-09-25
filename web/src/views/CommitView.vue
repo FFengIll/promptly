@@ -4,7 +4,6 @@ import router from "@/router";
 import { backend, BackendHelper } from "@/scripts/backend";
 import { RouteHelper } from "@/scripts/router";
 
-import { storeToRefs } from "pinia";
 import type { ArgumentSetting, CommitItem, UpdatePromptBody } from "sdk/models";
 import { onMounted, ref } from "vue";
 import { useRoute } from 'vue-router';
@@ -28,7 +27,6 @@ const key = ref<string>(route.params.key.toString())
 
 //
 const autoSave = ref<boolean>(true)
-const { source } = storeToRefs(store)
 
 const starOnly = ref<boolean>(false)
 
@@ -44,7 +42,6 @@ const argSetting = ref<ArgumentSetting>(
 const args = ref<Argument[]>(new Array<Argument>())
 
 
-console.log("store source", source.value)
 
 onMounted(
     () => {
@@ -53,7 +50,7 @@ onMounted(
                 argSetting.value = response.data
                 console.log('setting', argSetting.value)
             })
-        getCommit(source.value.name)
+        getCommit(key.value)
     }
 )
 
@@ -72,7 +69,6 @@ async function getCommit(name: string) {
         console.log(error)
     })
 
-    console.log(store.source)
 
     if (commits.value.length <= 0) {
         await backend.apiPromptNameGet(name).then(
