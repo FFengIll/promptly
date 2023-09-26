@@ -249,6 +249,8 @@ class MongoPromptManger:
         res = self.collection.find_one(
             {"name": key},
         )
+        if not res:
+            return None
         return Prompt(**res)
         # return self.odm.find_one_by({"name": key})
 
