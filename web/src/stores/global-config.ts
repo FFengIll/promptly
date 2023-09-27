@@ -1,6 +1,6 @@
 import { useLocalStorage } from '@vueuse/core';
 import { defineStore } from 'pinia';
-import type { Argument, ArgumentSetting } from '../../sdk/models';
+import type { ArgumentOutput as Argument, ArgumentSetting } from '../../sdk/models';
 
 export const useConfigStore = defineStore('config', {
     getters: {},
