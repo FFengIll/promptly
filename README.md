@@ -15,6 +15,21 @@ The prompt engineering tools.
   - install docker desktop: https://www.docker.com/products/docker-desktop/
 - ~~(DEPRECATED) gui: pysimplegui~~
 
+# config
+LLM api token is sensitive, so we only put a separate file for it.
+```sh
+# create and writhe this file for LLM api url and key
+vim promptly/config.py
+
+# with bellow content, use your own url and key
+key = "fake_cq5gn6rkyjgom6ocpeevuhjn7x8phaly"
+url = "http://localhost:8080/api/v1"
+```
+
+By default, promptly use `gpt-3.5-turbo` (the latest).
+
+Some other LLM is hardcode in `web/src/scripts/llm.ts`, you may edit it for your own.
+
 # run
 
 - task install
