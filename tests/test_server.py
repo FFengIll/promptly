@@ -1,12 +1,24 @@
-import random
+import asyncio
 import time
 
+import pytest
 
+
+async def sleep(i):
+    print("hello")
+    time.sleep(1)
+    print("bye")
+    return i
+
+
+@pytest.mark.asyncio
 async def test_await_in_loop():
-    def sleep():
-        time.sleep(5)
-        return random.randint(0, 10)
-
+    res = []
     for i in range(5):
-        res = await sleep()
-        print(res)
+        item = sleep(i)
+        print(item)
+        res.append(item)
+    g = asyncio.gather(*res)
+    res = await g
+    print(res)
+    return res
