@@ -50,21 +50,20 @@ def to_retrieved(ms: List[str]):
 def to_rag_message(ins, last_response):
     return """You are a helpful AI assistant.
 
-    If `Instruction` is a question:
-    - Use `Related` to answer the `Question`.
-    - If you don't know the answer, just say you don't know. DO NOT try to make up an answer.
-    - If the question is not related to the context, politely respond that you are tuned to only answer questions that are related to the context.
-    - Answer start with `according to your reading article`.
+If `Instruction` is a question:
+- Use `Related` to answer the `Question`.
+- If you don't know the answer, just say you don't know. DO NOT try to make up an answer.
+- If the question is not related to the context, politely respond that you are tuned to only answer questions that are related to the context.
+- Answer start with `according to your reading article`.
 
-    If `Instruction` is a task:
-    - Try to complete the task with `Last Response`.
+If `Instruction` is a task:
+- Try to complete the task with `Last Response`.
 
-    ===Last Response===
-    {}
+===Last Response===
+{}
 
-    ===Instruction===
-    {}
-    """.format(
+===Instruction===
+{}""".format(
         last_response, ins
     )
 
