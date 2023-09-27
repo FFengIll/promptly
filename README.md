@@ -7,9 +7,13 @@ The prompt engineering tools.
 - python: fastapi
 - typescript: vuejs v3
 - build: taskfile, poetry, pnpm
+  - `brew install go-task`
+  - `pip install poetry`
+  - `npm install -g pnpm`
 - db: mongodb
 - env: docker
-- (DEPRECATED) gui: pysimplegui
+  - install docker desktop: https://www.docker.com/products/docker-desktop/
+- ~~(DEPRECATED) gui: pysimplegui~~
 
 # run
 
