@@ -6,7 +6,7 @@ from pydantic_mongo import AbstractRepository
 from pymongo import MongoClient
 from pymongo.collection import Collection
 
-from promptly.model.case import Case
+from promptly.model.testcase import TestCase
 from promptly.model.prompt import Argument, ArgumentSetting, CommitItem, Prompt
 
 url = "mongodb://localhost:27017/"
@@ -197,14 +197,14 @@ class MongoCaseManager:
     def reload(self):
         self.index.clear()
         for i in self.collection.find({}, {"name": 1, "description": 1}):
-            self.index.add(Case(**i))
+            self.index.add(TestCase(**i))
 
     def keys(self):
         return list(self.index)
 
     def get(self, key):
         for i in self.collection.find({"name": key}):
-            return Case(**i)
+            return TestCase(**i)
         return None
 
 

@@ -9,7 +9,7 @@ from pydantic import BaseModel
 from promptly import llm
 from promptly.dao import MongoManager
 from promptly.llm import to_message
-from promptly.model.case import CaseResult
+from promptly.model.testcase import TestResult
 from promptly.model.prompt import Argument, ArgumentSetting, CommitItem, Message
 from .util import check_mongo_result
 
@@ -46,7 +46,7 @@ async def batch_test(messages, key, data, model):
         log.info("response: {}", target)
         mongo.history.push(CommitItem(messages=ms, response=target))
 
-        res.append(CaseResult(source=source, target=target, id=idx).dict())
+        res.append(TestResult(source=source, target=target, id=idx).dict())
 
     return res
 

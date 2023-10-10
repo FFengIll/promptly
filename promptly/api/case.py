@@ -2,7 +2,7 @@ import fastapi
 import loguru
 
 from promptly.dao.mongo import MongoCaseManager, MongoManager
-from promptly.model.case import Case
+from promptly.model.testcase import TestCase
 
 log = loguru.logger
 mongo = MongoManager.default()
@@ -17,9 +17,9 @@ def list_case(reload: bool):
     return manager.keys()
 
 
-@router.get("/api/case/{key}", response_model=Case)
+@router.get("/api/case/{key}", response_model=TestCase)
 async def get_case(key: str):
-    c: Case = manager.get(key)
+    c: TestCase = manager.get(key)
     log.info(c)
     if not c:
         raise fastapi.HTTPException(404)

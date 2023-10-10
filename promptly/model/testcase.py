@@ -6,7 +6,7 @@ from pydantic import BaseModel, Field
 log = loguru.logger
 
 
-class Case(BaseModel):
+class TestCase(BaseModel):
     id: int = Field(default=0)
     name: str
     data: List[str] = Field(default_factory=list)
@@ -16,7 +16,7 @@ class Case(BaseModel):
         return self.name.__hash__()
 
 
-class CaseResult(BaseModel):
+class TestResult(BaseModel):
     id: int
     source: str
     target: str
