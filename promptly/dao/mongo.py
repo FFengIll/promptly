@@ -107,7 +107,7 @@ class MongoArgumentManager:
 
     def get_setting(self, name):
         res = self.collection.find_one({"name": name})
-        log.info(res)
+        log.debug(res)
         if not res:
             return ArgumentSetting(name=name)
         return ArgumentSetting(**res)
