@@ -31,10 +31,10 @@
                                 <a-typography-text>Repeat</a-typography-text>
                                 <a-input-number id="inputNumber" v-model:value="repeat" :min="1" :max="10">
                                     <template #upIcon>
-                                        <ArrowUpOutlined />
+                                        <ArrowUpOutlined/>
                                     </template>
                                     <template #downIcon>
-                                        <ArrowDownOutlined />
+                                        <ArrowDownOutlined/>
                                     </template>
                                 </a-input-number>
                             </a-space>
@@ -66,40 +66,41 @@
                 <!-- show dataset info -->
                 <a-card title="Case List">
 
-                    <a-divider></a-divider>
                     <!-- case select -->
-                    Select Case to Debug:&nbsp;&nbsp;
+                    Case to Debug:&nbsp;&nbsp;
+
                     <a-select style="width:300px" @change="getCase">
                         <a-select-option v-for="item in caseList" :key="item.name">
                             {{ item.name }}
-                            <a-divider type="vertical" />
+                            <a-divider type="vertical"/>
                             {{ item.description }}
                         </a-select-option>
                     </a-select>
 
                     <a-button @click="listCase(true)">Refresh</a-button>
 
-                    <a-divider />
 
 
                     <!-- case description -->
-                    Case Description:&nbsp;&nbsp;
-                    <span>{{ config.description }}</span>
+                    <!--Case Description:&nbsp;&nbsp;-->
+                    <!--<span>{{ config.description }}</span>-->
 
-                    <a-divider />
+                    <a-divider/>
 
 
                     <a-space direction="horizontal">
+                        Argument to Override:&nbsp;&nbsp;
+
                         <a-select style="width:300px" @change="(value: string) => { caseKey = value }">
-                            <a-select-option v-for="key in args.keys()" :key="key">
-                                {{ key }}
+                            <a-select-option v-for="item in args" :key="item.key">
+                                {{ item.key }}
                             </a-select-option>
                         </a-select>
 
                         <a-button type="primary" @click="runTestWithCase">Run With Case</a-button>
                     </a-space>
 
-                    <a-divider />
+                    <a-divider/>
 
 
                     <div v-for="(item, index) in config.data" :key="index">
@@ -108,7 +109,7 @@
                             <a-button @click="sendBack(item)">Send Back</a-button>
                             <a-button @click="gotoSource(prompt.name)"> Go To Source</a-button>
                             <a-typography-text :ellipsis="true" :copyable="true" :content="item"></a-typography-text>
-                            <a-divider />
+                            <a-divider/>
                         </a-list-item>
 
                     </div>
@@ -160,21 +161,28 @@
     </div>
 </template>
 <script lang="ts" setup>
-import { onMounted, ref } from 'vue';
+import {onMounted, ref} from 'vue';
 
-import type { TableColumnType } from 'ant-design-vue';
-
+import type {TableColumnType} from 'ant-design-vue';
 
 
 import ArgumentPanel from '@/components/ArgumentPanel.vue';
 
 import ModelSelect from "@/components/ModelSelect.vue";
 import router from "@/router";
-import { backend } from '@/scripts/backend';
-import { openNotification } from '@/scripts/notice';
-import { useConfigStore } from '@/stores/global-config';
-import type { Argument, ArgumentSetting, Message, Prompt, TestingRequestBody, UpdatePromptBody } from 'sdk/models';
-import { useRoute } from 'vue-router';
+import {backend} from '@/scripts/backend';
+import {openNotification} from '@/scripts/notice';
+import {useConfigStore} from '@/stores/global-config';
+import type {
+    ArgumentOutput as Argument,
+    ArgumentSetting,
+    MessageOutput as Message,
+    Prompt,
+    TestingRequestBody,
+    UpdatePromptBody
+} from 'sdk/models';
+import {useRoute} from 'vue-router';
+
 const r = useRoute()
 
 
@@ -187,24 +195,24 @@ const repeat = ref<number>(1);
 const model = ref<string>("")
 
 const argSetting = ref<ArgumentSetting>(
-    {
-        name: "",
-        args: []
-    }
+{
+    name: "",
+    args: []
+}
 )
 const args = ref<Argument[]>(new Array())
 
 const prompt = ref<Prompt>(
-    <Prompt>{
-        "name": "",
-        "history": [],
-        "messages": <Message[]>[
-            { role: "角色1", content: "内容1", enable: true },
-            // 其他数据项
-        ],
-        model: "",
-        plugins: [""]
-    }
+<Prompt>{
+    "name": "",
+    "history": [],
+    "messages": <Message[]>[
+        {role: "角色1", content: "内容1", enable: true},
+        // 其他数据项
+    ],
+    model: "",
+    plugins: [""]
+}
 )
 
 interface ResultItem {
@@ -214,7 +222,7 @@ interface ResultItem {
 }
 
 const result = ref(
-    <ResultItem[]>[]
+<ResultItem[]>[]
 )
 
 const config = ref({
@@ -225,43 +233,42 @@ const config = ref({
 })
 
 const caseList = ref(
-    [
-        { id: 1, name: "test", description: "test", data: [1, 2, 3, 4] },
-    ],
+[
+    {id: 1, name: "test", description: "test", data: [1, 2, 3, 4]},
+],
 )
 
 onMounted(
-    async () => {
-        listCase(false)
+async () => {
+    listCase(false)
 
-        await backend.apiPromptNameGet(key)
-            .then(response => {
-                console.log(response.data)
-                prompt.value = response.data;
-            })
+    await backend.apiPromptNameGet(key)
+    .then(response => {
+        console.log(response.data)
+        prompt.value = response.data;
+    })
 
 
-        await backend.apiPromptArgsNameGet(key)
-            .then(response => {
-                argSetting.value = response.data
+    await backend.apiPromptArgsNameGet(key)
+    .then(response => {
+        argSetting.value = response.data
 
-                console.log('response', argSetting.value)
+        console.log('response', argSetting.value)
 
-            }).catch(error => {
-                console.log(error)
-            })
-    }
+    }).catch(error => {
+        console.log(error)
+    })
+}
 )
 
 
 function toTestcase() {
     return config.value.data.map((item, index) => {
-        return { id: index, source: item, target: "" }
+        return {id: index, source: item, target: ""}
     })
 }
 
 const caseKey = ref("")
-
 
 
 const columns: TableColumnType[] = [
@@ -274,7 +281,7 @@ const columns: TableColumnType[] = [
         title: 'source',
         dataIndex: 'source',
         key: 'source',
-        ellipsis: { showTitle: false },
+        ellipsis: {showTitle: false},
     },
     {
         title: 'target',
@@ -296,7 +303,7 @@ interface Params {
 function sendBack(source: string) {
 
     let messages = prompt.value.messages.map((item: any) => {
-        let copied = { ...item };
+        let copied = {...item};
         copied.content = copied.content.replace('{{}}', source)
         console.log(copied)
         return copied
@@ -307,14 +314,14 @@ function sendBack(source: string) {
     }
 
     backend.apiPromptNamePut(body, prompt.value.name)
-        .then(
-            response => {
-                console.log(response)
-            }
-        )
-        .catch(error => {
-            console.error(error)
-        })
+    .then(
+    response => {
+        console.log(response)
+    }
+    )
+    .catch(error => {
+        console.error(error)
+    })
 }
 
 function gotoSource(source: string) {
@@ -336,27 +343,27 @@ async function debugOne(source: string) {
     }
 
     await backend.apiActionTestingPost(body, repeat.value)
-        .then(
-            (response) => {
-                let element = response.data[0]
-                result.value.splice(0, 0, element)
-            }
-        )
-        .catch(err => {
-            openNotification(err, 'error')
-        })
+    .then(
+    (response) => {
+        let element = response.data[0]
+        result.value.splice(0, 0, element)
+    }
+    )
+    .catch(err => {
+        openNotification(err, 'error')
+    })
 }
 
 async function doRunTest(body: TestingRequestBody) {
     await backend.apiActionTestingPost(body, 1)
-        .then(
-            (response) => {
-                result.value.splice(0, 0, ...response.data)
-            }
-        )
-        .catch(err => {
-            openNotification(err, 'error')
-        })
+    .then(
+    (response) => {
+        result.value.splice(0, 0, ...response.data)
+    }
+    )
+    .catch(err => {
+        openNotification(err, 'error')
+    })
 }
 
 async function runTestWithCase() {
@@ -395,14 +402,14 @@ async function runTest(repeat: number) {
 
 async function listCase(refresh: boolean) {
     await backend.apiCaseGet(refresh).then(
-        (response) => {
-            caseList.value = response.data
-            console.log(caseList.value)
-        }
+    (response) => {
+        caseList.value = response.data
+        console.log(caseList.value)
+    }
     )
-        .catch(err => {
-            openNotification(err, 'error')
-        })
+    .catch(err => {
+        openNotification(err, 'error')
+    })
 }
 
 async function getCase(id: string) {
@@ -410,9 +417,9 @@ async function getCase(id: string) {
         console.log(response.data)
         config.value = response.data
     })
-        .catch(err => {
-            openNotification(err, 'error')
-        })
+    .catch(err => {
+        openNotification(err, 'error')
+    })
 }
 
 function selectArg(key: string, value: string) {
@@ -422,7 +429,7 @@ function selectArg(key: string, value: string) {
             return
         }
     }
-    args.value.push({ key: key, value: value })
+    args.value.push({key: key, value: value})
 }
 
 </script>
