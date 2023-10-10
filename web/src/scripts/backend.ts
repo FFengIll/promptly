@@ -1,5 +1,5 @@
-import type { Argument, Message } from "sdk/models";
-import * as defaultApi from "../../sdk/apis/default-api";
+import type { Argument, Message } from "@/sdk/models";
+import * as defaultApi from "@/sdk/api";
 import { format } from "./template";
 
 

@@ -4,7 +4,10 @@
     "env.d.ts",
     "src/**/*",
     "src/**/*.vue",
-    "src/stores"
+    "src/stores",
+    "src/sdk/apis/*.ts",
+    "src/sdk/models/*.ts",
+    "src/sdk/*.ts"
   ],
   "exclude": [
     "src/**/__tests__/*"

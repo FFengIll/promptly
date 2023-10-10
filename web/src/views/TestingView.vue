@@ -174,13 +174,13 @@ import {backend} from '@/scripts/backend';
 import {openNotification} from '@/scripts/notice';
 import {useConfigStore} from '@/stores/global-config';
 import type {
-    ArgumentOutput as Argument,
+    Argument,
     ArgumentSetting,
-    MessageOutput as Message,
+    Message,
     Prompt,
     TestingRequestBody,
     UpdatePromptBody
-} from 'sdk/models';
+} from '@/sdk/models';
 import {useRoute} from 'vue-router';
 
 const r = useRoute()

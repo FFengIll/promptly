@@ -5,7 +5,7 @@ import { CloseOutlined, DownOutlined, PlusOutlined, UpOutlined } from "@ant-desi
 import { useClipboard } from '@vueuse/core';
 import { useRouter } from 'vue-router';
 
-import type { Message } from "../../sdk";
+import type { Message } from "@/sdk/models";
 
 
 const { text, copy, copied, isSupported } = useClipboard({})

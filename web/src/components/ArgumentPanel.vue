@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { Argument, ArgumentSetting } from 'sdk/models';
+import type { Argument, ArgumentSetting } from '@/sdk/models';
 
 export interface Props {
     setting: ArgumentSetting,

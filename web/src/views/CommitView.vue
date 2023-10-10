@@ -4,7 +4,7 @@ import router from "@/router";
 import { backend, BackendHelper } from "@/scripts/backend";
 import { RouteHelper } from "@/scripts/router";
 
-import type { ArgumentSetting, CommitItem, UpdatePromptBody } from "sdk/models";
+import type { ArgumentSetting, CommitItem, UpdatePromptBody } from "@/sdk/models";
 import { onMounted, ref } from "vue";
 import { useRoute } from 'vue-router';
 
@@ -15,7 +15,7 @@ import { defaultLLM } from "@/scripts/llm";
 import { openNotification } from "@/scripts/notice";
 import { useConfigStore } from "@/stores/global-config";
 import VueMarkdown from "vue-markdown-render";
-import type { Argument } from "../../sdk/models";
+import type { Argument } from "@/sdk/models";
 
 //
 const store = useConfigStore()

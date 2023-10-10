@@ -1,15 +1,13 @@
-import { useLocalStorage } from '@vueuse/core';
-import { defineStore } from 'pinia';
-import type { ArgumentOutput as Argument, ArgumentSetting } from '../../sdk/models';
+import {useLocalStorage} from '@vueuse/core';
+import {defineStore} from 'pinia';
+import type {Argument, ArgumentSetting} from '@/sdk/models';
 
 export const useConfigStore = defineStore('config', {
     getters: {},
 
     state: () => ({
         globalArgs: useLocalStorage('args',
-            <ArgumentSetting>{
-
-            }
+            <ArgumentSetting>{}
         ),
     })
     ,
@@ -17,7 +15,7 @@ export const useConfigStore = defineStore('config', {
         updateArgs(args: Argument[]) {
             this.$patch(
                 {
-                    globalArgs: { args: args }
+                    globalArgs: {args: args}
                 }
             )
         },

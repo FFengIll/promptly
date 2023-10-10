@@ -1,4 +1,4 @@
-import type { Argument } from "sdk/models"
+import type { Argument } from "@/sdk/models"
 
 export class ArgumentHelper {
     static toArgumentList(args: Map<string, string>) {

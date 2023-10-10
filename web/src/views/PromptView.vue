@@ -230,7 +230,7 @@ import { openNotification } from "@/scripts/notice";
 import { RouteHelper } from '@/scripts/router';
 import { useConfigStore } from "@/stores/global-config";
 import VueMarkdown from 'vue-markdown-render';
-import type { ArgRequest, ArgumentOutput as Argument, ArgumentSetting, MessageOutput as Message, NewCommitBody, Prompt, UpdatePromptBody } from "../../sdk";
+import type { ArgRequest, Argument, ArgumentSetting, Message, NewCommitBody, Prompt, UpdatePromptBody } from "src/sdk";
 import PromptCard from '../components/PromptCard.vue';
 
 const store = useConfigStore()
