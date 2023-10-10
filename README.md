@@ -21,14 +21,24 @@ LLM api token is sensitive, so we only put a separate file for it.
 # create and writhe this file for LLM api url and key
 vim promptly/config.py
 
-# with bellow content, use your own url and key
+# with bellow content; use your own url and key
 key = "fake_cq5gn6rkyjgom6ocpeevuhjn7x8phaly"
 url = "http://localhost:8080/api/v1"
+
+# or run export to set env; use your own url and key
+export LLM_KEY="fake_cq5gn6rkyjgom6ocpeevuhjn7x8phaly"
+export LLM_API="http://localhost:8080/api/v1"
 ```
 
 By default, promptly use `gpt-3.5-turbo` (the latest).
 
 Some other LLM is hardcode in `web/src/scripts/llm.ts`, you may edit it for your own.
+
+If you can not access LLM service, config your proxy first.
+e.g.
+```shell
+export ALL_PROXY="socks5h://0.0.0.0:10888"
+```
 
 # run
 
