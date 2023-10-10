@@ -42,8 +42,14 @@ tasks:
     dir: "{{.ROOT_DIR}}"
     cmds:
       - mkdir -p ./data/mongodb
-      - docker stop promptly-mongo || docker container remove promptly-mongo || echo "done"
+      - task: db-stop
       - task: db-init
+  
+  db-stop:
+    desc: "stop db via docker"
+    dir: "{{.ROOT_DIR}}"
+    cmds:
+      - docker stop promptly-mongo || docker container remove promptly-mongo || echo "done"
   
   db:
     desc: "start db via docker"
@@ -56,6 +62,13 @@ tasks:
       - |
         docker exec -it promptly-mongo \
         mongodump --db promptly --out /data/db/backup/
+    
+  db-cleanup:
+    desc: "clear db journal"
+    dir: "{{.ROOT_DIR}}"
+    cmds:
+      - task: db-stop
+      - rm -rf ./data/mongodb/journal
   
   gen:
     desc: "generate sdk via swagger"
