@@ -7,14 +7,13 @@
 <template>
     <a-card title="Project List">
         <a-space direction="horizontal">
-            <a-input v-model:value="newGroup" placeholder="input group" size="large">
+            <a-input v-model:value="newGroup" placeholder="group name" size="large">
             </a-input>
-            <a-input v-model:value="newName" placeholder="input name" size="large">
+            <a-input v-model:value="newName" placeholder="prompt name" size="large">
             </a-input>
             <a-button @click="create_profile(newGroup, newName)">
                 Create
             </a-button>
-
 
 
             <a-button @click="fetchList(true)">
@@ -29,12 +28,24 @@
         <a-divider></a-divider>
 
 
-
         <a-card v-for="(values, key) in group" :title="key || '[default]'">
 
+            <a-space direction="horizontal">
+
+                <a-input v-model:value="newName" placeholder="prompt name" size="large">
+                </a-input>
+                <a-button @click="create_profile(key, newName)">
+                    Create In Group
+                </a-button>
+            </a-space>
+
+            <a-divider></a-divider>
             <a-modal v-model:open="open" title="Rename" @ok="handleOk">
                 source name: <p>{{ sourceKey }}</p>
-                target name: <p><a-input v-model:value="targetKey"></a-input></p>
+                target name:
+                <p>
+                    <a-input v-model:value="targetKey"></a-input>
+                </p>
             </a-modal>
 
             <a-list :data-source="values.sort()" size="small" :grid="{ gutter: 16, column: 3 }">
@@ -43,7 +54,7 @@
                         <a-space>
                             <a-button type="primary" @click="showModal(item)">
                                 <template #icon>
-                                    <EditFilled />
+                                    <EditFilled/>
                                 </template>
                             </a-button>
 
@@ -64,10 +75,10 @@
 <script lang="ts" setup>
 import router from "@/router";
 
-import { backend } from "@/scripts/backend";
+import {backend} from "@/scripts/backend";
 
-import { EditFilled, SyncOutlined } from "@ant-design/icons-vue";
-import { onMounted, ref } from 'vue';
+import {EditFilled, SyncOutlined} from "@ant-design/icons-vue";
+import {onMounted, ref} from 'vue';
 
 
 // field
@@ -95,16 +106,14 @@ const handleOk = (e: MouseEvent) => {
 };
 
 
-
-
 const newName = ref<string>("")
 const newGroup = ref<string>("")
 
 // created
 onMounted(
-    () => {
-        fetchList(false)
-    }
+() => {
+    fetchList(false)
+}
 )
 
 
@@ -114,22 +123,22 @@ function openPrompt(key: string) {
 
 
 async function create_profile(group: string, name: string) {
-    await backend.apiPromptPost({ group: group }, name)
+    await backend.apiPromptPost({group: group}, name)
     fetchList(true)
 }
 
 
 async function fetchList(refresh: boolean) {
     return backend.apiPromptGet(refresh).then(
-        response => {
-            group.value = response.data['data']
-            console.log(response.data)
-            return response.data
-        }
+    response => {
+        group.value = response.data['data']
+        console.log(response.data)
+        return response.data
+    }
     ).catch(
-        error => {
-            console.error(error)
-        }
+    error => {
+        console.error(error)
+    }
     )
 }
 
