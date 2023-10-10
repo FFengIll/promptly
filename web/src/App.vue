@@ -1,36 +1,40 @@
 <script setup lang="ts">
-import { onMounted, ref } from "vue";
-import { RouterView, useRouter } from 'vue-router';
+import {onMounted, ref} from "vue";
+import {RouterView, useRoute, useRouter} from 'vue-router';
 
-import { MenuFoldOutlined, MenuUnfoldOutlined } from "@ant-design/icons-vue";
-import { backend } from "./scripts/backend";
-import { useConfigStore } from "./stores/global-config";
+import {MenuFoldOutlined, MenuUnfoldOutlined} from "@ant-design/icons-vue";
+import {backend} from "./scripts/backend";
+import {useConfigStore} from "./stores/global-config";
 
 
 const router = useRouter()
+const r = useRoute()
 
 const collapsed = ref(false)
 
 const store = useConfigStore()
 
 onMounted(
-    () => {
-        backend.apiGlobalArgsGet()
-            .then((res) => {
-                store.updateArgs(res.data.args ?? [])
-            })
+() => {
+    backend.apiGlobalArgsGet()
+    .then((res) => {
+        store.updateArgs(res.data.args ?? [])
+    })
 
-    }
+}
 )
 
-function routerTo(key: string) {
-    let path = `/view/${key}`
-    if (['prompt', 'commit'].indexOf(key) >= 0) {
-        let source = store.source.name
-        path = `${path}/${source}`
-    } else {
-
+function routerTo(view: string) {
+    const key = r.params.key;
+    let path = `/view/${view}`
+    console.log(view)
+    if (view != 'index') {
+        if (key && key.length > 0) {
+            console.log(router.currentRoute)
+            path = `${path}/${key}`
+        }
     }
+
     router.push(path)
 }
 
@@ -39,7 +43,7 @@ function routerTo(key: string) {
 <template>
     <a-layout theme="light">
         <a-layout-sider v-model:collapsed="collapsed" :trigger="null" collapsible>
-            <div class="logo" />
+            <div class="logo"/>
 
             <a-menu theme="dark" @click="(e) => routerTo(e.key)" mode="inline" :style="{ lineHeight: '64px' }">
                 <a-menu-item key="index">Index</a-menu-item>
@@ -52,13 +56,13 @@ function routerTo(key: string) {
 
         <a-layout>
             <a-layout-header style="background: #fff; padding: 0">
-                <menu-unfold-outlined v-if="collapsed" class="trigger" @click="() => (collapsed = !collapsed)" />
-                <menu-fold-outlined v-else class="trigger" @click="() => (collapsed = !collapsed)" />
+                <menu-unfold-outlined v-if="collapsed" class="trigger" @click="() => (collapsed = !collapsed)"/>
+                <menu-fold-outlined v-else class="trigger" @click="() => (collapsed = !collapsed)"/>
 
             </a-layout-header>
 
             <a-layout-content :style="{ margin: '24px 16px', padding: '24px', background: '#fff', minHeight: '280px' }">
-                <RouterView />
+                <RouterView/>
             </a-layout-content>
         </a-layout>
         <!-- <a-layout-footer :style="footerStyle">Footer</a-layout-footer> -->
