@@ -11,8 +11,8 @@
  * https://github.com/swagger-api/swagger-codegen.git
  * Do not edit the class manually.
  */
-import { ArgumentInput } from './argument-input';
-import { MessageInput } from './message-input';
+import { Argument } from './argument';
+import { Message } from './message';
 /**
  * 
  * @export
@@ -21,10 +21,10 @@ import { MessageInput } from './message-input';
 export interface UpdatePromptBody {
     /**
      * 
-     * @type {Array<MessageInput>}
+     * @type {Array<Message>}
      * @memberof UpdatePromptBody
      */
-    messages?: Array<MessageInput>;
+    messages?: Array<Message>;
     /**
      * 
      * @type {string}
@@ -33,10 +33,10 @@ export interface UpdatePromptBody {
     model?: string;
     /**
      * 
-     * @type {Array<ArgumentInput>}
+     * @type {Array<Argument>}
      * @memberof UpdatePromptBody
      */
-    args?: Array<ArgumentInput>;
+    args?: Array<Argument>;
     /**
      * 
      * @type {string}

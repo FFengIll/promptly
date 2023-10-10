@@ -14,25 +14,31 @@
 /**
  * 
  * @export
- * @interface ArgumentOutput
+ * @interface TestCase
  */
-export interface ArgumentOutput {
+export interface TestCase {
+    /**
+     * 
+     * @type {number}
+     * @memberof TestCase
+     */
+    id?: number;
     /**
      * 
      * @type {string}
-     * @memberof ArgumentOutput
+     * @memberof TestCase
      */
-    key: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof ArgumentOutput
-     */
-    value: string;
+    name: string;
     /**
      * 
      * @type {Array<string>}
-     * @memberof ArgumentOutput
+     * @memberof TestCase
      */
-    candidates: Array<string>;
+    data?: Array<string>;
+    /**
+     * 
+     * @type {string}
+     * @memberof TestCase
+     */
+    description?: string;
 }

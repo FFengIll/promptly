@@ -11,8 +11,8 @@
  * https://github.com/swagger-api/swagger-codegen.git
  * Do not edit the class manually.
  */
-import { ArgumentOutput } from './argument-output';
-import { MessageOutput } from './message-output';
+import { Argument } from './argument';
+import { Message } from './message';
 /**
  * 
  * @export
@@ -30,47 +30,47 @@ export interface Prompt {
      * @type {string}
      * @memberof Prompt
      */
-    model: string;
+    model?: string;
     /**
      * 
      * @type {string}
      * @memberof Prompt
      */
-    defaultModel: string;
+    defaultModel?: string;
     /**
      * 
-     * @type {Array<MessageOutput>}
+     * @type {Array<Message>}
      * @memberof Prompt
      */
-    messages: Array<MessageOutput>;
+    messages: Array<Message>;
     /**
      * 
      * @type {Array<string>}
      * @memberof Prompt
      */
-    history: Array<string>;
+    history?: Array<string>;
     /**
      * 
-     * @type {Array<ArgumentOutput>}
+     * @type {Array<Argument>}
      * @memberof Prompt
      */
-    args: Array<ArgumentOutput>;
+    args?: Array<Argument>;
     /**
      * 
      * @type {string}
      * @memberof Prompt
      */
-    group: string;
+    group?: string;
     /**
      * 
      * @type {Array<string>}
      * @memberof Prompt
      */
-    plugins: Array<string>;
+    plugins?: Array<string>;
     /**
      * 
      * @type {Array<string>}
      * @memberof Prompt
      */
-    docs: Array<string>;
+    docs?: Array<string>;
 }

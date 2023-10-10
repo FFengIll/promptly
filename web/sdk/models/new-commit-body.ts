@@ -11,7 +11,7 @@
  * https://github.com/swagger-api/swagger-codegen.git
  * Do not edit the class manually.
  */
-import { CommitItemInput } from './commit-item-input';
+import { CommitItem } from './commit-item';
 /**
  * 
  * @export
@@ -20,10 +20,10 @@ import { CommitItemInput } from './commit-item-input';
 export interface NewCommitBody {
     /**
      * 
-     * @type {CommitItemInput}
+     * @type {CommitItem}
      * @memberof NewCommitBody
      */
-    commit: CommitItemInput;
+    commit: CommitItem;
     /**
      * 
      * @type {string}

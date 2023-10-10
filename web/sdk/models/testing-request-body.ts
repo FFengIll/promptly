@@ -11,8 +11,8 @@
  * https://github.com/swagger-api/swagger-codegen.git
  * Do not edit the class manually.
  */
-import { ArgumentInput } from './argument-input';
-import { MessageInput } from './message-input';
+import { Argument } from './argument';
+import { Message } from './message';
 /**
  * 
  * @export
@@ -27,10 +27,10 @@ export interface TestingRequestBody {
     sources: Array<string>;
     /**
      * 
-     * @type {Array<MessageInput>}
+     * @type {Array<Message>}
      * @memberof TestingRequestBody
      */
-    messages: Array<MessageInput>;
+    messages: Array<Message>;
     /**
      * 
      * @type {string}
@@ -39,10 +39,10 @@ export interface TestingRequestBody {
     argKey: string;
     /**
      * 
-     * @type {Array<ArgumentInput>}
+     * @type {Array<Argument>}
      * @memberof TestingRequestBody
      */
-    args: Array<ArgumentInput>;
+    args: Array<Argument>;
     /**
      * 
      * @type {string}
