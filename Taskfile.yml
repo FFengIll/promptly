@@ -61,10 +61,10 @@ tasks:
     desc: "generate sdk via swagger"
     dir: "{{.ROOT_DIR}}"
     cmds:
-      - rm -rf ./web/sdk
+      - rm -rf ./web/src/sdk
       - python bin/swagger.py
-      - swagger-codegen generate -i ./data/swagger.json -l typescript-axios -o ./web/sdk
-      - git add ./web/sdk
+      - swagger-codegen generate -i ./data/swagger.json -l typescript-axios -o ./web/src/sdk
+      - git add ./web/src/sdk
   
   dist:
     desc: "build for dist"
