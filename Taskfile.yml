@@ -21,7 +21,20 @@ tasks:
     desc: "install deps for the project"
     dir: "{{.ROOT_DIR}}"
     cmds:
-      - cd web; pnpm install
+      - task: install-node
+      - task: install-python
+  
+  install-node:
+    desc: "install node deps for the project"
+    dir: "{{.ROOT_DIR}}/web"
+    cmds:
+      - pnpm install
+
+  install-python:
+    desc: "install python deps for the project"
+    dir: "{{.ROOT_DIR}}"
+    cmds:
+      # - python -m pip install -U pip
       - pip install poetry
       - poetry install
   
@@ -30,31 +43,29 @@ tasks:
     cmds:
       - black .
   
-  db-init:
+  db-start:
     desc: "create db via docker"
     dir: "{{.ROOT_DIR}}"
     cmds:
       - mkdir -p ./data/mongodb
-      - docker run --name promptly-mongo -p 27017:27017 -p 8001:8001 -v ./data/mongodb:/data/db -d mongo
+      - docker run --name promptly-mongo -p 27017:27017 -p 8001:8001 -v ./data/mongodb:/data/db -d mongo || echo "done"
+      - docker start promptly-mongo
   
   db-restart:
     desc: "resest db via docker"
     dir: "{{.ROOT_DIR}}"
     cmds:
-      - mkdir -p ./data/mongodb
       - task: db-stop
-      - task: db-init
+      - task: db-start
   
   db-stop:
     desc: "stop db via docker"
     dir: "{{.ROOT_DIR}}"
     cmds:
-      - docker stop promptly-mongo || docker container remove promptly-mongo || echo "done"
+      - docker stop promptly-mongo || echo "done"
+      - docker container remove promptly-mongo || echo "done"
   
-  db:
-    desc: "start db via docker"
-    cmds:
-      - docker start promptly-mongo
+
   
   db-backup:
     desc: "backup db via docker"
@@ -100,13 +111,13 @@ tasks:
     aliases:
       - "py"
     cmds:
-      - task: db
-      - uvicorn bin.main:app --reload
+      - task: db-start
+      - uvicorn bin.main:app --reload --port 8000
   
   run:
     desc: run server without reload
     dir: "{{.ROOT_DIR}}"
     cmds:
-      - task: db
+      - task: db-start
       - uvicorn bin.main:app
       
