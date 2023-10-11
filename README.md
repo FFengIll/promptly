@@ -45,7 +45,19 @@ e.g.
 export ALL_PROXY="socks5h://0.0.0.0:10888"
 ```
 
-# run
+# run in docker
+run bellow
+
+```sh
+# start db
+task db-start
+
+# start promptly
+```
+
+> visit `localhost:8000` to use.
+
+# build to run
 
 - task install
 - task build
