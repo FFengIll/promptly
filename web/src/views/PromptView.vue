@@ -167,10 +167,10 @@
                             <a-button @click="chat">Request</a-button>
                             <a-button @click="doCommit">Commit</a-button>
                         </a-space>
-                        <a-space direction="horizontal">
-                            <a-button @click="gotoTesting">Goto Testing</a-button>
-                            <a-button @click="gotoCommit">Goto Commit</a-button>
-                        </a-space>
+                        <!--<a-space direction="horizontal">-->
+                            <!--<a-button @click="gotoTesting">Goto Testing</a-button>-->
+                            <!--<a-button @click="gotoCommit">Goto Commit</a-button>-->
+                        <!--</a-space>-->
 
                     </a-space>
                 </a-card>
