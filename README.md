@@ -9,7 +9,7 @@ The prompt engineering tools.
 - typescript: 
   - use vuejs v3 for front
 - build tools: taskfile, poetry, pnpm
-  - `brew install go-task node`
+  - `brew install go-task node swagger-codegen`
   - `pip install poetry`
     - if it is too slow, try `pip config set global.index-url https://pypi.tuna.tsinghua.edu.cn/simple`
   - `npm install -g pnpm`
