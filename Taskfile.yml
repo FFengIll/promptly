@@ -117,4 +117,4 @@ tasks:
     dir: "{{.ROOT_DIR}}"
     cmds:
       - task: db-start
-      - poetry run uvicorn bin.main:app
+      - poetry run python bin/main.py
