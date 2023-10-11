@@ -118,15 +118,3 @@ tasks:
     cmds:
       - task: db-start
       - poetry run uvicorn bin.main:app
-    
-  docker-build:
-    cmds:
-      - docker build -t promptly .
-
-  docker-run:
-    cmds:
-      - task: db-start
-      - |
-        docker run -it --rm --link promptly-mongo -p 8000:8000 --entrypoint sh chatxim/chatx:promptly \
-        -c \
-        "poetry run python bin/main.py --host "0.0.0.0" --db mongodb://promptly-mongo:27017/"
