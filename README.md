@@ -11,7 +11,9 @@ The prompt engineering tools.
 - build tools: taskfile, poetry, pnpm
   - `brew install go-task node`
   - `pip install poetry`
+    - if it is too slow, try `pip config set global.index-url https://pypi.tuna.tsinghua.edu.cn/simple`
   - `npm install -g pnpm`
+    - if it is too slow, try `npm config set registry https://registry.npmmirror.com`
 - db: mongodb
 - env: docker
   - install docker desktop: https://www.docker.com/products/docker-desktop/
