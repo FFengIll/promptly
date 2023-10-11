@@ -7,7 +7,7 @@ The prompt engineering tools.
 - python: fastapi
 - typescript: vuejs v3
 - build: taskfile, poetry, pnpm
-  - `brew install go-task`
+  - `brew install go-task node`
   - `pip install poetry`
   - `npm install -g pnpm`
 - db: mongodb
