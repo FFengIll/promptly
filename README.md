@@ -2,11 +2,19 @@
 
 The prompt engineering tools.
 
+# features
+
+- build a prompt.
+- run a prompt (with available model service).
+- using arguments for prompt.
+- commit prompt into commit repository to save a snapshot.
+- testing a prompt (with loop or cases).
+
 # deps
 
 - python: 3.8 and above
   - use fastapi for backend
-- typescript: 
+- typescript:
   - use vuejs v3 for front
 - build tools: taskfile, poetry, pnpm
   - `brew install go-task node swagger-codegen`
@@ -20,8 +28,42 @@ The prompt engineering tools.
   - use image container for db
 - ~~(DEPRECATED) gui: pysimplegui~~
 
+# run
+
+## run in docker
+
+run bellow
+
+```sh
+# start db
+task db-start
+
+# start promptly
+...
+```
+
+> visit `localhost:8000` to use.
+
+## build to run
+
+- task install
+- task dist
+- task run
+
+> task is coming from `Taskfile`, you must install `task`.
+> see [Taskfile](https://taskfile.dev/) for more details.
+> see [Install](https://taskfile.dev/installation/) to install `task`.
+
+## build to dev
+
+- task install
+- task dev
+- task run
+
 # config
+
 LLM api token is sensitive, so we only put a separate file for it.
+
 ```sh
 # create and writhe this file for LLM api url and key
 vim promptly/config.py
@@ -41,36 +83,7 @@ Some other LLM is hardcode in `web/src/scripts/llm.ts`, you may edit it for your
 
 If you can not access LLM service, config your proxy first.
 e.g.
+
 ```shell
 export ALL_PROXY="socks5h://0.0.0.0:10888"
 ```
-
-# run in docker
-run bellow
-
-```sh
-# start db
-task db-start
-
-# start promptly
-```
-
-> visit `localhost:8000` to use.
-
-# build to run
-
-- task install
-- task build
-- task run
-
-> task is coming from `Taskfile`, you must install `task`.
-> see [Taskfile](https://taskfile.dev/) for more details.
-> see [Install](https://taskfile.dev/installation/) to install `task`.
-
-# features
-
-- build a prompt.
-- run a prompt (with available model service).
-- using arguments for prompt.
-- commit prompt into commit repository to save a snapshot.
-- testing a prompt (with loop or cases).
