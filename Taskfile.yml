@@ -11,7 +11,7 @@ tasks:
       - echo "{{.GREETING}}"
     silent: true
   
-  build:
+  dev:
     cmds:
       - task: black
       - task: gen
