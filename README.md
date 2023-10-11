@@ -18,8 +18,8 @@ The prompt engineering tools.
   - use vuejs v3 for front
 - build tools: taskfile, poetry, pnpm
   - `brew install go-task node swagger-codegen`
-  - `pip install poetry`
-    - if it is too slow, try `pip config set global.index-url https://pypi.tuna.tsinghua.edu.cn/simple`
+  - `pip3 install poetry`
+    - if it is too slow, try `pip3 config set global.index-url https://pypi.tuna.tsinghua.edu.cn/simple`
   - `npm install -g pnpm`
     - if it is too slow, try `npm config set registry https://registry.npmmirror.com`
 - db: mongodb
