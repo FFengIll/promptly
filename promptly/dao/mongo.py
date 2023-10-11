@@ -11,7 +11,6 @@ from promptly.model.testcase import TestCase
 
 url = "mongodb://127.0.0.1:27017/"
 
-client = MongoClient(url, timeoutMS=1000)
 log = loguru.logger
 
 
@@ -29,6 +28,8 @@ class MongoManager:
 
     @staticmethod
     def default():
+        log.info("mongodb url: {}", url)
+        client = MongoClient(url, timeoutMS=1000)
         return MongoManager(client)
 
     def reload(self):
