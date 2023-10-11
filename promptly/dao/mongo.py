@@ -6,10 +6,10 @@ from pydantic_mongo import AbstractRepository
 from pymongo import MongoClient
 from pymongo.collection import Collection
 
-from promptly.model.testcase import TestCase
 from promptly.model.prompt import Argument, ArgumentSetting, CommitItem, Prompt
+from promptly.model.testcase import TestCase
 
-url = "mongodb://localhost:27017/"
+url = "mongodb://127.0.0.1:27017/"
 
 client = MongoClient(url, timeoutMS=1000)
 log = loguru.logger
