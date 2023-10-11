@@ -34,8 +34,8 @@ tasks:
     desc: "install python deps for the project"
     dir: "{{.ROOT_DIR}}"
     cmds:
-      # - python -m pip install -U pip
-      - pip install poetry
+      # - python3 -m pip install -U pip
+      - pip3 install poetry
       - poetry install
   
   black:
@@ -65,8 +65,6 @@ tasks:
       - docker stop promptly-mongo || echo "done"
       - docker container remove promptly-mongo || echo "done"
   
-
-  
   db-backup:
     desc: "backup db via docker"
     cmds:
@@ -86,7 +84,7 @@ tasks:
     dir: "{{.ROOT_DIR}}"
     cmds:
       - rm -rf ./web/src/sdk
-      - python bin/swagger.py
+      - poetry run python bin/swagger.py
       - swagger-codegen generate -i ./data/swagger.json -l typescript-axios -o ./web/src/sdk
       - git add ./web/src/sdk
   
@@ -119,5 +117,16 @@ tasks:
     dir: "{{.ROOT_DIR}}"
     cmds:
       - task: db-start
-      - uvicorn bin.main:app
-      
+      - poetry run uvicorn bin.main:app
+    
+  docker-build:
+    cmds:
+      - docker build -t promptly .
+
+  docker-run:
+    cmds:
+      - task: db-start
+      - |
+        docker run -it --rm --link promptly-mongo -p 8000:8000 --entrypoint sh chatxim/chatx:promptly \
+        -c \
+        "poetry run python bin/main.py --host "0.0.0.0" --db mongodb://promptly-mongo:27017/"
