@@ -112,7 +112,7 @@ tasks:
       - "py"
     cmds:
       - task: db-start
-      - uvicorn bin.main:app --reload --port 8000
+      - poetry run uvicorn bin.main:app --reload --port 8000
   
   run:
     desc: run server without reload
