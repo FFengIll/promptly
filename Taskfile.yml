@@ -92,7 +92,7 @@ tasks:
     desc: "build for dist"
     dir: "{{.ROOT_DIR}}/web"
     cmds:
-      - pnpm run build-only
+      - pnpm run build-only -m prod
   
   front:
     desc: start front for dev
