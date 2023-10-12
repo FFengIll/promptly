@@ -24,8 +24,8 @@ typer = "^0.9.0"
 
 [[tool.poetry.source]]
 # 国内建议修改源
-name = "tsinghua"
-url = "https://pypi.tuna.tsinghua.edu.cn/simple"
+name = "aliyun"
+url = "https://mirrors.aliyun.com/pypi/simple/"
 priority = "default"
 
 
