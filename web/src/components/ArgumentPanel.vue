@@ -111,10 +111,8 @@ function getSelect(key: string) {
 
         </a-list-item>
 
-
     </a-list>
 
-    <a-divider></a-divider>
 </template>
 
 <style scoped></style>
