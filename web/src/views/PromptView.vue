@@ -9,11 +9,18 @@
 
 <template>
     <div>
-        <a-typography-title>{{ key }}</a-typography-title>
+        <a-space align="center">
+            <a-typography-title>{{ key }}</a-typography-title>
+            <a-button @click="reload">
+                <template #icon>
+                    <SyncOutlined />
+                </template>
+            </a-button>
+        </a-space>
         <a-row :gutter='6'>
             <a-col class="gutter-row" :span="12">
 
-                <a-collapse>
+                <!-- <a-collapse>
                     <a-collapse-panel header="History">
                         <a-space direction="horizontal" align="baseline" v-for="h in prompt.history">
                             <a-button @click="copy(h)">
@@ -27,94 +34,15 @@
 
                         </a-space>
                     </a-collapse-panel>
-                </a-collapse>
+                </a-collapse> -->
 
-                <a-card title="Argument">
-
-                    <template #extra>
-                        <a-button @click="fetchArgument(key)">
-                            <template #icon>
-                                <SyncOutlined />
-                            </template>
-                        </a-button>
-                    </template>
-
-
-
-                    <ArgumentPanel :setting="argSetting" :args="args" @select=selectArg>
-                        <template #extra>
-                            <a-space direction="horizontal">
-                                <a-select ref="select" v-model:value="argKey" style="width: 120px" show-search>
-                                    <a-select-option v-for="k in args" :key="k.key">{{ k.key }}</a-select-option>
-                                </a-select>
-
-                                <a-input v-model:value="argKey">
-                                </a-input>
-
-                                <a-input v-model:value="argValue">
-                                </a-input>
-
-                                <a-button @click="newArg()">
-                                    <template #icon>
-                                        <PlusOutlined />
-                                    </template>
-                                    New
-                                </a-button>
-                            </a-space>
-
-                        </template>
-                    </ArgumentPanel>
-
-
-                    <ArgumentPanel :setting="store.globalArgs" :args="args" @select=selectArg>
-                    </ArgumentPanel>
-
-                </a-card>
-
-                <a-divider></a-divider>
-
-                <a-card title="Model">
-
-
-                    <template #extra>
-                        <ModelSelect :model="model" :defaultModel="(() => { return prompt.defaultModel })()"
-                            v-on:select="(value) => { model = value }" v-on:default="(value) => updateDefaultModel(value)"
-                            style="width: 200px">
-
-                        </ModelSelect>
-                        <a-button @click="fetchArgument(key)">
-                            <template #icon>
-                                <SyncOutlined />
-                            </template>
-                        </a-button>
-                    </template>
-
-                    <a-divider></a-divider>
-
-                    <a-checkbox v-model:checked="withEmbed" @change="(e) => {
-                        if (e.target.checked) {
-                            let idx = prompt.plugins!!.findIndex(it => { return it == 'embed' })
-                            if (idx >= 0) {
-                                return
-                            }
-                            prompt.plugins!!.push('embed')
-                        }
-                    }">Use Embed</a-checkbox>
-                </a-card>
-
-                <a-divider></a-divider>
 
                 <a-card title="Prompt">
                     <template #extra>
-                        <a-button @click="reload">
 
-                            <template #icon>
+                        <!-- <template #icon>
                                 <SyncOutlined />
-                            </template>
-                        </a-button>
-                    </template>
-
-                    <a-row justify="end">
+                            </template> -->
                         <a-button
                             @click="() => { copy(JSON.stringify({ name: key, prompt: prompt.messages.filter((item: Message) => { return item.enable }) }, null, 2)) }">
                             Copy To JSON
@@ -125,7 +53,8 @@
                         <a-button @click="() => { prompt.messages.forEach((item) => item.enable = true) }">Enable
                             All
                         </a-button>
-                    </a-row>
+                    </template>
+
 
                     <a-row justify="space-around">
                         <PromptInput :messages="prompt.messages" with-copy with-control
@@ -153,46 +82,127 @@
             <a-col class="gutter-row" :span="12">
 
 
-                <a-collapse>
+                <a-card title="Preference">
 
-                    <a-collapse-panel header="Prompt Preview">
-                        <PromptCard :messages="prompt.messages.filter((i) => i.enable)"></PromptCard>
-                    </a-collapse-panel>
-                </a-collapse>
+                    <a-list item-layout="horizontal">
+                        <a-list-item>
+                            Model
+                            <ModelSelect :model="model" :defaultModel="(() => { return prompt.defaultModel })()"
+                                v-on:select="(value) => { model = value }"
+                                v-on:default="(value) => updateDefaultModel(value)" style="width: 200px">
+                            </ModelSelect>
+                            <a-button @click="fetchArgument(key)">
+                                <template #icon>
+                                    <SyncOutlined />
+                                </template>
+                            </a-button>
+                        </a-list-item>
+
+                        <a-space>
+                            <ArgumentPanel :setting="store.globalArgs" :args="args" @select=selectArg>
+                            </ArgumentPanel>
+                        </a-space>
+
+                        <a-list-item>
+                            Use Embed
+                            <a-switch v-model:checked="withEmbed" @change="(e) => {
+                                if (e.target.checked) {
+                                    let idx = prompt.plugins!!.findIndex(it => { return it == 'embed' })
+                                    if (idx >= 0) {
+                                        return
+                                    }
+                                    prompt.plugins!!.push('embed')
+                                }
+                            }"></a-switch>
+
+                        </a-list-item>
+                    </a-list>
+
+                </a-card>
+
+
+                <a-card title="Argument">
+
+                    <template #extra>
+                        <a-button @click="fetchArgument(key)">
+                            <template #icon>
+                                <SyncOutlined />
+                            </template>
+                        </a-button>
+                    </template>
+
+
+
+                    <ArgumentPanel :setting="argSetting" :args="args" @select=selectArg>
+                        <template #extra>
+                            <a-space direction="horizontal">
+                                <a-select ref="select" v-model:value="argKey" style="width: 120px" show-search>
+                                    <a-select-option v-for="k in args" :key="k.key">{{ k.key }}</a-select-option>
+                                </a-select>
+
+                                <a-input v-model:value="argKey" placeholder="key">
+                                </a-input>
+
+                                <a-input v-model:value="argValue" placeholder="value">
+                                </a-input>
+
+                                <a-button @click="newArg()">
+                                    <template #icon>
+                                        <PlusOutlined />
+                                    </template>
+                                    New
+                                </a-button>
+                            </a-space>
+                            <a-divider></a-divider>
+
+                        </template>
+                    </ArgumentPanel>
+
+
+                </a-card>
 
 
                 <a-card title="Operation">
-                    <a-space direction="vertical">
-                        <a-space direction="horizontal">
-                            <a-button @click="chat">Request</a-button>
-                            <a-button @click="doCommit">Commit</a-button>
-                        </a-space>
-                        <!--<a-space direction="horizontal">-->
-                            <!--<a-button @click="gotoTesting">Goto Testing</a-button>-->
-                            <!--<a-button @click="gotoCommit">Goto Commit</a-button>-->
-                        <!--</a-space>-->
 
+                    <a-space direction="horizontal">
+                        <a-button @click="chat">Request</a-button>
+                        <a-button @click="doCommit">Commit</a-button>
                     </a-space>
+                    <!--<a-space direction="horizontal">-->
+                    <!--<a-button @click="gotoTesting">Goto Testing</a-button>-->
+                    <!--<a-button @click="gotoCommit">Goto Commit</a-button>-->
+                    <!--</a-space>-->
+
+
                 </a-card>
 
-                <a-card title="Corresponding Response">
+                <a-divider></a-divider>
+
+
+                <a-card title="Response">
+                    <template #extra>
+                        <a-space direction="horizontal">
+                            <a-button>Good</a-button>
+                            <a-button>Bad</a-button>
+                            <a-button @click="() => copy(response)">Copy</a-button>
+
+                        </a-space>
+
+                        <a-space>
+                            <a-button @click="responseToPrompt">Append to prompt</a-button>
+                        </a-space>
+
+                    </template>
                     <a-skeleton :loading="loading" active avatar>
                         <div>
-                            <a-space direction="horizontal">
-                                <a-button>Good</a-button>
-                                <a-button>Bad</a-button>
-                                <a-button @click="() => copy(response)">Copy</a-button>
+                            <a-collapse>
 
-                            </a-space>
-
-                            <a-divider type="vertical"></a-divider>
-
-                            <a-space>
-                                <a-button @click="responseToPrompt">Append to prompt</a-button>
-                            </a-space>
+                                <a-collapse-panel header="Prompt Preview">
+                                    <PromptCard :messages="prompt.messages.filter((i) => i.enable)"></PromptCard>
+                                </a-collapse-panel>
+                            </a-collapse>
 
                             <a-divider></a-divider>
-
 
                             <a-tabs v-model:activeKey="responseMode">
                                 <a-tab-pane key="1" tab="Markown"> <vue-markdown :source="response"
@@ -216,9 +226,9 @@
 </template>
 
 <script lang="ts" setup>
-import { CopyOutlined, PlusOutlined, SyncOutlined } from '@ant-design/icons-vue';
+import { PlusOutlined, SyncOutlined } from '@ant-design/icons-vue';
 import { useClipboard } from '@vueuse/core';
-import { onMounted, reactive, ref } from 'vue';
+import { onMounted, ref } from 'vue';
 
 import { useRoute } from 'vue-router';
 
@@ -229,8 +239,8 @@ import { backend, BackendHelper } from "@/scripts/backend";
 import { openNotification } from "@/scripts/notice";
 import { RouteHelper } from '@/scripts/router';
 import { useConfigStore } from "@/stores/global-config";
-import VueMarkdown from 'vue-markdown-render';
 import type { ArgRequest, Argument, ArgumentSetting, Message, NewCommitBody, Prompt, UpdatePromptBody } from "src/sdk";
+import VueMarkdown from 'vue-markdown-render';
 import PromptCard from '../components/PromptCard.vue';
 
 const store = useConfigStore()
