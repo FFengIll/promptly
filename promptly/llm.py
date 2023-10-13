@@ -35,7 +35,12 @@ async def chat(messages, model=""):
 
     log.info("response: {}", response)
 
-    res = response["choices"][0]["message"]["content"]
-    log.info("res:{}", res)
+    choice = response["choices"][0]
+    log.info("choice: {}", choice)
 
-    return res
+    try:
+        return choice["message"]["content"]
+    except Exception as e:
+        log.exception(e)
+
+    return choice["text"]
