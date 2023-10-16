@@ -116,12 +116,25 @@
                             }"></a-switch>
 
                         </a-list-item>
+
+                        <a-list-item>
+                            Temperature:
+                            <a-input-number style="width: 200px" :min="0" :max="2" :step="0.1"
+                                v-model:value="options.temperature" placeholder="key">
+                            </a-input-number>
+                        </a-list-item>
+                        <a-list-item>
+                            Top_P:
+                            <a-input-number style="width: 200px" :min="0" :max="2" :step="0.1" v-model:value="options.topP"
+                                placeholder="key">
+                            </a-input-number>
+                        </a-list-item>
                     </a-list>
 
                 </a-card>
 
 
-                <a-card title="Argument">
+                <a-card title="Message Replace">
 
                     <template #extra>
                         <a-button @click="fetchArgument(key)">
@@ -172,7 +185,6 @@
                     <!--<a-button @click="gotoTesting">Goto Testing</a-button>-->
                     <!--<a-button @click="gotoCommit">Goto Commit</a-button>-->
                     <!--</a-space>-->
-
 
                 </a-card>
 
@@ -239,7 +251,16 @@ import { backend, BackendHelper } from "@/scripts/backend";
 import { openNotification } from "@/scripts/notice";
 import { RouteHelper } from '@/scripts/router';
 import { useConfigStore } from "@/stores/global-config";
-import type { ArgRequest, Argument, ArgumentSetting, Message, NewCommitBody, Prompt, UpdatePromptBody } from "src/sdk";
+import type {
+    ArgRequest,
+    Argument,
+    ArgumentSetting,
+    LLMOption,
+    Message,
+    NewCommitBody,
+    Prompt,
+    UpdatePromptBody
+} from "src/sdk";
 import VueMarkdown from 'vue-markdown-render';
 import PromptCard from '../components/PromptCard.vue';
 
@@ -274,8 +295,7 @@ const argSetting = ref<ArgumentSetting>(
 )
 const args = ref<Argument[]>([])
 const prompt = ref<Prompt>(<Prompt>{})
-
-
+const options = ref<LLMOption>(<LLMOption>{})
 
 // created
 onMounted(
@@ -283,6 +303,8 @@ onMounted(
         fetchPrompt(key)
     }
 )
+
+
 
 function updateDefaultModel(model: string) {
     let body: UpdatePromptBody = <UpdatePromptBody>({ defaultModel: model })
@@ -436,11 +458,15 @@ async function fetchPrompt(name: string) {
             console.log(response.data)
             prompt.value = response.data;
 
-            model.value = prompt.value.model!!
-            console.log(model.value)
-
             args.value = prompt.value.args!!
             console.log(args.value)
+
+            options.value = prompt.value.options!!
+            console.log(options.value)
+
+            model.value = options.value.model!!
+            console.log(model.value)
+
 
             let idx = prompt.value.plugins?.findIndex(it => { return it == 'embed' })
             console.info(idx)
@@ -521,8 +547,8 @@ async function chatWithPrompt() {
     console.log(prompt.value.messages)
     let body: UpdatePromptBody = {
         messages: prompt.value.messages!!,
-        model: model.value,
         args: args.value,
+        options: options.value,
     }
     await backend.apiPromptNamePut(body, key).catch((err) => {
         console.log(err)
@@ -532,7 +558,7 @@ async function chatWithPrompt() {
     try {
         loading.value = true
         response.value = ''
-        await BackendHelper.doChat(model.value, prompt.value.messages, args.value)
+        await BackendHelper.doChat(options.value, prompt.value.messages, args.value)
             .then(
                 (res) => {
                     response.value = res.data;

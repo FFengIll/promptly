@@ -1,5 +1,5 @@
-import type { Argument, Message } from "@/sdk/models";
 import * as defaultApi from "@/sdk/api";
+import type { Argument, LLMOption, Message } from "@/sdk/models";
 import { format } from "./template";
 
 
@@ -20,16 +20,20 @@ export class BackendHelper {
         return another
     }
 
-    static async doChat(model: string, messages: Message[], args: Argument[],) {
+    static async doChat(options: LLMOption, messages: Message[], args: Argument[],) {
 
         console.log("origin message", messages)
         console.log("origin argument", args)
+        console.log("origin options", options)
 
         let enables = messages?.filter((item: Message) => item.enable)
 
-        let another = BackendHelper.replace(enables, args)
+        let another: Message[] = BackendHelper.replace(enables, args)
         console.log("will chat with messages", another)
 
-        return backend.apiActionChatPost(another, model)
+        return backend.apiActionChatPost({
+            messages: another,
+            options: options
+        })
     }
 }
