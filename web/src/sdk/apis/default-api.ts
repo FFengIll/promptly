@@ -18,10 +18,10 @@ import { Configuration } from '../configuration';
 import { BASE_PATH, COLLECTION_FORMATS, RequestArgs, BaseAPI, RequiredError } from '../base';
 import { ArgRequest } from '../models';
 import { ArgumentSetting } from '../models';
+import { ChatBody } from '../models';
 import { CommitItem } from '../models';
 import { HTTPValidationError } from '../models';
 import { ListPromptResponse } from '../models';
-import { Message } from '../models';
 import { NewCommitBody } from '../models';
 import { Prompt } from '../models';
 import { RenameBody } from '../models';
@@ -82,12 +82,11 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         /**
          * 
          * @summary Chat
-         * @param {Array<Message>} body 
-         * @param {string} [model] 
+         * @param {ChatBody} body 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        apiActionChatPost: async (body: Array<Message>, model?: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        apiActionChatPost: async (body: ChatBody, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'body' is not null or undefined
             if (body === null || body === undefined) {
                 throw new RequiredError('body','Required parameter body was null or undefined when calling apiActionChatPost.');
@@ -102,10 +101,6 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             const localVarRequestOptions :AxiosRequestConfig = { method: 'POST', ...baseOptions, ...options};
             const localVarHeaderParameter = {} as any;
             const localVarQueryParameter = {} as any;
-
-            if (model !== undefined) {
-                localVarQueryParameter['model'] = model;
-            }
 
             localVarHeaderParameter['Content-Type'] = 'application/json';
 
@@ -998,13 +993,12 @@ export const DefaultApiFp = function(configuration?: Configuration) {
         /**
          * 
          * @summary Chat
-         * @param {Array<Message>} body 
-         * @param {string} [model] 
+         * @param {ChatBody} body 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async apiActionChatPost(body: Array<Message>, model?: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => Promise<AxiosResponse<any>>> {
-            const localVarAxiosArgs = await DefaultApiAxiosParamCreator(configuration).apiActionChatPost(body, model, options);
+        async apiActionChatPost(body: ChatBody, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => Promise<AxiosResponse<any>>> {
+            const localVarAxiosArgs = await DefaultApiAxiosParamCreator(configuration).apiActionChatPost(body, options);
             return (axios: AxiosInstance = globalAxios, basePath: string = BASE_PATH) => {
                 const axiosRequestArgs :AxiosRequestConfig = {...localVarAxiosArgs.options, url: basePath + localVarAxiosArgs.url};
                 return axios.request(axiosRequestArgs);
@@ -1314,13 +1308,12 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
         /**
          * 
          * @summary Chat
-         * @param {Array<Message>} body 
-         * @param {string} [model] 
+         * @param {ChatBody} body 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async apiActionChatPost(body: Array<Message>, model?: string, options?: AxiosRequestConfig): Promise<AxiosResponse<any>> {
-            return DefaultApiFp(configuration).apiActionChatPost(body, model, options).then((request) => request(axios, basePath));
+        async apiActionChatPost(body: ChatBody, options?: AxiosRequestConfig): Promise<AxiosResponse<any>> {
+            return DefaultApiFp(configuration).apiActionChatPost(body, options).then((request) => request(axios, basePath));
         },
         /**
          * 
@@ -1548,14 +1541,13 @@ export class DefaultApi extends BaseAPI {
     /**
      * 
      * @summary Chat
-     * @param {Array<Message>} body 
-     * @param {string} [model] 
+     * @param {ChatBody} body 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof DefaultApi
      */
-    public async apiActionChatPost(body: Array<Message>, model?: string, options?: AxiosRequestConfig) : Promise<AxiosResponse<any>> {
-        return DefaultApiFp(this.configuration).apiActionChatPost(body, model, options).then((request) => request(this.axios, this.basePath));
+    public async apiActionChatPost(body: ChatBody, options?: AxiosRequestConfig) : Promise<AxiosResponse<any>> {
+        return DefaultApiFp(this.configuration).apiActionChatPost(body, options).then((request) => request(this.axios, this.basePath));
     }
     /**
      * 

@@ -12,6 +12,7 @@
  * Do not edit the class manually.
  */
 import { Argument } from './argument';
+import { LLMOption } from './llmoption';
 import { Message } from './message';
 /**
  * 
@@ -27,6 +28,12 @@ export interface CommitItem {
     args?: Array<Argument>;
     /**
      * 
+     * @type {LLMOption}
+     * @memberof CommitItem
+     */
+    options?: LLMOption;
+    /**
+     * 
      * @type {Array<Message>}
      * @memberof CommitItem
      */
@@ -37,12 +44,6 @@ export interface CommitItem {
      * @memberof CommitItem
      */
     response?: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof CommitItem
-     */
-    model?: string;
     /**
      * 
      * @type {string}

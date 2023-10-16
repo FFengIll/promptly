@@ -11,43 +11,24 @@
  * https://github.com/swagger-api/swagger-codegen.git
  * Do not edit the class manually.
  */
-import { Argument } from './argument';
 import { LLMOption } from './llmoption';
 import { Message } from './message';
 /**
  * 
  * @export
- * @interface UpdatePromptBody
+ * @interface ChatBody
  */
-export interface UpdatePromptBody {
-    /**
-     * 
-     * @type {string}
-     * @memberof UpdatePromptBody
-     */
-    group?: string;
+export interface ChatBody {
     /**
      * 
      * @type {Array<Message>}
-     * @memberof UpdatePromptBody
+     * @memberof ChatBody
      */
-    messages?: Array<Message>;
-    /**
-     * 
-     * @type {Array<Argument>}
-     * @memberof UpdatePromptBody
-     */
-    args?: Array<Argument>;
+    messages: Array<Message>;
     /**
      * 
      * @type {LLMOption}
-     * @memberof UpdatePromptBody
+     * @memberof ChatBody
      */
-    options?: LLMOption;
-    /**
-     * 
-     * @type {Array<string>}
-     * @memberof UpdatePromptBody
-     */
-    plugins?: Array<string>;
+    options: LLMOption;
 }

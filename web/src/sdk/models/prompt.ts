@@ -12,6 +12,7 @@
  * Do not edit the class manually.
  */
 import { Argument } from './argument';
+import { LLMOption } from './llmoption';
 import { Message } from './message';
 /**
  * 
@@ -24,31 +25,13 @@ export interface Prompt {
      * @type {string}
      * @memberof Prompt
      */
+    group?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof Prompt
+     */
     name: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof Prompt
-     */
-    model?: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof Prompt
-     */
-    defaultModel?: string;
-    /**
-     * 
-     * @type {Array<Message>}
-     * @memberof Prompt
-     */
-    messages: Array<Message>;
-    /**
-     * 
-     * @type {Array<string>}
-     * @memberof Prompt
-     */
-    history?: Array<string>;
     /**
      * 
      * @type {Array<Argument>}
@@ -57,10 +40,16 @@ export interface Prompt {
     args?: Array<Argument>;
     /**
      * 
-     * @type {string}
+     * @type {LLMOption}
      * @memberof Prompt
      */
-    group?: string;
+    options?: LLMOption;
+    /**
+     * 
+     * @type {Array<Message>}
+     * @memberof Prompt
+     */
+    messages: Array<Message>;
     /**
      * 
      * @type {Array<string>}
