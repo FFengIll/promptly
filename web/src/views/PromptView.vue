@@ -11,11 +11,17 @@
     <div>
         <a-space align="center">
             <a-typography-title>{{ key }}</a-typography-title>
-            <a-button @click="reload">
-                <template #icon>
-                    <SyncOutlined />
-                </template>
-            </a-button>
+
+            <a-space direction="horizontal" align="baseline">
+                <a-button @click="reload">
+                    <template #icon>
+                        <SyncOutlined />
+                    </template>
+                </a-button>
+                <a-divider type="vertical"></a-divider>
+
+
+            </a-space>
         </a-space>
         <a-row :gutter='6'>
             <a-col class="gutter-row" :span="12">
@@ -39,22 +45,18 @@
 
                 <a-card title="Prompt">
                     <template #extra>
-
-                        <!-- <template #icon>
-                                <SyncOutlined />
-                            </template> -->
-                        <a-button
-                            @click="() => { copy(JSON.stringify({ name: key, prompt: prompt.messages.filter((item: Message) => { return item.enable }) }, null, 2)) }">
-                            Copy To JSON
-                        </a-button>
-                        <a-button @click="() => { prompt.messages.forEach((item) => item.enable = false) }">Disable
-                            All
-                        </a-button>
-                        <a-button @click="() => { prompt.messages.forEach((item) => item.enable = true) }">Enable
-                            All
-                        </a-button>
+                        <a-space>
+                            <a-button
+                                @click="() => { copy(JSON.stringify({ name: key, prompt: prompt.messages.filter((item: Message) => { return item.enable }) }, null, 2)) }">
+                                CopyAll
+                            </a-button>
+                            <a-divider type="vertical"></a-divider>
+                            <a-button @click="() => { prompt.messages.forEach((item) => item.enable = false) }">DisableAll
+                            </a-button>
+                            <a-button @click="() => { prompt.messages.forEach((item) => item.enable = true) }">EnableAll
+                            </a-button>
+                        </a-space>
                     </template>
-
 
                     <a-row justify="space-around">
                         <PromptInput :messages="prompt.messages" with-copy with-control
@@ -80,28 +82,82 @@
 
 
             <a-col class="gutter-row" :span="12">
+                <a-card title="Response">
+
+                    <template #extra>
+                        <a-space direction="horizontal">
+                            <a-button @click="chat">Request</a-button>
+                            <a-button @click="doCommit">Commit</a-button>
+                            <a-button @click="() => copy(response)">Copy</a-button>
+                            <a-button @click="responseToPrompt">Append</a-button>
+                        </a-space>
+                    </template>
+
+                    <a-collapse>
+
+                        <a-collapse-panel header="Prompt Preview">
+                            <PromptCard :messages="prompt.messages.filter((i) => i.enable)"></PromptCard>
+                        </a-collapse-panel>
+                    </a-collapse>
+
+                    <a-divider></a-divider>
 
 
-                <a-card title="Preference">
+
+
+                    <a-skeleton :loading="loading" active avatar>
+                        <div>
+
+
+                            <a-divider></a-divider>
+
+                            <a-tabs v-model:activeKey="responseMode">
+                                <a-tab-pane key="1" tab="Markown"> <vue-markdown :source="response"
+                                        :options="{}"></vue-markdown></a-tab-pane>
+                                <a-tab-pane key="2" tab="Text" force-render>
+                                    <a-textarea v-model:value="response" :auto-size="{ maxRows: 16 }">
+                                    </a-textarea>
+                                </a-tab-pane>
+                            </a-tabs>
+
+
+
+                        </div>
+                    </a-skeleton>
+
+                </a-card>
+
+
+
+
+                <a-card title="LLM Options">
 
                     <a-list item-layout="horizontal">
                         <a-list-item>
-                            Model
-                            <ModelSelect :model="model" :defaultModel="(() => { return prompt.defaultModel })()"
-                                v-on:select="(value) => { model = value }"
-                                v-on:default="(value) => updateDefaultModel(value)" style="width: 200px">
-                            </ModelSelect>
-                            <a-button @click="fetchArgument(key)">
-                                <template #icon>
-                                    <SyncOutlined />
-                                </template>
-                            </a-button>
+                            <a-space>
+                                Model:
+                                <ModelSelect :model="model" :defaultModel="(() => { return prompt.defaultModel })()"
+                                    v-on:select="(value) => { model = value }"
+                                    v-on:default="(value) => updateDefaultModel(value)" style="width: 200px">
+                                </ModelSelect>
+                            </a-space>
                         </a-list-item>
 
-                        <a-space>
-                            <ArgumentPanel :setting="store.globalArgs" :args="args" @select=selectArg>
-                            </ArgumentPanel>
-                        </a-space>
+                        <a-list-item>
+                            <a-space>
+                                Temperature:
+                                <a-input-number style="width: 100px" :min="0" :max="2" :step="0.1"
+                                    v-model:value="options.temperature" placeholder="key">
+                                </a-input-number>
+                            </a-space>
+                            <a-space>
+                                Top_P:
+                                <a-input-number style="width: 100px" :min="0" :max="2" :step="0.1"
+                                    v-model:value="options.topP" placeholder="key">
+                                </a-input-number>
+                            </a-space>
+
+                        </a-list-item>
 
                         <a-list-item>
                             Use Embed
@@ -117,18 +173,12 @@
 
                         </a-list-item>
 
-                        <a-list-item>
-                            Temperature:
-                            <a-input-number style="width: 200px" :min="0" :max="2" :step="0.1"
-                                v-model:value="options.temperature" placeholder="key">
-                            </a-input-number>
-                        </a-list-item>
-                        <a-list-item>
-                            Top_P:
-                            <a-input-number style="width: 200px" :min="0" :max="2" :step="0.1" v-model:value="options.topP"
-                                placeholder="key">
-                            </a-input-number>
-                        </a-list-item>
+
+                        <a-space>
+                            <ArgumentPanel :setting="store.globalArgs" :args="args" @select=selectArg>
+                            </ArgumentPanel>
+                        </a-space>
+
                     </a-list>
 
                 </a-card>
@@ -175,62 +225,9 @@
                 </a-card>
 
 
-                <a-card title="Operation">
-
-                    <a-space direction="horizontal">
-                        <a-button @click="chat">Request</a-button>
-                        <a-button @click="doCommit">Commit</a-button>
-                    </a-space>
-                    <!--<a-space direction="horizontal">-->
-                    <!--<a-button @click="gotoTesting">Goto Testing</a-button>-->
-                    <!--<a-button @click="gotoCommit">Goto Commit</a-button>-->
-                    <!--</a-space>-->
-
-                </a-card>
-
-                <a-divider></a-divider>
-
-
-                <a-card title="Response">
-                    <template #extra>
-                        <a-space direction="horizontal">
-                            <a-button>Good</a-button>
-                            <a-button>Bad</a-button>
-                            <a-button @click="() => copy(response)">Copy</a-button>
-
-                        </a-space>
-
-                        <a-space>
-                            <a-button @click="responseToPrompt">Append to prompt</a-button>
-                        </a-space>
-
-                    </template>
-                    <a-skeleton :loading="loading" active avatar>
-                        <div>
-                            <a-collapse>
-
-                                <a-collapse-panel header="Prompt Preview">
-                                    <PromptCard :messages="prompt.messages.filter((i) => i.enable)"></PromptCard>
-                                </a-collapse-panel>
-                            </a-collapse>
-
-                            <a-divider></a-divider>
-
-                            <a-tabs v-model:activeKey="responseMode">
-                                <a-tab-pane key="1" tab="Markown"> <vue-markdown :source="response"
-                                        :options="{}"></vue-markdown></a-tab-pane>
-                                <a-tab-pane key="2" tab="Text" force-render>
-                                    <a-textarea v-model:value="response" :auto-size="{ maxRows: 16 }">
-                                    </a-textarea>
-                                </a-tab-pane>
-                            </a-tabs>
 
 
 
-                        </div>
-                    </a-skeleton>
-
-                </a-card>
 
             </a-col>
         </a-row>
