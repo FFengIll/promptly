@@ -5,10 +5,8 @@ from uuid import uuid1
 import loguru
 from pydantic import BaseModel
 from pydantic import Field
-from pydantic_mongo import ObjectIdField
 
 from promptly.schema import autocomplete
-
 
 log = loguru.logger
 
@@ -42,12 +40,18 @@ class Argument(BaseModel):
     candidates: List[str] = []
 
 
+class LLMOption(BaseModel):
+    temperature: float = 1.0
+    top_k: float = 1.0
+    model: str = ""
+
+
 @autocomplete
 class CommitItem(BaseModel):
     args: List[Argument] = Field(default_factory=list)
+    options: LLMOption = Field(default_factory=LLMOption)
     messages: List[Message] = ...
     response: str = ""
-    model: str = ""
     md5: str = ""
     star: bool = False
     tag: str = ""
@@ -59,9 +63,6 @@ class CommitItem(BaseModel):
     def calc_md5(self):
         items = [m.json() for m in self.messages]
         h = md5()
-
-        # firstly, process model
-        h.update(self.model.encode())
 
         # then for the messages
         for it in items:
@@ -78,13 +79,14 @@ class ArgumentSetting(BaseModel):
 
 @autocomplete
 class Prompt(BaseModel):
-    name: str = ...
-    model: str = Field(default="")
-    default_model: str = Field(default="", alias="defaultModel")
-    messages: List[Message] = ...
-    history: List[str] = Field(default_factory=list)
-    args: List[Argument] = Field(default_factory=list)
     group: str = ""
+    name: str = ...
+
+    args: List[Argument] = Field(default_factory=list)
+    options: LLMOption = Field(default_factory=LLMOption)
+
+    messages: List[Message] = ...
+
     plugins: List[str] = Field(default_factory=list)
     docs: List[str] = Field(default_factory=list)
 
