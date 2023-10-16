@@ -78,6 +78,21 @@ tasks:
     cmds:
       - task: db-stop
       - rm -rf ./data/mongodb/journal
+      - rm -rf ./data/mongodb/diagnostic.data
+
+  data-dump:
+    dir: "{{.ROOT_DIR}}"
+    cmds:
+      - task: db-cleanup
+      - zip -r data/mongodb.zip data/mongodb
+  
+  data-load:
+    dir: "{{.ROOT_DIR}}"
+    cmds:
+      - task: db-stop
+      - mv data/mongodb data/mongodb.bak || echo "ignore or done"
+      - unzip data/mongodb.zip -d .
+      - task: db-start
   
   gen:
     desc: "generate sdk via swagger"
