@@ -7,7 +7,14 @@ from fastapi_restful.api_model import APIModel
 from pydantic import BaseModel
 
 from promptly.dao import MongoManager
-from promptly.model.prompt import Argument, ArgumentSetting, CommitItem, Message, Prompt
+from promptly.model.prompt import (
+    Argument,
+    ArgumentSetting,
+    CommitItem,
+    LLMOption,
+    Message,
+    Prompt,
+)
 from promptly.schema import autocomplete
 
 from .util import check_mongo_result
@@ -51,11 +58,13 @@ def list_prompt(refresh: bool = False):
 
 
 class UpdatePromptBody(APIModel):
-    messages: List[Message] = pydantic.Field(default="")
-    model: str = ""
-    args: List[Argument] = pydantic.Field(default_factory=list)
-    default_model: str = pydantic.Field(default="", alias="defaultModel")
     group: str = ""
+
+    messages: List[Message] = pydantic.Field(default="")
+
+    args: List[Argument] = pydantic.Field(default_factory=list)
+    options: LLMOption = pydantic.Field(default_factory=LLMOption)
+
     plugins: List[str] = []
 
 
@@ -88,9 +97,10 @@ def update_prompt(
 
     p = manager.get(name)
     p.messages = body.messages or p.messages
-    p.model = body.model or p.model
+
     p.args = body.args or p.args
-    p.default_model = body.default_model or p.default_model
+    p.options = body.options
+
     p.plugins = body.plugins
 
     manager.update_prompt(p)

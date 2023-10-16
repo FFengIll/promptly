@@ -9,8 +9,15 @@ from pydantic import BaseModel
 from promptly import llm
 from promptly.dao import MongoManager
 from promptly.llm import to_message
+from promptly.model.prompt import (
+    Argument,
+    ArgumentSetting,
+    CommitItem,
+    LLMOption,
+    Message,
+)
 from promptly.model.testcase import TestResult
-from promptly.model.prompt import Argument, ArgumentSetting, CommitItem, Message
+
 from .util import check_mongo_result
 
 log = loguru.logger
@@ -84,12 +91,19 @@ def new_commit(body: StarBody):
     return check_mongo_result(res)
 
 
-@router.post("/api/action/chat")
-async def chat(ms: List[Message], model: str = ""):
-    ms = to_message(ms)
-    log.info(ms)
+class ChatBody(BaseModel):
+    messages: List[Message]
+    options: LLMOption
 
-    content = await llm.chat(ms, model=model)
+
+@router.post("/api/action/chat")
+async def chat(body: ChatBody):
+    ms = to_message(body.messages)
+    options = body.options
+    log.info(ms)
+    log.info(options)
+
+    content = await llm.chat(ms, **options.dict(by_alias=False))
     log.info(content)
 
     mongo.history.push(CommitItem(messages=ms, response=content))

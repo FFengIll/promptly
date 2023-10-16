@@ -3,8 +3,7 @@ from typing import Any, List
 from uuid import uuid1
 
 import loguru
-from pydantic import BaseModel
-from pydantic import Field
+from pydantic import BaseModel, Field
 
 from promptly.schema import autocomplete
 
@@ -42,7 +41,7 @@ class Argument(BaseModel):
 
 class LLMOption(BaseModel):
     temperature: float = 1.0
-    top_k: float = 1.0
+    top_p: float = Field(default=1.0, alias="topP")
     model: str = ""
 
 

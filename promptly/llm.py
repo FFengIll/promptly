@@ -22,15 +22,15 @@ def simple_chat(content):
     return chat(messages)
 
 
-async def chat(messages, model=""):
+async def chat(messages, **kwargs):
     openai.api_base = url
     openai.api_key = key
 
     response = openai.ChatCompletion.create(
-        model=model,
         messages=messages,
         headers={"HTTP-Referer": "https://test.com", "X-Title": "test"},
         timeout=3,
+        **kwargs
     )
 
     log.info("response: {}", response)
