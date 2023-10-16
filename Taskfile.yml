@@ -14,7 +14,7 @@ tasks:
   dev:
     cmds:
       - task: black
-      - task: gen
+      - task: codegen
       - task: dist
   
   install:
@@ -94,10 +94,11 @@ tasks:
       - unzip data/mongodb.zip -d .
       - task: db-start
   
-  gen:
+  codegen:
     desc: "generate sdk via swagger"
     dir: "{{.ROOT_DIR}}"
     cmds:
+      - task: db-start
       - rm -rf ./web/src/sdk
       - poetry run python bin/swagger.py
       - swagger-codegen generate -i ./data/swagger.json -l typescript-axios -o ./web/src/sdk
