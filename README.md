@@ -1,8 +1,8 @@
-# prompt
+# Promptly
 
 The prompt engineering tools.
 
-# features
+# Features
 
 - build a prompt.
 - run a prompt (with available model service).
@@ -10,7 +10,7 @@ The prompt engineering tools.
 - commit prompt into commit repository to save a snapshot.
 - testing a prompt (with loop or cases).
 
-# deps
+# Deps
 
 - python: 3.8 and above
   - use fastapi for backend
@@ -28,9 +28,25 @@ The prompt engineering tools.
   - use image container for db
 - ~~(DEPRECATED) gui: pysimplegui~~
 
-# run
+# Run
 
-## run in docker
+## Install & Run [recommand]
+
+- task install
+- task dist
+- task run
+
+> task is coming from `Taskfile`, you must install `task`.
+> see [Taskfile](https://taskfile.dev/) for more details.
+> see [Install](https://taskfile.dev/installation/) to install `task`.
+
+## Build & Dev [for developer only]
+
+- task install
+- task dev
+- task run
+
+## Run With Docker [WIP]
 
 run bellow
 
@@ -44,23 +60,13 @@ task db-start
 
 > visit `localhost:8000` to use.
 
-## build to run
 
-- task install
-- task dist
-- task run
+# Data
+Run `task data-dump` to dump your data into `data/mongodb.zip`.
 
-> task is coming from `Taskfile`, you must install `task`.
-> see [Taskfile](https://taskfile.dev/) for more details.
-> see [Install](https://taskfile.dev/installation/) to install `task`.
+While put file to `data/mongodb.zip`, run `task data-load` will load your data with db restart.
 
-## build to dev
-
-- task install
-- task dev
-- task run
-
-# config
+# Config
 
 LLM api token is sensitive, so we only put a separate file for it.
 
