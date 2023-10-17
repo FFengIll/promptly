@@ -4,6 +4,9 @@ import loguru
 import typer
 import uvicorn
 
+from promptly.config import SystemConfigModel
+from promptly.dao import mongo
+
 sys.path.insert(0, ".")
 
 
@@ -12,9 +15,13 @@ log = loguru.logger
 
 def main(
     db: str = typer.Option(None, "--db", help="db url"),
+    config: str = typer.Option(
+        "", "-c", "--config", is_eager=True, help="config file path"
+    ),
     host: str = typer.Option("127.0.0.1", "--host", help="host"),
 ):
-    from promptly.dao import mongo
+    config = SystemConfigModel.parse_from(config)
+    log.info(config)
 
     if db:
         mongo.url = db
