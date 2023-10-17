@@ -10,6 +10,5 @@ promptly:
     - gpt-3.5-turbo-0613
     - gpt-4-0613
   defaultModel: gpt-3.5-turbo
-  server:
-    key: fake_xxx
-    base: http://localhost:8080/api/v1
+  api_key: fake_xxx
+  api_base: http://localhost:8080/api/v1
