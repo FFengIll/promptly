@@ -4,20 +4,20 @@ import { HeartOutlined, HeartTwoTone } from "@ant-design/icons-vue";
 
 interface Props {
     selected: string,
-    defaultModel: string,
+    prefer: string,
     models: string[],
 }
 
 const props = withDefaults(defineProps<Props>(), {
     model: "",
-    defaultModel: "",
+    prefer: "",
     models: () => [],
 })
 
 
 const emit = defineEmits<{
     (e: 'select', value: string): void
-    (e: 'default', value: string): void
+    (e: 'prefer', value: string): void
 
 }>()
 
@@ -28,24 +28,26 @@ function onSelect(value: string) {
 
 function onDefault(value: string) {
     console.log(value)
-    emit('default', value)
+    emit('prefer', value)
 }
 
 </script>
 
 <template>
-    <a-select ref="select" v-model:value="props.selected" style="width: 120px" @change="onSelect">
-        <a-select-option v-for="item, key in models" :value="item">
-            <a-button @click="onDefault(item)">
-                <template #icon>
-                    <HeartTwoTone v-if="item == defaultModel" two-tone-color="#eb2f96" />
-                    <HeartOutlined v-else />
-                </template>
-            </a-button>
-            {{ item }}
-        </a-select-option>
+    <div>
+        <a-select style="width: 200px" ref="select" v-model:value="props.selected" @change="onSelect">
+            <a-select-option v-for="(value, key)  in models" :value="value">
+                <a-button @click="onDefault(value)">
+                    <template #icon>
+                        <HeartTwoTone v-if="value == prefer" two-tone-color="#eb2f96" />
+                        <HeartOutlined v-else />
+                    </template>
+                </a-button>
+                {{ value }}
+            </a-select-option>
 
-    </a-select>
+        </a-select>
+    </div>
 </template>
 
 <style scoped></style>

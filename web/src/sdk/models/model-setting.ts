@@ -25,8 +25,8 @@ export interface ModelSetting {
     defaultModel: string;
     /**
      * 
-     * @type {{ [key: string]: string; }}
+     * @type {Array<string>}
      * @memberof ModelSetting
      */
-    models?: { [key: string]: string; };
+    models?: Array<string>;
 }

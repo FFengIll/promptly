@@ -132,15 +132,21 @@
 
                 <a-card title="LLM Options">
 
+
                     <a-list item-layout="horizontal">
                         <a-list-item>
                             <a-space>
                                 Model:
-                                <ModelSelect :selected="options.model!!"
-                                    :defaultModel="(() => { return options!!.model })()"
-                                    :models="store.globalModels.models ?? []" v-on:select="(value) => { model = value }"
-                                    v-on:default="(value) => updateDefaultModel(value)" style="width: 200px">
+                                <ModelSelect style="width: 200px" :selected="model" :prefer="options!!.model"
+                                    :models="store.globalModels.models ?? []"
+                                    v-on:select="(value: string) => { model = value }"
+                                    v-on:prefer="(value: string) => updateDefaultModel(value)">
                                 </ModelSelect>
+                                <a-button @click="reloadModels()">
+                                    <template #icon>
+                                        <SyncOutlined />
+                                    </template>
+                                </a-button>
                             </a-space>
                         </a-list-item>
 
@@ -299,14 +305,21 @@ onMounted(
     }
 )
 
+function reloadModels() {
+    backend.apiGlobalModelsGet()
+        .then((res) => {
+            store.globalModels = res.data
+        })
+}
+
 
 
 function updateDefaultModel(model: string) {
-    let body: UpdatePromptBody = <UpdatePromptBody>({ defaultModel: model })
+    options.value.model = model
+    let body: UpdatePromptBody = <UpdatePromptBody>({ options: options.value })
     backend.apiPromptNamePut(body, prompt.value.name)
         .then(() => {
             console.log(model)
-            prompt.value.options!!.model = model
         })
         .catch(err => {
             openNotification(err, 'error')
