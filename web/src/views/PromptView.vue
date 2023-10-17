@@ -185,7 +185,7 @@
                 </a-card>
 
 
-                <a-card title="Message Replace">
+                <a-card title="Replace Args">
 
                     <template #extra>
                         <a-button @click="fetchArgument(key)">
