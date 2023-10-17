@@ -1,15 +1,17 @@
 <script setup lang="ts">
-import { LLM } from "@/scripts/llm";
 import { HeartOutlined, HeartTwoTone } from "@ant-design/icons-vue";
 
+
 interface Props {
-    model: string,
+    selected: string,
     defaultModel: string,
+    models: string[],
 }
 
 const props = withDefaults(defineProps<Props>(), {
     model: "",
-    defaultModel: ""
+    defaultModel: "",
+    models: () => [],
 })
 
 
@@ -32,15 +34,15 @@ function onDefault(value: string) {
 </script>
 
 <template>
-    <a-select ref="select" v-model:value="props.model" style="width: 120px" @change="onSelect">
-        <a-select-option v-for="value, key in LLM" :value="value">
-            <a-button @click="onDefault(value)">
+    <a-select ref="select" v-model:value="props.selected" style="width: 120px" @change="onSelect">
+        <a-select-option v-for="item, key in models" :value="item">
+            <a-button @click="onDefault(item)">
                 <template #icon>
-                    <HeartTwoTone v-if="value == defaultModel" two-tone-color="#eb2f96" />
+                    <HeartTwoTone v-if="item == defaultModel" two-tone-color="#eb2f96" />
                     <HeartOutlined v-else />
                 </template>
             </a-button>
-            {{ key }}
+            {{ item }}
         </a-select-option>
 
     </a-select>

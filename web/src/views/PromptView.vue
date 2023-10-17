@@ -136,8 +136,9 @@
                         <a-list-item>
                             <a-space>
                                 Model:
-                                <ModelSelect :model="model" :defaultModel="(() => { return prompt.defaultModel })()"
-                                    v-on:select="(value) => { model = value }"
+                                <ModelSelect :selected="options.model!!"
+                                    :defaultModel="(() => { return options!!.model })()"
+                                    :models="store.globalModels.models ?? []" v-on:select="(value) => { model = value }"
                                     v-on:default="(value) => updateDefaultModel(value)" style="width: 200px">
                                 </ModelSelect>
                             </a-space>
@@ -246,7 +247,6 @@ import ModelSelect from '@/components/ModelSelect.vue';
 import PromptInput from "@/components/PromptInput.vue";
 import { backend, BackendHelper } from "@/scripts/backend";
 import { openNotification } from "@/scripts/notice";
-import { RouteHelper } from '@/scripts/router';
 import { useConfigStore } from "@/stores/global-config";
 import type {
     ArgRequest,
@@ -270,8 +270,6 @@ const key = r.params.key.toString()
 
 const responseMode = ref()
 
-// props
-const props = defineProps<{}>()
 
 // field
 const loading = ref(false)
@@ -308,7 +306,7 @@ function updateDefaultModel(model: string) {
     backend.apiPromptNamePut(body, prompt.value.name)
         .then(() => {
             console.log(model)
-            prompt.value.defaultModel = model
+            prompt.value.options!!.model = model
         })
         .catch(err => {
             openNotification(err, 'error')
@@ -360,26 +358,6 @@ function deletePrompt(index: number) {
     ms.splice(index, 1); // 删除指定索引的元素
 }
 
-function gotoCommit() {
-    console.log(key)
-
-    RouteHelper.toCommit(key)
-}
-
-async function gotoTesting() {
-    let body: UpdatePromptBody = {
-        messages: prompt.value.messages!!,
-        model: model.value,
-        args: args.value,
-    }
-
-    await backend.apiPromptNamePut(body, key).catch((err) => {
-        console.log(err)
-        openNotification(err.toString(), "error")
-    })
-
-    RouteHelper.toTesting(key)
-}
 
 
 async function doCommit() {
@@ -389,7 +367,7 @@ async function doCommit() {
             messages: prompt.value.messages,
             response: response.value,
             args: args.value,
-            model: model.value,
+            options: options.value,
         },
     }
     backend.apiCommitPost(body)

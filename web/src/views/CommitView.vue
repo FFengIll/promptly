@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import PromptInput from "@/components/PromptInput.vue";
-import router from "@/router";
 import { backend, BackendHelper } from "@/scripts/backend";
 import { RouteHelper } from "@/scripts/router";
 
@@ -11,11 +10,10 @@ import { useRoute } from 'vue-router';
 import { HeartOutlined, HeartTwoTone } from "@ant-design/icons-vue";
 
 import ArgumentPanel from '@/components/ArgumentPanel.vue';
-import { defaultLLM } from "@/scripts/llm";
 import { openNotification } from "@/scripts/notice";
+import type { Argument } from "@/sdk/models";
 import { useConfigStore } from "@/stores/global-config";
 import VueMarkdown from "vue-markdown-render";
-import type { Argument } from "@/sdk/models";
 
 //
 const store = useConfigStore()
@@ -88,10 +86,6 @@ async function getCommit(name: string) {
 }
 
 
-function gotoTest(it: CommitItem, args: Argument[]) {
-    store.sendSource(store.source.name, it.messages!!, args)
-    router.push('/view/debug')
-}
 
 
 async function saveCommits(key: string, data: CommitItem[]) {
@@ -115,7 +109,7 @@ function dropCommit(commit: CommitItem, index: number) {
 
 async function replay(commit: CommitItem) {
     commit.response = ""
-    let response = await BackendHelper.doChat(commit.model, commit.messages, commit.args)
+    let response = await BackendHelper.doChat(commit.options!!, commit.messages, commit.args!!)
     console.log('response', response)
     commit.response = response.data
 
@@ -124,7 +118,7 @@ async function replay(commit: CommitItem) {
 
 async function doChat(commit: CommitItem) {
     commit.response = ""
-    await BackendHelper.doChat(commit.model, commit.messages, args.value)
+    await BackendHelper.doChat(commit.options!!, commit.messages, args.value)
         .then((res) => {
             console.log('response', res)
             commit.response = res.data
@@ -246,7 +240,6 @@ const simpleOnly = ref(false)
                     <!--        button-->
                     <a-button @click="doChat(commit)">Request</a-button>
                     <a-button @click="replay(commit)">Replay</a-button>
-                    <a-button @click="gotoTest(commit, args)">Goto Test</a-button>
                     <a-button @click="gotoPrompt(commit)">Goto Prompt</a-button>
                     <a-button @click="dropCommit(commit, index)">Drop</a-button>
 
@@ -267,7 +260,7 @@ const simpleOnly = ref(false)
                 <a-divider></a-divider>
 
                 <!--response-->
-                <a-card :title="commit.model || defaultLLM" class="highlight-ant-card-head ">
+                <a-card :title="commit.options!!.model" class="highlight-ant-card-head ">
 
                     <template #extra>
                         <a-button @click="changeStar(commit)">

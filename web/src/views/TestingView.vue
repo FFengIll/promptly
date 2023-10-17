@@ -17,7 +17,7 @@
 
                     <a-divider></a-divider>
 
-                    <ModelSelect :model="model" v-on:select="(value) => { model = value }" style="width: 200px">
+                    <ModelSelect :selected="model" v-on:select="(value) => { model = value }" style="width: 200px">
 
                     </ModelSelect>
 
