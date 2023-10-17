@@ -134,3 +134,9 @@ tasks:
     cmds:
       - task: db-start
       - poetry run python bin/main.py -c config/llm.yaml
+
+  config:
+    desc: auto generate config file
+    dir: "{{.ROOT_DIR}}"
+    cmds:
+      - cp -v -n config/sample.yaml config/llm.yaml
