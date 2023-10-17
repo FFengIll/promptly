@@ -7,6 +7,7 @@ export * from './httpvalidation-error';
 export * from './llmoption';
 export * from './list-prompt-response';
 export * from './message';
+export * from './model-setting';
 export * from './new-commit-body';
 export * from './prompt';
 export * from './rename-body';
