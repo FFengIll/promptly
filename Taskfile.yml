@@ -126,11 +126,11 @@ tasks:
       - "py"
     cmds:
       - task: db-start
-      - poetry run python bin/main.py
+      - poetry run python bin/main.py -c config/llm.yaml
   
   run:
     desc: run server without reload
     dir: "{{.ROOT_DIR}}"
     cmds:
       - task: db-start
-      - poetry run python bin/main.py
+      - poetry run python bin/main.py -c config/llm.yaml
