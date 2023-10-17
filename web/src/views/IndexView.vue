@@ -1,7 +1,5 @@
 <style scoped>
-.large-font {
-    font-size: 200%
-}
+
 </style>
 
 <template>
@@ -32,7 +30,7 @@
 
             <a-space direction="horizontal">
 
-                <a-input v-model:value="newName" placeholder="prompt name" size="large">
+                <a-input v-model:value="newName" placeholder="prompt name">
                 </a-input>
                 <a-button @click="create_profile(key, newName)">
                     Create In Group
@@ -48,7 +46,7 @@
                 </p>
             </a-modal>
 
-            <a-list :data-source="values.sort()" size="small" :grid="{ gutter: 16, column: 3 }">
+            <a-list :data-source="values.sort()" size="small" :grid="{ gutter: 16, column: 4 }">
                 <template #renderItem="{ item }">
                     <a-list-item>
                         <a-space>
