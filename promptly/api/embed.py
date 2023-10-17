@@ -133,5 +133,4 @@ async def generate(body: RetrieveBody, model: str = ""):
     content = await llm.chat(ms, model=model)
     log.info(content)
 
-    mongo.history.push(CommitItem(messages=ms, response=content))
     return content

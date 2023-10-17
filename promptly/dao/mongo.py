@@ -21,7 +21,6 @@ class MongoManager:
 
         self.prompt: MongoPromptManger = MongoPromptManger(self.db["prompt"], self.db)
         self.case: MongoCaseManager = MongoCaseManager(self.db["case"])
-        self.history: MongoHistoryManager = MongoHistoryManager(self.db["history"])
         self.commit: MongoCommitManager = MongoCommitManager(self.db["commit"])
         self.argument: MongoArgumentManager = MongoArgumentManager(self.db["argument"])
         self.embed: MongoEmbedManager = MongoEmbedManager(self.db["prompt"])
@@ -209,14 +208,6 @@ class MongoCaseManager:
         return None
 
 
-class MongoHistoryManager:
-    def __init__(self, col: Collection):
-        self.collection = col
-
-    def push(self, item: CommitItem):
-        self.collection.insert_one(item.dict())
-
-
 class PromptODM(AbstractRepository[Prompt]):
     class Meta:
         collection_name = "prompt"
@@ -258,11 +249,6 @@ class MongoPromptManger:
     def update_args(self, key, args: List[Argument]):
         return self.collection.update_one(
             {"name": key}, {"$set": {"args": [a.dict() for a in args]}}
-        )
-
-    def update_history(self, p: Prompt):
-        return self.collection.update_one(
-            {"name": p.name}, {"$set": {"history": p.history}}
         )
 
     def update_prompt(self, p: Prompt):

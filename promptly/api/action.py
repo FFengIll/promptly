@@ -51,7 +51,6 @@ async def batch_test(messages, key, data, model):
 
         target = await llm.chat(ms, model=model)
         log.info("response: {}", target)
-        mongo.history.push(CommitItem(messages=ms, response=target))
 
         res.append(TestResult(source=source, target=target, id=idx).dict())
 
@@ -106,7 +105,6 @@ async def chat(body: ChatBody):
     content = await llm.chat(ms, **options.dict(by_alias=False))
     log.info(content)
 
-    mongo.history.push(CommitItem(messages=ms, response=content))
     return content
 
 
