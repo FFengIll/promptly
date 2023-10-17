@@ -1,14 +1,14 @@
 # a map, which map name to real model id
 models: 
   # openai
-  "gpt-3.5-turbo": gpt-3.5-turbo 
-  "gpt-4": gpt-4 
-  "gpt-3.5-turbo-instruct": gpt-3.5-turbo-instruct 
+  - gpt-3.5-turbo
+  - gpt-4
+  - gpt-3.5-turbo-instruct
   # openrouter
-  "anthropic/claude-instant-v1": anthropic/claude-instant-v1 
+  - anthropic/claude-instant-v1
   # special
-  "gpt-3.5-turbo-0613": gpt-3.5-turbo-0613 
-  "gpt-4-0613": gpt-4-0613 
+  - gpt-3.5-turbo-0613
+  - gpt-4-0613 
 defaultModel: gpt-3.5-turbo
 api_key: fake_xxx
 api_base: http://localhost:8080/api/v1
