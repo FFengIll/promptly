@@ -109,12 +109,6 @@ def update_prompt(
     return p
 
 
-@router.get("/api/global/args", response_model=ArgumentSetting)
-def get_global_argument():
-    res = mongo.argument.get_setting("_global")
-    return res
-
-
 @router.get("/api/prompt/args/{name}", response_model=ArgumentSetting)
 def get_argument(name: str):
     res = mongo.argument.get_setting(name)

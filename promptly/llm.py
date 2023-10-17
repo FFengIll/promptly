@@ -3,7 +3,7 @@ from typing import List
 import loguru
 import openai
 
-from promptly.config import key, url
+from promptly.config import SystemConfigModel
 from promptly.model.prompt import Message
 
 log = loguru.logger
@@ -22,14 +22,19 @@ def simple_chat(content):
     return chat(messages)
 
 
-async def chat(messages, **kwargs):
-    openai.api_base = url
-    openai.api_key = key
+async def chat(messages, model="", **kwargs):
+    config = SystemConfigModel.singleton()
+    openai.api_base = config.api_base
+    openai.api_key = config.api_key
+
+    if not model:
+        model = SystemConfigModel.singleton().default_model
 
     response = openai.ChatCompletion.create(
         messages=messages,
         headers={"HTTP-Referer": "https://test.com", "X-Title": "test"},
         timeout=3,
+        model=model,
         **kwargs
     )
 
