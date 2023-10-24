@@ -98,8 +98,9 @@ tasks:
   codegen:
     desc: "generate sdk via swagger"
     dir: "{{.ROOT_DIR}}"
-    cmds:
+    deps:
       - task: db-start
+    cmds:
       - rm -rf ./web/src/sdk
       - poetry run python bin/swagger.py
       - swagger-codegen generate -i ./data/swagger.json -l typescript-axios -o ./web/src/sdk
@@ -125,8 +126,9 @@ tasks:
     dir: "{{.ROOT_DIR}}"
     aliases:
       - "py"
-    cmds:
+    deps:
       - task: db-start
+    cmds:
       - poetry run python bin/main.py -c config/llm.yaml
   
   run:
