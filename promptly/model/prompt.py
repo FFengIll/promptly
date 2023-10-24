@@ -54,6 +54,7 @@ class CommitItem(BaseModel):
     md5: str = ""
     star: bool = False
     tag: str = ""
+    timecost: int = 0
 
     def __init__(self, **data: Any):
         super().__init__(**data)
@@ -80,6 +81,7 @@ class ArgumentSetting(BaseModel):
 class Prompt(BaseModel):
     group: str = ""
     name: str = ...
+    description: str = ""
 
     args: List[Argument] = Field(default_factory=list)
     options: LLMOption = Field(default_factory=LLMOption)

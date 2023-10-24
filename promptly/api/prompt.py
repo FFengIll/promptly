@@ -61,6 +61,7 @@ class UpdatePromptBody(APIModel):
     group: str = ""
 
     messages: List[Message] = pydantic.Field(default="")
+    description: str = ""
 
     args: List[Argument] = pydantic.Field(default_factory=list)
     options: LLMOption = pydantic.Field(default_factory=LLMOption)
@@ -102,6 +103,8 @@ def update_prompt(
     p.options = body.options
 
     p.plugins = body.plugins
+
+    p.description = body.description
 
     manager.update_prompt(p)
 
