@@ -34,6 +34,12 @@ export interface UpdatePromptBody {
     messages?: Array<Message>;
     /**
      * 
+     * @type {string}
+     * @memberof UpdatePromptBody
+     */
+    description?: string;
+    /**
+     * 
      * @type {Array<Argument>}
      * @memberof UpdatePromptBody
      */

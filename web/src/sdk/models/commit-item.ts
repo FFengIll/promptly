@@ -62,4 +62,10 @@ export interface CommitItem {
      * @memberof CommitItem
      */
     tag?: string;
+    /**
+     * 
+     * @type {number}
+     * @memberof CommitItem
+     */
+    timecost?: number;
 }

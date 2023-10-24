@@ -34,6 +34,12 @@ export interface Prompt {
     name: string;
     /**
      * 
+     * @type {string}
+     * @memberof Prompt
+     */
+    description?: string;
+    /**
+     * 
      * @type {Array<Argument>}
      * @memberof Prompt
      */

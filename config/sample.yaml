@@ -4,11 +4,19 @@ models:
   - gpt-3.5-turbo
   - gpt-4
   - gpt-3.5-turbo-instruct
-  # openrouter
-  - anthropic/claude-instant-v1
-  # special
   - gpt-3.5-turbo-0613
   - gpt-4-0613 
+
+  # openrouter
+  - meta-llama/codellama-34b-instruct
+  - phind/phind-codellama-34b
+  - anthropic/claude-instant-v1
+  - anthropic/claude-2
+  - openai/gpt-3.5-turbo
+  - openai/gpt-4
+  - meta-llama/llama-2-70b-chat
+  - google/palm-2-codechat-bison
+
 defaultModel: gpt-3.5-turbo
 api_key: fake_xxx
 api_base: http://localhost:8080/api/v1
