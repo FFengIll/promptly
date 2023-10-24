@@ -11,7 +11,7 @@ tasks:
       - echo "{{.GREETING}}"
     silent: true
   
-  dev:
+  build:
     cmds:
       - task: black
       - task: codegen
@@ -38,8 +38,9 @@ tasks:
       - pip3 install poetry
       - poetry install
   
-  black:
+  fmt:
     desc: "format python with black"
+    dir: "{{.ROOT_DIR}}"
     cmds:
       - black .
   
@@ -131,8 +132,10 @@ tasks:
   run:
     desc: run server without reload
     dir: "{{.ROOT_DIR}}"
-    cmds:
+    deps:
       - task: db-start
+      - task: dist
+    cmds:
       - poetry run python bin/main.py -c config/llm.yaml
 
   config:
@@ -140,3 +143,20 @@ tasks:
     dir: "{{.ROOT_DIR}}"
     cmds:
       - cp -v -n config/sample.yaml config/llm.yaml
+
+  hold:
+    cmds:
+      - |
+        echo "dev mode"
+        while true  # 无限循环
+        do
+            sleep 1000  # 每次睡眠2秒钟
+        done
+  
+  dev:
+    desc: run in dev mode
+    deps:
+      - py
+      - web
+    cmds:
+      - task: hold
