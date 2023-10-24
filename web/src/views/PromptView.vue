@@ -9,7 +9,7 @@
 
 <template>
     <div>
-        <a-space align="center">
+        <a-space align="center" style="width: 100%">
             <a-typography-title>{{ key }}</a-typography-title>
 
             <a-space direction="horizontal" align="baseline">
@@ -19,10 +19,12 @@
                     </template>
                 </a-button>
                 <a-divider type="vertical"></a-divider>
-
-
             </a-space>
         </a-space>
+        <a-space>
+            <a-input style="width: 400px" v-model:value="description"></a-input>
+        </a-space>
+
         <a-row :gutter='6'>
             <a-col class="gutter-row" :span="12">
 
@@ -37,11 +39,42 @@
                             <p>{{ h }}</p>
 
 
-
                         </a-space>
                     </a-collapse-panel>
                 </a-collapse> -->
 
+                <a-card title="Replace Args">
+                    <template #extra>
+                        <a-button @click="fetchArgument(key)">
+                            <template #icon>
+                                <SyncOutlined />
+                            </template>
+                        </a-button>
+                    </template>
+
+                    <ArgumentPanel :setting="argSetting" :args="args" @select=selectArg>
+                        <template #extra>
+                            <a-space direction="horizontal">
+                                <a-select ref="select" v-model:value="argKey" style="width: 120px" show-search>
+                                    <a-select-option v-for="k in args" :key="k.key">{{ k.key }}</a-select-option>
+                                </a-select>
+
+                                <a-input v-model:value="argKey" placeholder="key">
+                                </a-input>
+
+                                <a-input v-model:value="argValue" placeholder="value">
+                                </a-input>
+
+                                <a-button @click="newArg()">
+                                    <template #icon>
+                                        <PlusOutlined />
+                                    </template>
+                                    New
+                                </a-button>
+                            </a-space>
+                        </template>
+                    </ArgumentPanel>
+                </a-card>
 
                 <a-card title="Prompt">
                     <template #extra>
@@ -80,12 +113,12 @@
 
             </a-col>
 
-
             <a-col class="gutter-row" :span="12">
                 <a-card title="Response">
 
                     <template #extra>
                         <a-space direction="horizontal">
+                            <a-button @click="update">Update</a-button>
                             <a-button @click="chat">Request</a-button>
                             <a-button @click="doCommit">Commit</a-button>
                             <a-button @click="() => copy(response)">Copy</a-button>
@@ -93,21 +126,20 @@
                         </a-space>
                     </template>
 
-                    <a-collapse>
+                    <!-- <a-collapse>
 
                         <a-collapse-panel header="Prompt Preview">
                             <PromptCard :messages="prompt.messages.filter((i) => i.enable)"></PromptCard>
                         </a-collapse-panel>
-                    </a-collapse>
+                    </a-collapse> -->
 
-                    <a-divider></a-divider>
-
+                    <!-- <a-divider></a-divider> -->
 
 
 
                     <a-skeleton :loading="loading" active avatar>
                         <div>
-
+                            <a-text>time cost: {{ timecost / 1000 }} second</a-text>
 
                             <a-divider></a-divider>
 
@@ -121,7 +153,6 @@
                             </a-tabs>
 
 
-
                         </div>
                     </a-skeleton>
 
@@ -129,9 +160,7 @@
 
 
 
-
                 <a-card title="LLM Options">
-
 
                     <a-list item-layout="horizontal">
                         <a-list-item>
@@ -180,7 +209,6 @@
 
                         </a-list-item>
 
-
                         <a-space>
                             <ArgumentPanel :setting="store.globalArgs" :args="args" @select=selectArg>
                             </ArgumentPanel>
@@ -189,53 +217,6 @@
                     </a-list>
 
                 </a-card>
-
-
-                <a-card title="Replace Args">
-
-                    <template #extra>
-                        <a-button @click="fetchArgument(key)">
-                            <template #icon>
-                                <SyncOutlined />
-                            </template>
-                        </a-button>
-                    </template>
-
-
-
-                    <ArgumentPanel :setting="argSetting" :args="args" @select=selectArg>
-                        <template #extra>
-                            <a-space direction="horizontal">
-                                <a-select ref="select" v-model:value="argKey" style="width: 120px" show-search>
-                                    <a-select-option v-for="k in args" :key="k.key">{{ k.key }}</a-select-option>
-                                </a-select>
-
-                                <a-input v-model:value="argKey" placeholder="key">
-                                </a-input>
-
-                                <a-input v-model:value="argValue" placeholder="value">
-                                </a-input>
-
-                                <a-button @click="newArg()">
-                                    <template #icon>
-                                        <PlusOutlined />
-                                    </template>
-                                    New
-                                </a-button>
-                            </a-space>
-                            <a-divider></a-divider>
-
-                        </template>
-                    </ArgumentPanel>
-
-
-                </a-card>
-
-
-
-
-
-
             </a-col>
         </a-row>
     </div>
@@ -244,7 +225,7 @@
 <script lang="ts" setup>
 import { PlusOutlined, SyncOutlined } from '@ant-design/icons-vue';
 import { useClipboard } from '@vueuse/core';
-import { onMounted, ref } from 'vue';
+import { computed, onMounted, ref } from 'vue';
 
 import { useRoute } from 'vue-router';
 
@@ -265,7 +246,6 @@ import type {
     UpdatePromptBody
 } from "src/sdk";
 import VueMarkdown from 'vue-markdown-render';
-import PromptCard from '../components/PromptCard.vue';
 
 const store = useConfigStore()
 // use
@@ -276,11 +256,23 @@ const key = r.params.key.toString()
 
 const responseMode = ref()
 
-
 // field
 const loading = ref(false)
 const model = ref<string>("")
+const timecost = ref<number>(0)
 
+const description = computed(
+    {
+        // getter
+        get() {
+            return prompt.value.description ?? ""
+        },
+        // setter
+        set(newValue) {
+            // Note: we are using destructuring assignment syntax here.
+            prompt.value.description = newValue
+        }
+    })
 
 
 const withEmbed = ref<boolean>(false)
@@ -305,13 +297,14 @@ onMounted(
     }
 )
 
-function reloadModels() {
-    backend.apiGlobalModelsGet()
+async function reloadModels() {
+    console.log("reload models")
+    await backend.apiGlobalModelsGet()
         .then((res) => {
+            console.log(res.data)
             store.globalModels = res.data
         })
 }
-
 
 
 function updateDefaultModel(model: string) {
@@ -325,7 +318,6 @@ function updateDefaultModel(model: string) {
             openNotification(err, 'error')
         })
 }
-
 
 function selectArg(key: string, value: string) {
     for (const item of args.value) {
@@ -359,7 +351,6 @@ async function newArg() {
 
 }
 
-
 // methods
 function responseToPrompt() {
     addPrompt(prompt.value.messages.length, 'assistant', response.value)
@@ -372,7 +363,6 @@ function deletePrompt(index: number) {
 }
 
 
-
 async function doCommit() {
     let body: NewCommitBody = {
         name: key,
@@ -381,6 +371,7 @@ async function doCommit() {
             response: response.value,
             args: args.value,
             options: options.value,
+            timecost: timecost.value,
         },
     }
     backend.apiCommitPost(body)
@@ -396,6 +387,9 @@ function addPrompt(index: number, role: string, content: string) {
     let m: Message = { content: content, role: role, enable: true, }
     let ms = prompt.value.messages
     while (1) {
+        if (index - 1 < 0) {
+            break
+        }
         if (ms[index - 1].role == 'system') {
             index -= 1
         } else {
@@ -422,7 +416,6 @@ function order(index: number, delta: number) {
 
     console.log(prompt.value.messages)
 }
-
 
 async function fetchArgument(name: string) {
     await backend.apiPromptArgsNameGet(name)
@@ -455,7 +448,6 @@ async function fetchPrompt(name: string) {
             model.value = options.value.model!!
             console.log(model.value)
 
-
             let idx = prompt.value.plugins?.findIndex(it => { return it == 'embed' })
             console.info(idx)
             if (idx !== undefined && idx >= 0) {
@@ -471,6 +463,20 @@ function reload() {
     fetchPrompt(key);
 }
 
+async function update() {
+    console.log("model", model.value)
+    console.log(prompt.value.messages)
+    let body: UpdatePromptBody = {
+        messages: prompt.value.messages!!,
+        args: args.value,
+        options: options.value,
+        description: description.value,
+    }
+    await backend.apiPromptNamePut(body, key).catch((err) => {
+        console.log(err)
+        openNotification(err.toString(), "error")
+    })
+}
 
 async function chat() {
     if (withEmbed.value) {
@@ -494,7 +500,6 @@ async function chatWithRAG() {
         //     .then((res) => {
         //         messages[0].content = res.data
         //     })
-
 
         let body: UpdatePromptBody = {
             messages: prompt.value.messages!!,
@@ -546,12 +551,18 @@ async function chatWithPrompt() {
     try {
         loading.value = true
         response.value = ''
+
+        options.value.model = model.value
+
+        var start = new Date().getTime()
         await BackendHelper.doChat(options.value, prompt.value.messages, args.value)
             .then(
                 (res) => {
                     response.value = res.data;
                 }
             )
+        var end = new Date().getTime()
+        timecost.value = end - start
 
     } catch (err) {
         console.log(err)

@@ -80,7 +80,10 @@ function getSelect(key: string) {
     <a-list item-layout="horizontal">
         <!-- <a-table :columns="columns" :data-source="data"> -->
         <!-- </a-table> -->
-        <slot name="extra"></slot>
+        <a-list-item>
+            <slot name="extra"></slot>
+
+        </a-list-item>
 
         <a-list-item v-for="(arg, index) in  setting.args " :key="index">
 
@@ -110,9 +113,7 @@ function getSelect(key: string) {
             </a-space>
 
         </a-list-item>
-
     </a-list>
-
 </template>
 
 <style scoped></style>

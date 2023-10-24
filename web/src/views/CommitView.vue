@@ -183,7 +183,7 @@ function selectArg(key: string, value: string) {
 }
 
 
-const simpleOnly = ref(false)
+const simpleModel = ref(true)
 
 
 </script>
@@ -201,7 +201,7 @@ const simpleOnly = ref(false)
                     <a-checkbox v-model:checked="autoSave">Auto Save</a-checkbox>
                     <a-divider type="vertical"></a-divider>
                     <a-checkbox v-model:checked="starOnly">Star Only</a-checkbox>
-                    <a-checkbox v-model:checked="simpleOnly">Simple</a-checkbox>
+                    <a-checkbox v-model:checked="simpleModel">Simple</a-checkbox>
                 </a-space>
 
 
@@ -236,7 +236,7 @@ const simpleOnly = ref(false)
         <a-col :span="8" v-for="(  commit, index  ) in    commits   " :key="index">
             <a-card v-if="(starOnly && (commit.star ?? false)) || (!starOnly)">
 
-                <div v-if="!simpleOnly">
+                <div v-if="!simpleModel">
                     <!--        button-->
                     <a-button @click="doChat(commit)">Request</a-button>
                     <a-button @click="replay(commit)">Replay</a-button>
@@ -250,6 +250,8 @@ const simpleOnly = ref(false)
                 <!-- args -->
 
                 <a-card title="Args">
+
+
                     <a-space v-for="( item, index ) in  commit.args " :key="index">
                         <a-typography-text :content="item.key">
                         </a-typography-text>
@@ -262,6 +264,7 @@ const simpleOnly = ref(false)
                 <!--response-->
                 <a-card :title="commit.options!!.model" class="highlight-ant-card-head ">
 
+
                     <template #extra>
                         <a-button @click="changeStar(commit)">
                             <template #icon>
@@ -270,6 +273,11 @@ const simpleOnly = ref(false)
                             </template>
                         </a-button>
                     </template>
+
+                    <a-typography-text>Request Timecost: {{ (commit.timecost?? 0) / 1000 }} seconds</a-typography-text>
+
+                    <a-divider></a-divider>
+
                     <vue-markdown :source="commit.response" :options="{}"
                         style="height: 100px; overflow-y: scroll;"></vue-markdown>
                 </a-card>
@@ -279,7 +287,7 @@ const simpleOnly = ref(false)
 
                 <!-- prompt -->
                 <PromptInput :title="'Prompt'" :messages="commit.messages!!" with-copy with-sidebar
-                    :with-enable="simpleOnly">
+                    :with-enable="simpleModel">
 
                 </PromptInput>
 
