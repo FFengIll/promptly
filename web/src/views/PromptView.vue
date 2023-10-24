@@ -166,10 +166,10 @@
                         <a-list-item>
                             <a-space>
                                 Model:
-                                <ModelSelect style="width: 200px" :selected="model" :prefer="options!!.model"
+                                <ModelSelect style="width: 200px" :selected="model" :prefer="options!!.prefer"
                                     :models="store.globalModels.models ?? []"
                                     v-on:select="(value: string) => { model = value }"
-                                    v-on:prefer="(value: string) => updateDefaultModel(value)">
+                                    v-on:prefer="(value: string) => updatePreferModel(value)">
                                 </ModelSelect>
                                 <a-button @click="reloadModels()">
                                     <template #icon>
@@ -307,8 +307,8 @@ async function reloadModels() {
 }
 
 
-function updateDefaultModel(model: string) {
-    options.value.model = model
+function updatePreferModel(model: string) {
+    options.value.prefer = model
     let body: UpdatePromptBody = <UpdatePromptBody>({ options: options.value })
     backend.apiPromptNamePut(body, prompt.value.name)
         .then(() => {
@@ -503,7 +503,7 @@ async function chatWithRAG() {
 
         let body: UpdatePromptBody = {
             messages: prompt.value.messages!!,
-            model: model.value,
+            options: options.value,
             args: args.value,
             plugins: [
                 'embed'
