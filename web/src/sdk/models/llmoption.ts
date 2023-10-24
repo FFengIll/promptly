@@ -35,4 +35,10 @@ export interface LLMOption {
      * @memberof LLMOption
      */
     model?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof LLMOption
+     */
+    prefer?: string;
 }

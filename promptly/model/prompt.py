@@ -43,6 +43,7 @@ class LLMOption(BaseModel):
     temperature: float = 1.0
     top_p: float = Field(default=1.0, alias="topP")
     model: str = ""
+    prefer: str = ""
 
 
 @autocomplete
