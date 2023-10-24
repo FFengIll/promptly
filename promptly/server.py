@@ -4,7 +4,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from starlette.staticfiles import StaticFiles
 
-from promptly.api import case, action, prompt, static, embed, config
+from promptly.api import action, case, config, embed, prompt, static
 from promptly.dao.mongo import MongoManager
 
 __all__ = ["app"]

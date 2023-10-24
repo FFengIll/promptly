@@ -19,6 +19,7 @@ def main(
         "", "-c", "--config", is_eager=True, help="config file path"
     ),
     host: str = typer.Option("127.0.0.1", "--host", help="host"),
+    reload: bool = typer.Option(False, "-r", "--reload", is_flag=True),
 ):
     config = SystemConfigModel.parse_from(config)
     log.info(config)
@@ -29,7 +30,10 @@ def main(
 
     from promptly.server import app
 
-    uvicorn.run(app, host=host, port=8000)
+    if reload:
+        uvicorn.run("promptly.server:app", host=host, port=8000, reload=True)
+    else:
+        uvicorn.run(app, host=host, port=8000)
 
 
 if __name__ == "__main__":
