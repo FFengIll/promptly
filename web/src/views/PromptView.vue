@@ -15,7 +15,7 @@
             <a-space direction="horizontal" align="baseline">
                 <a-button @click="reload">
                     <template #icon>
-                        <SyncOutlined />
+                        <SyncOutlined/>
                     </template>
                 </a-button>
                 <a-divider type="vertical"></a-divider>
@@ -43,38 +43,6 @@
                     </a-collapse-panel>
                 </a-collapse> -->
 
-                <a-card title="Replace Args">
-                    <template #extra>
-                        <a-button @click="fetchArgument(key)">
-                            <template #icon>
-                                <SyncOutlined />
-                            </template>
-                        </a-button>
-                    </template>
-
-                    <ArgumentPanel :setting="argSetting" :args="args" @select=selectArg>
-                        <template #extra>
-                            <a-space direction="horizontal">
-                                <a-select ref="select" v-model:value="argKey" style="width: 120px" show-search>
-                                    <a-select-option v-for="k in args" :key="k.key">{{ k.key }}</a-select-option>
-                                </a-select>
-
-                                <a-input v-model:value="argKey" placeholder="key">
-                                </a-input>
-
-                                <a-input v-model:value="argValue" placeholder="value">
-                                </a-input>
-
-                                <a-button @click="newArg()">
-                                    <template #icon>
-                                        <PlusOutlined />
-                                    </template>
-                                    New
-                                </a-button>
-                            </a-space>
-                        </template>
-                    </ArgumentPanel>
-                </a-card>
 
                 <a-card title="Prompt">
                     <template #extra>
@@ -84,7 +52,8 @@
                                 CopyAll
                             </a-button>
                             <a-divider type="vertical"></a-divider>
-                            <a-button @click="() => { prompt.messages.forEach((item) => item.enable = false) }">DisableAll
+                            <a-button @click="() => { prompt.messages.forEach((item) => item.enable = false) }">
+                                DisableAll
                             </a-button>
                             <a-button @click="() => { prompt.messages.forEach((item) => item.enable = true) }">EnableAll
                             </a-button>
@@ -92,17 +61,21 @@
                     </template>
 
                     <a-row justify="space-around">
-                        <PromptInput :messages="prompt.messages" with-copy with-control
-                            @order-up="index => order(index, -1)" @order-down="index => order(index, 1)"
-                            @remove="index => deletePrompt(index)" @add="index => addPrompt(index, 'user', '')">
-                        </PromptInput>
+                        <a-col :span="24">
+                            <PromptInput :messages="prompt.messages" with-copy with-control
+                                         @order-up="index => order(index, -1)" @order-down="index => order(index, 1)"
+                                         @remove="index => deletePrompt(index)"
+                                         @add="index => addPrompt(index, 'user', '')">
+                            </PromptInput>
+                        </a-col>
                     </a-row>
 
                     <a-divider>
                         <a-space>
-                            <a-button @click="() => prompt.messages.push({ role: 'system', enable: true, content: '' })">
+                            <a-button
+                                @click="() => prompt.messages.push({ role: 'system', enable: true, content: '' })">
                                 <template #icon>
-                                    <PlusOutlined />
+                                    <PlusOutlined/>
                                 </template>
                             </a-button>
                         </a-space>
@@ -136,7 +109,6 @@
                     <!-- <a-divider></a-divider> -->
 
 
-
                     <a-skeleton :loading="loading" active avatar>
                         <div>
                             <a-text>time cost: {{ timecost / 1000 }} second</a-text>
@@ -144,8 +116,10 @@
                             <a-divider></a-divider>
 
                             <a-tabs v-model:activeKey="responseMode">
-                                <a-tab-pane key="1" tab="Markown"> <vue-markdown :source="response"
-                                        :options="{}"></vue-markdown></a-tab-pane>
+                                <a-tab-pane key="1" tab="Markown">
+                                    <vue-markdown :source="response"
+                                                  :options="{}"></vue-markdown>
+                                </a-tab-pane>
                                 <a-tab-pane key="2" tab="Text" force-render>
                                     <a-textarea v-model:value="response" :auto-size="{ maxRows: 16 }">
                                     </a-textarea>
@@ -159,6 +133,38 @@
                 </a-card>
 
 
+                <a-card title="Replace Args">
+                    <template #extra>
+                        <a-button @click="fetchArgument(key)">
+                            <template #icon>
+                                <SyncOutlined/>
+                            </template>
+                        </a-button>
+                    </template>
+
+                    <ArgumentPanel :setting="argSetting" :args="args" @select=selectArg>
+                        <template #extra>
+                            <a-space direction="horizontal">
+                                <a-select ref="select" v-model:value="argKey" style="width: 120px" show-search>
+                                    <a-select-option v-for="k in args" :key="k.key">{{ k.key }}</a-select-option>
+                                </a-select>
+
+                                <a-input v-model:value="argKey" placeholder="key">
+                                </a-input>
+
+                                <a-input v-model:value="argValue" placeholder="value">
+                                </a-input>
+
+                                <a-button @click="newArg()">
+                                    <template #icon>
+                                        <PlusOutlined/>
+                                    </template>
+                                    New
+                                </a-button>
+                            </a-space>
+                        </template>
+                    </ArgumentPanel>
+                </a-card>
 
                 <a-card title="LLM Options">
 
@@ -167,13 +173,13 @@
                             <a-space>
                                 Model:
                                 <ModelSelect style="width: 200px" :selected="model" :prefer="options!!.prefer"
-                                    :models="store.globalModels.models ?? []"
-                                    v-on:select="(value: string) => { model = value }"
-                                    v-on:prefer="(value: string) => updatePreferModel(value)">
+                                             :models="store.globalModels.models ?? []"
+                                             v-on:select="(value: string) => { model = value }"
+                                             v-on:prefer="(value: string) => updatePreferModel(value)">
                                 </ModelSelect>
                                 <a-button @click="reloadModels()">
                                     <template #icon>
-                                        <SyncOutlined />
+                                        <SyncOutlined/>
                                     </template>
                                 </a-button>
                             </a-space>
@@ -183,13 +189,13 @@
                             <a-space>
                                 Temperature:
                                 <a-input-number style="width: 100px" :min="0" :max="2" :step="0.1"
-                                    v-model:value="options.temperature" placeholder="key">
+                                                v-model:value="options.temperature" placeholder="key">
                                 </a-input-number>
                             </a-space>
                             <a-space>
                                 Top_P:
                                 <a-input-number style="width: 100px" :min="0" :max="2" :step="0.1"
-                                    v-model:value="options.topP" placeholder="key">
+                                                v-model:value="options.topP" placeholder="key">
                                 </a-input-number>
                             </a-space>
 
@@ -223,18 +229,18 @@
 </template>
 
 <script lang="ts" setup>
-import { PlusOutlined, SyncOutlined } from '@ant-design/icons-vue';
-import { useClipboard } from '@vueuse/core';
-import { computed, onMounted, ref } from 'vue';
+import {PlusOutlined, SyncOutlined} from '@ant-design/icons-vue';
+import {useClipboard} from '@vueuse/core';
+import {computed, onMounted, ref} from 'vue';
 
-import { useRoute } from 'vue-router';
+import {useRoute} from 'vue-router';
 
 import ArgumentPanel from '@/components/ArgumentPanel.vue';
 import ModelSelect from '@/components/ModelSelect.vue';
 import PromptInput from "@/components/PromptInput.vue";
-import { backend, BackendHelper } from "@/scripts/backend";
-import { openNotification } from "@/scripts/notice";
-import { useConfigStore } from "@/stores/global-config";
+import {backend, BackendHelper} from "@/scripts/backend";
+import {openNotification} from "@/scripts/notice";
+import {useConfigStore} from "@/stores/global-config";
 import type {
     ArgRequest,
     Argument,
@@ -250,7 +256,7 @@ import VueMarkdown from 'vue-markdown-render';
 const store = useConfigStore()
 // use
 const r = useRoute()
-const { text, copy, copied, isSupported } = useClipboard({})
+const {text, copy, copied, isSupported} = useClipboard({})
 
 const key = r.params.key.toString()
 
@@ -309,7 +315,7 @@ async function reloadModels() {
 
 function updatePreferModel(model: string) {
     options.value.prefer = model
-    let body: UpdatePromptBody = <UpdatePromptBody>({ options: options.value })
+    let body: UpdatePromptBody = <UpdatePromptBody>({options: options.value})
     backend.apiPromptNamePut(body, prompt.value.name)
         .then(() => {
             console.log(model)
@@ -326,7 +332,7 @@ function selectArg(key: string, value: string) {
             return
         }
     }
-    args.value.push({ key: key, value: value, candidates: [] })
+    args.value.push({key: key, value: value, candidates: []})
 }
 
 async function newArg() {
@@ -384,7 +390,7 @@ async function doCommit() {
 }
 
 function addPrompt(index: number, role: string, content: string) {
-    let m: Message = { content: content, role: role, enable: true, }
+    let m: Message = {content: content, role: role, enable: true,}
     let ms = prompt.value.messages
     while (1) {
         if (index - 1 < 0) {
@@ -448,7 +454,9 @@ async function fetchPrompt(name: string) {
             model.value = options.value.model!!
             console.log(model.value)
 
-            let idx = prompt.value.plugins?.findIndex(it => { return it == 'embed' })
+            let idx = prompt.value.plugins?.findIndex(it => {
+                return it == 'embed'
+            })
             console.info(idx)
             if (idx !== undefined && idx >= 0) {
                 withEmbed.value = true

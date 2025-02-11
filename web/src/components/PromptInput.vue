@@ -1,14 +1,14 @@
 <script setup lang="ts">
 
-import { CloseOutlined, DownOutlined, PlusOutlined, UpOutlined } from "@ant-design/icons-vue";
+import {CloseOutlined, DownOutlined, PlusOutlined, UpOutlined} from "@ant-design/icons-vue";
 
-import { useClipboard } from '@vueuse/core';
-import { useRouter } from 'vue-router';
+import {useClipboard} from '@vueuse/core';
+import {useRouter} from 'vue-router';
 
-import type { Message } from "@/sdk/models";
+import type {Message} from "@/sdk/models";
 
 
-const { text, copy, copied, isSupported } = useClipboard({})
+const {text, copy, copied, isSupported} = useClipboard({})
 
 const router = useRouter()
 
@@ -18,7 +18,6 @@ const emit = defineEmits<{
     (e: 'remove', index: number): void
     (e: 'add', index: number): void
 }>()
-
 
 
 export interface Props {
@@ -31,12 +30,12 @@ export interface Props {
 }
 
 const props = withDefaults(defineProps<Props>(), {
-    withControl: false,
-    withCopy: false,
-    withSidebar: false,
-    title: "",
-    withEnable: false,
-}
+        withControl: false,
+        withCopy: false,
+        withSidebar: false,
+        title: "",
+        withEnable: false,
+    }
 )
 
 
@@ -59,14 +58,14 @@ function remove(index) {
 function color(role: string) {
     switch (role) {
         case 'user':
-            return { color: 'blue' }
+            return {color: 'blue'}
 
             break;
         case 'system':
-            return { color: 'red' }
+            return {color: 'red'}
 
         case 'assitant':
-            return { color: 'black' }
+            return {color: 'black'}
             break
         default:
             break;
@@ -95,36 +94,47 @@ const dragData = () => {
             <a-row v-if="withControl">
                 <a-divider>
                     <a-space>
-                        <a-button @click="add(index)">
+                        <a-button shape="round" @click="add(index)">
                             <template #icon>
-                                <PlusOutlined />
+                                <PlusOutlined/>
                             </template>
                         </a-button>
 
-                        <a-divider type="vertical"></a-divider>
 
                         <!-- up down the order -->
-                        <a-button type="primary" shape="round" @click="orderUp(index,)">
+                        <a-button shape="round" @click="orderUp(index,)">
                             <template #icon>
-                                <UpOutlined />
+                                <UpOutlined/>
                             </template>
                         </a-button>
-                        <a-button type="primary" shape="round" @click="orderDown(index)">
+                        <a-button shape="round" @click="orderDown(index)">
                             <template #icon>
-                                <DownOutlined />
+                                <DownOutlined/>
                             </template>
                         </a-button>
 
-                        <a-divider type="vertical"></a-divider>
+
+                        <a-button v-if="withSidebar" :style="color(item.role)">
+                            {{ item.role }}
+                        </a-button>
+
 
                         <a-popconfirm title="Are you sure delete this task?" ok-text="Yes" cancel-text="No"
-                            @confirm="remove(index)">
-                            <a-button>
+                                      @confirm="remove(index)">
+                            <a-button shape="round">
                                 <template #icon>
-                                    <CloseOutlined />
+                                    <CloseOutlined/>
                                 </template>
                             </a-button>
                         </a-popconfirm>
+
+                        <a-divider type="vertical"></a-divider>
+
+                        <a-space v-if="withControl">
+                            <a-switch size="default" v-model:checked="item.enable" checked-children="On"
+                                      un-checked-children="Off"/>
+                        </a-space>
+                        <a-button v-if="withCopy" @click="copy(JSON.stringify(item.content))">Copy JSON</a-button>
 
                     </a-space>
 
@@ -133,35 +143,24 @@ const dragData = () => {
             <a-row>
                 <!-- role -->
                 <a-space direction="vertical">
-                    <a-radio-group v-if="!withSidebar" v-model:value="item.role" option-type="button" button-style="solid">
+                    <a-radio-group v-if="!withSidebar" v-model:value="item.role" option-type="button"
+                                   button-style="solid">
                         <a-radio-button value="user">User</a-radio-button>
                         <a-radio-button value="system">System</a-radio-button>
                         <a-radio-button value="assistant">Assitant</a-radio-button>
                     </a-radio-group>
                 </a-space>
-                <a-divider type="vertical"></a-divider>
-
-                <!-- enable toggle -->
-                <a-space direction="horizontal">
-                    <a-button v-if="withSidebar" :style="color(item.role)">
-                        {{ item.role }}
-                    </a-button>
-                    <a-space v-if="withControl">
-                        <a-typography-text>Enable</a-typography-text>
-                        <a-switch v-model:checked="item.enable"></a-switch>
-                    </a-space>
-                    <a-button v-if="withCopy" @click="copy(JSON.stringify(item.content))">Copy JSON</a-button>
-                </a-space>
             </a-row>
-            <a-row :gutter="12" align="middle">
+            <a-row>
 
                 <a-col :span='24'>
                     <!-- content edit -->
                     <a-textarea :disabled="!item.enable" v-model:value="item.content"
-                        :auto-size="{ minRows: 3, maxRows: 5 }" placeholder="textarea with clear icon" />
+                                :auto-size="{ minRows: 3, maxRows: 5 }" placeholder="textarea with clear icon"/>
                 </a-col>
 
             </a-row>
+
         </div>
     </div>
 </template>
