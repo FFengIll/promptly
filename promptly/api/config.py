@@ -35,6 +35,6 @@ class ModelSetting(BaseModel):
 def get_global_argument():
     res = ModelSetting(
         defaultModel=SystemConfigModel.singleton().default_model,
-        models=SystemConfigModel.singleton().models,
+        models=SystemConfigModel.singleton().list_models(),
     )
     return res

@@ -1,22 +1,29 @@
-# a map, which map name to real model id
-models: 
-  # openai
-  - gpt-3.5-turbo
-  - gpt-4
-  - gpt-3.5-turbo-instruct
-  - gpt-3.5-turbo-0613
-  - gpt-4-0613 
+default_model: deepseek-chat
 
-  # openrouter
-  - meta-llama/codellama-34b-instruct
-  - phind/phind-codellama-34b
-  - anthropic/claude-instant-v1
-  - anthropic/claude-2
-  - openai/gpt-3.5-turbo
-  - openai/gpt-4
-  - meta-llama/llama-2-70b-chat
-  - google/palm-2-codechat-bison
+# a map, which map name to real model id, and group them by provider
+providers:
+  - name: deepseek
+    api_key: "fake-xxx"
+    api_base: https://api.deepseek.com
+    models:
+      - deepseek-chat
+  
+  - name: openai
+    models: 
+      # openai
+      - gpt-3.5-turbo
+      - gpt-4
+      - gpt-3.5-turbo-instruct
+      - gpt-3.5-turbo-0613
+      - gpt-4-0613 
 
-defaultModel: gpt-3.5-turbo
-api_key: fake_xxx
-api_base: http://localhost:8080/api/v1
+  - name: openrouter
+    models:
+      - meta-llama/codellama-34b-instruct
+      - phind/phind-codellama-34b
+      - anthropic/claude-instant-v1
+      - anthropic/claude-2
+      - openai/gpt-3.5-turbo
+      - openai/gpt-4
+      - meta-llama/llama-2-70b-chat
+      - google/palm-2-codechat-bison
