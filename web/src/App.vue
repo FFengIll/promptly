@@ -54,6 +54,10 @@ function routerTo(view: string) {
         <a-layout-sider v-model:collapsed="collapsed" :trigger="null" collapsible>
             <div class="logo" />
 
+
+          <menu-unfold-outlined v-if="collapsed" class="trigger icon-white"  @click="() => (collapsed = !collapsed)" />
+          <menu-fold-outlined v-else class="trigger icon-white"  @click="() => (collapsed = !collapsed)" />
+
             <a-menu theme="dark" @click="(e) => routerTo(e.key)" mode="inline" :style="{ lineHeight: '64px' }">
                 <a-menu-item key="index">Index</a-menu-item>
                 <a-menu-item key="prompt">Prompt</a-menu-item>
@@ -64,12 +68,6 @@ function routerTo(view: string) {
         </a-layout-sider>
 
         <a-layout>
-            <a-layout-header style="background: #fff; padding: 0">
-                <menu-unfold-outlined v-if="collapsed" class="trigger" @click="() => (collapsed = !collapsed)" />
-                <menu-fold-outlined v-else class="trigger" @click="() => (collapsed = !collapsed)" />
-
-            </a-layout-header>
-
             <a-layout-content :style="{ margin: '24px 16px', padding: '24px', background: '#fff', minHeight: '280px' }">
                 <RouterView />
             </a-layout-content>
@@ -85,10 +83,16 @@ function routerTo(view: string) {
     padding: 0 24px;
     cursor: pointer;
     transition: color 0.3s;
+    justify-content: center;
+    align-items: center;
 }
 
 .trigger:hover {
     color: #1890ff;
+}
+
+.icon-white {
+  color: white;
 }
 
 .logo {
