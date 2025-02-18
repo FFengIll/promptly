@@ -9,8 +9,6 @@ readme = "README.md"
 python = "^3.10"
 
 fastapi = "0.115.8"
-# httpx = "^0.24.1"
-openai = "1.61.1"
 uvicorn = "0.34.0"
 loguru = "^0.7.2"
 path = "^16.7.1"
@@ -22,12 +20,15 @@ typing-inspect = "^0.9.0"
 requests = { extras = ["socks"], version = "^2.31.0" }
 typer = "^0.15.1"
 pyyaml = "^6.0.2"
+httpx = "^0.28.1"
+openai = "0.28"
+pydantic = "^2.10.6"
 
 [[tool.poetry.source]]
 # 国内建议修改源
 name = "aliyun"
 url = "https://mirrors.aliyun.com/pypi/simple/"
-priority = "default"
+priority = "primary"
 
 
 [tool.poetry.group.test.dependencies]
