@@ -17,9 +17,9 @@ def to_message(ms: List[Message]):
     return res
 
 
-def simple_chat(content):
+async def simple_chat(content):
     messages = [dict(role="user", content=content)]
-    return chat(messages)
+    return await chat(messages)
 
 
 async def chat(messages, model="", **kwargs):
