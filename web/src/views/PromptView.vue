@@ -9,24 +9,33 @@
 
 <template>
     <div>
-        <a-space align="center" style="width: 100%">
+        <a-space
+            align="baseline"
+            style="width: 100%"
+        >
             <a-typography-title>{{ key }}</a-typography-title>
 
-            <a-space direction="horizontal" align="baseline">
-                <a-button @click="reload">
-                    <template #icon>
-                        <SyncOutlined/>
-                    </template>
-                </a-button>
-                <a-divider type="vertical"></a-divider>
-            </a-space>
-        </a-space>
-        <a-space>
-            <a-input style="width: 400px" v-model:value="description"></a-input>
+            <a-divider type="vertical"></a-divider>
+
+            <a-input
+                style="width: 400px"
+                v-model:value="description"
+            ></a-input>
+
+            <a-divider type="vertical"></a-divider>
+
+            <a-button @click="reload">
+                <template #icon>
+                    <SyncOutlined/>
+                </template>
+            </a-button>
         </a-space>
 
         <a-row :gutter='6'>
-            <a-col class="gutter-row" :span="12">
+            <a-col
+                class="gutter-row"
+                :span="12"
+            >
 
                 <!-- <a-collapse>
                     <a-collapse-panel header="History">
@@ -48,8 +57,9 @@
                     <template #extra>
                         <a-space>
                             <a-button
-                                @click="() => { copy(JSON.stringify({ name: key, prompt: prompt.messages.filter((item: Message) => { return item.enable }) }, null, 2)) }">
-                                CopyAll
+                                @click="() => { copy(JSON.stringify({ name: key, prompt: prompt.messages.filter((item: Message) => { return item.enable }) }, null, 2)) }"
+                            >
+                                <CopyOutlined/>
                             </a-button>
                             <a-divider type="vertical"></a-divider>
                             <a-button @click="() => { prompt.messages.forEach((item) => item.enable = false) }">
@@ -62,10 +72,15 @@
 
                     <a-row justify="space-around">
                         <a-col :span="24">
-                            <PromptInput :messages="prompt.messages" with-copy with-control
-                                         @order-up="index => order(index, -1)" @order-down="index => order(index, 1)"
-                                         @remove="index => deletePrompt(index)"
-                                         @add="index => addPrompt(index, 'user', '')">
+                            <PromptInput
+                                :messages="prompt.messages"
+                                with-copy
+                                with-control
+                                @order-up="index => order(index, -1)"
+                                @order-down="index => order(index, 1)"
+                                @remove="index => deletePrompt(index)"
+                                @add="index => addPrompt(index, 'user', '')"
+                            >
                             </PromptInput>
                         </a-col>
                     </a-row>
@@ -86,7 +101,10 @@
 
             </a-col>
 
-            <a-col class="gutter-row" :span="12">
+            <a-col
+                class="gutter-row"
+                :span="12"
+            >
                 <a-card title="Response">
 
                     <template #extra>
@@ -109,19 +127,35 @@
                     <!-- <a-divider></a-divider> -->
 
 
-                    <a-skeleton :loading="loading" active avatar>
+                    <a-skeleton
+                        :loading="loading"
+                        active
+                        avatar
+                    >
                         <div>
                             <a-text>time cost: {{ timecost / 1000 }} second</a-text>
 
                             <a-divider></a-divider>
 
                             <a-tabs v-model:activeKey="responseMode">
-                                <a-tab-pane key="1" tab="Markown">
-                                    <vue-markdown :source="response"
-                                                  :options="{}"></vue-markdown>
+                                <a-tab-pane
+                                    key="1"
+                                    tab="Markown"
+                                >
+                                    <vue-markdown
+                                        :source="response"
+                                        :options="{}"
+                                    ></vue-markdown>
                                 </a-tab-pane>
-                                <a-tab-pane key="2" tab="Text" force-render>
-                                    <a-textarea v-model:value="response" :auto-size="{ maxRows: 16 }">
+                                <a-tab-pane
+                                    key="2"
+                                    tab="Text"
+                                    force-render
+                                >
+                                    <a-textarea
+                                        v-model:value="response"
+                                        :auto-size="{ maxRows: 16 }"
+                                    >
                                     </a-textarea>
                                 </a-tab-pane>
                             </a-tabs>
@@ -142,17 +176,36 @@
                         </a-button>
                     </template>
 
-                    <ArgumentPanel :setting="argSetting" :args="args" @select=selectArg>
+                    <ArgumentPanel
+                        :setting="argSetting"
+                        :args="args"
+                        @select=selectArg
+                    >
                         <template #extra>
                             <a-space direction="horizontal">
-                                <a-select ref="select" v-model:value="argKey" style="width: 120px" show-search>
-                                    <a-select-option v-for="k in args" :key="k.key">{{ k.key }}</a-select-option>
+                                <a-select
+                                    ref="select"
+                                    v-model:value="argKey"
+                                    style="width: 120px"
+                                    show-search
+                                >
+                                    <a-select-option
+                                        v-for="k in args"
+                                        :key="k.key"
+                                    >{{ k.key }}
+                                    </a-select-option>
                                 </a-select>
 
-                                <a-input v-model:value="argKey" placeholder="key">
+                                <a-input
+                                    v-model:value="argKey"
+                                    placeholder="key"
+                                >
                                 </a-input>
 
-                                <a-input v-model:value="argValue" placeholder="value">
+                                <a-input
+                                    v-model:value="argValue"
+                                    placeholder="value"
+                                >
                                 </a-input>
 
                                 <a-button @click="newArg()">
@@ -172,10 +225,14 @@
                         <a-list-item>
                             <a-space>
                                 Model:
-                                <ModelSelect style="width: 200px" :selected="model" :prefer="options!!.prefer"
-                                             :models="store.globalModels.models ?? []"
-                                             v-on:select="(value: string) => { model = value }"
-                                             v-on:prefer="(value: string) => updatePreferModel(value)">
+                                <ModelSelect
+                                    style="width: 200px"
+                                    :selected="model"
+                                    :prefer="options!!.prefer"
+                                    :models="store.globalModels.models ?? []"
+                                    v-on:select="(value: string) => { model = value }"
+                                    v-on:prefer="(value: string) => updatePreferModel(value)"
+                                >
                                 </ModelSelect>
                                 <a-button @click="reloadModels()">
                                     <template #icon>
@@ -188,14 +245,26 @@
                         <a-list-item>
                             <a-space>
                                 Temperature:
-                                <a-input-number style="width: 100px" :min="0" :max="2" :step="0.1"
-                                                v-model:value="options.temperature" placeholder="key">
+                                <a-input-number
+                                    style="width: 100px"
+                                    :min="0"
+                                    :max="2"
+                                    :step="0.1"
+                                    v-model:value="options.temperature"
+                                    placeholder="key"
+                                >
                                 </a-input-number>
                             </a-space>
                             <a-space>
                                 Top_P:
-                                <a-input-number style="width: 100px" :min="0" :max="2" :step="0.1"
-                                                v-model:value="options.topP" placeholder="key">
+                                <a-input-number
+                                    style="width: 100px"
+                                    :min="0"
+                                    :max="2"
+                                    :step="0.1"
+                                    v-model:value="options.topP"
+                                    placeholder="key"
+                                >
                                 </a-input-number>
                             </a-space>
 
@@ -203,20 +272,27 @@
 
                         <a-list-item>
                             Use Embed
-                            <a-switch v-model:checked="withEmbed" @change="(e) => {
-                                if (e.target.checked) {
-                                    let idx = prompt.plugins!!.findIndex(it => { return it == 'embed' })
-                                    if (idx >= 0) {
-                                        return
+                            <a-switch
+                                v-model:checked="withEmbed"
+                                @change="(e) => {
+                                    if (e.target.checked) {
+                                        let idx = prompt.plugins!!.findIndex(it => { return it == 'embed' })
+                                        if (idx >= 0) {
+                                            return
+                                        }
+                                        prompt.plugins!!.push('embed')
                                     }
-                                    prompt.plugins!!.push('embed')
-                                }
-                            }"></a-switch>
+                                }"
+                            ></a-switch>
 
                         </a-list-item>
 
                         <a-space>
-                            <ArgumentPanel :setting="store.globalArgs" :args="args" @select=selectArg>
+                            <ArgumentPanel
+                                :setting="store.globalArgs"
+                                :args="args"
+                                @select=selectArg
+                            >
                             </ArgumentPanel>
                         </a-space>
 
@@ -229,7 +305,7 @@
 </template>
 
 <script lang="ts" setup>
-import {PlusOutlined, SyncOutlined} from '@ant-design/icons-vue';
+import {CopyOutlined, PlusOutlined, SyncOutlined} from '@ant-design/icons-vue';
 import {useClipboard} from '@vueuse/core';
 import {computed, onMounted, ref} from 'vue';
 
