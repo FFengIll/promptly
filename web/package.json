@@ -11,11 +11,11 @@
   },
   "dependencies": {
     "@ant-design/icons-vue": "^6.1.0",
-    "@antv/l7": "^2.22.3",
-    "@antv/l7-maps": "^2.22.3",
+    "@antv/l7": "^2.22.5",
+    "@antv/l7-maps": "^2.22.5",
     "@antv/l7plot": "^0.5.11",
     "ant-design-vue": "^4.2.6",
-    "axios": "^1.7.9",
+    "axios": "^1.8.4",
     "pinia": "^2.3.1",
     "vue": "^3.5.13",
     "vue-markdown-render": "^2.2.1",
@@ -24,7 +24,7 @@
   "devDependencies": {
     "@tsconfig/node18": "^2.0.1",
     "@types/markdown-it": "^13.0.9",
-    "@types/node": "^18.19.75",
+    "@types/node": "^18.19.80",
     "@vitejs/plugin-vue": "^4.6.2",
     "@vitejs/plugin-vue-jsx": "^3.1.0",
     "@vue/tsconfig": "^0.4.0",
