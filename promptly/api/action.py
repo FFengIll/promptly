@@ -102,7 +102,7 @@ async def chat(body: ChatBody):
     log.info(ms)
     log.info(options)
 
-    content = await llm.chat(ms, **options.dict(by_alias=False))
+    content = await llm.chat(ms, **options.model_dump(by_alias=False))
     log.info(content)
 
     return content
