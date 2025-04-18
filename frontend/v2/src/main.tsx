@@ -10,7 +10,6 @@ import PromptView from './views/PromptView';
 import WelcomeView from './views/Welcome';
 
 
-
 // 导入你的页面组件
 const router = createBrowserRouter([
     {
@@ -20,6 +19,10 @@ const router = createBrowserRouter([
             {
                 path: '/',
                 element: <WelcomeView />,
+            },
+            {
+                path: '/view/index',
+                element: <IndexView />,
             },
             {
                 path: '/view/index/:key',
@@ -40,7 +43,6 @@ const router = createBrowserRouter([
         ],
     },
 ]);
-
 
 
 createRoot(document.getElementById('root')!).render(
