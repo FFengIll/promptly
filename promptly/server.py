@@ -40,4 +40,4 @@ def ping():
 
 
 # put this after all
-app.mount("/", StaticFiles(directory="./web/dist"), name="static")
+app.mount("/", StaticFiles(directory="./frontend/v2/dist"), name="static")

@@ -5,7 +5,7 @@ from fastapi.templating import Jinja2Templates
 
 log = loguru.logger
 
-templates = Jinja2Templates(directory="./web/dist")
+templates = Jinja2Templates(directory="./frontend/v2/dist")
 
 router = fastapi.APIRouter()
 
