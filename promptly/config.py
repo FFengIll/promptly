@@ -10,6 +10,7 @@ class ProviderModel(BaseModel):
     api_base: str = ""
     api_key: str = ""
     models: List[str] = []
+    proxy: str = ""
 
 
 class SystemConfigModel(BaseModel):
@@ -36,8 +37,6 @@ class SystemConfigModel(BaseModel):
 
     @classmethod
     def singleton(cls) -> "SystemConfigModel":
-        if not cls.__parsed:
-            cls.__parsed = SystemConfigModel()
         return cls.__parsed
 
     @classmethod
