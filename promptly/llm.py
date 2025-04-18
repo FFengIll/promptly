@@ -1,7 +1,8 @@
 from typing import List
 
+import httpx
 import loguru
-import openai
+from openai import OpenAI
 
 from promptly.config import ProviderModel, SystemConfigModel
 from promptly.model.prompt import Message
@@ -30,20 +31,23 @@ async def chat(messages, model="", **kwargs):
 
     provider: ProviderModel = config.get_provider(model)
 
-    openai.api_base = provider.api_base
-    openai.api_key = provider.api_key
+    proxy = provider.proxy
 
-    response = openai.ChatCompletion.create(
-        messages=messages,
-        headers={"HTTP-Referer": "https://test.com", "X-Title": "test"},
-        timeout=3,
-        model=model,
-        **kwargs
-    )
+    # TODO: The 'openai.api_base' option isn't read in the client API. You will need to pass it when you instantiate the client, e.g. 'OpenAI(base_url=provider.api_base)'
+    if proxy:
+        client = OpenAI(
+            api_key=provider.api_key,
+            base_url=provider.api_base,
+            http_client=httpx.Client(proxy=str(proxy)),
+        )
+    else:
+        client = OpenAI(api_key=provider.api_key, base_url=provider.api_base)
+
+    response = client.chat.completions.create(model=model, messages=messages, timeout=3)
 
     log.info("response: {}", response)
 
-    choice = response["choices"][0]
+    choice = response.choices[0]
     log.info("choice: {}", choice)
 
     try:
