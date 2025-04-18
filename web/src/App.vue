@@ -104,4 +104,4 @@ function routerTo(view: string) {
 .site-layout .site-layout-background {
     background: #fff;
 }
-</style>./stores/global-config
+</style>
