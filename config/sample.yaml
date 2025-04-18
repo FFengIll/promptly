@@ -5,6 +5,7 @@ providers:
   - name: deepseek
     api_key: "fake-xxx"
     api_base: https://api.deepseek.com
+    proxy: "set this if you need"
     models:
       - deepseek-chat
   
