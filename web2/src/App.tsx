@@ -43,21 +43,21 @@ const App = () => {
     const items: MenuItem[] = [
         {
             label: (
-                <Link to="/view/index">Index</Link>
+                <Link to={`/view/index${params.key ? `/${params.key}` : ''}`}>Index</Link>
             ),
             key: 'index',
             icon: <HomeOutlined />,
         },
         {
             label: (
-                <Link to="/view/prompt">Prompt</Link>
+                <Link to={`/view/prompt${params.key ? `/${params.key}` : ''}`}>Prompt</Link>
             ),
             key: 'prompt',
             icon: <FileOutlined />,
         },
         {
             label: (
-                <Link to="/view/commit">Commit</Link>
+                <Link to={`/view/commit${params.key ? `/${params.key}` : ''}`}>Commit</Link>
             ),
             key: 'commit',
             icon: <CheckOutlined />,

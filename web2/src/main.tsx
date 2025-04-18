@@ -1,3 +1,4 @@
+import '@ant-design/v5-patch-for-react-19';
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
@@ -21,15 +22,15 @@ const router = createBrowserRouter([
                 element: <WelcomeView />,
             },
             {
-                path: '/view/index',
+                path: '/view/index/:key',
                 element: <IndexView />,
             },
             {
-                path: '/view/prompt',
+                path: '/view/prompt/:key',
                 element: <PromptView />,
             },
             {
-                path: '/view/commit',
+                path: '/view/commit/:key',
                 element: <CommitView />,
             },
             // {
