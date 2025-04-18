@@ -9,6 +9,8 @@ from promptly.model.prompt import Message
 
 log = loguru.logger
 
+client_pool = {}
+
 
 def to_message(ms: List[Message]):
     res = []
@@ -33,15 +35,21 @@ async def chat(messages, model="", **kwargs):
 
     proxy = provider.proxy
 
-    # TODO: The 'openai.api_base' option isn't read in the client API. You will need to pass it when you instantiate the client, e.g. 'OpenAI(base_url=provider.api_base)'
-    if proxy:
-        client = OpenAI(
-            api_key=provider.api_key,
-            base_url=provider.api_base,
-            http_client=httpx.Client(proxy=str(proxy)),
-        )
-    else:
-        client = OpenAI(api_key=provider.api_key, base_url=provider.api_base)
+    key = "{}+{}".format(provider.api_base, proxy)
+    client = client_pool.get(key, None)
+
+    if not client:
+        # TODO: The 'openai.api_base' option isn't read in the client API. You will need to pass it when you instantiate the client, e.g. 'OpenAI(base_url=provider.api_base)'
+        if proxy:
+            client = OpenAI(
+                api_key=provider.api_key,
+                base_url=provider.api_base,
+                http_client=httpx.Client(proxy=str(proxy)),
+            )
+        else:
+            client = OpenAI(api_key=provider.api_key, base_url=provider.api_base)
+
+        client_pool[key] = client
 
     response = client.chat.completions.create(model=model, messages=messages, timeout=3)
 
