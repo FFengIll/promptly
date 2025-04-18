@@ -108,16 +108,22 @@ tasks:
   
   dist:
     desc: "build for dist"
-    dir: "{{.ROOT_DIR}}/web"
+    dir: "{{.ROOT_DIR}}/frontend/v2"
     cmds:
       - pnpm run build-only -m prod
   
   front:
     desc: start front for dev
-    dir: "{{.ROOT_DIR}}/web"
+    dir: "{{.ROOT_DIR}}/frontend/v2"
     aliases:
       - "web"
       - "node"
+    cmds:
+      - pnpm run dev
+      
+  front-legacy:
+    desc: start front for dev
+    dir: "{{.ROOT_DIR}}/frontend/v1"
     cmds:
       - pnpm run dev
   
