@@ -1,11 +1,12 @@
-import React, { useState } from 'react';
 import {
     CloseOutlined,
+    CopyOutlined,
     DownOutlined,
     PlusOutlined,
     UpOutlined,
 } from '@ant-design/icons';
-import { Button, Divider, Popconfirm, Radio, Switch, Space, Typography, Row, Col, Input } from 'antd';
+import { Button, Divider, Input, Popconfirm, Radio, Row, Space, Switch } from 'antd';
+import React, { useState } from 'react';
 
 interface Message {
     role: string;
@@ -20,6 +21,7 @@ interface Props {
     withSidebar?: boolean;
     title?: string;
     withEnable?: boolean;
+    setMessages: (messages: Message[]) => void;
     onOrderUp: (index: number) => void;
     onOrderDown: (index: number) => void;
     onRemove: (index: number) => void;
@@ -33,6 +35,7 @@ const PromptInput: React.FC<Props> = ({
     withSidebar = false,
     title = '',
     withEnable = false,
+    setMessages,
     onOrderUp,
     onOrderDown,
     onRemove,
@@ -64,11 +67,11 @@ const PromptInput: React.FC<Props> = ({
     };
 
     return (
-        <div>
+        <>
             {messages.map((item, index) => (
                 <div key={index}>
                     {(withEnable && item.enable) || !withEnable ? (
-                        <Row>
+                        <>
                             {withControl && (
                                 <Divider>
                                     <Space>
@@ -105,62 +108,93 @@ const PromptInput: React.FC<Props> = ({
                                 </Divider>
                             )}
                             <Row>
-                                <Space direction="vertical">
-                                    {!withSidebar && (
-                                        <Radio.Group
-                                            value={item.role}
-                                            onChange={(e) => setSelectedRole(e.target.value)}
-                                            buttonStyle="solid"
-                                        >
-                                            <Radio.Button value="user">User</Radio.Button>
-                                            <Radio.Button value="system">System</Radio.Button>
-                                            <Radio.Button value="assistant">Assistant</Radio.Button>
-                                        </Radio.Group>
-                                    )}
-                                </Space>
-                                <Divider type="vertical" />
-                                <Space direction="horizontal">
+                                <Space direction="horizontal" style={{ width: '100%', display: 'flex', justifyContent: 'space-between' }}>
+                                    <div>
+                                        {!withSidebar && (
+                                            <Radio.Group
+                                                value={item.role}
+                                                onChange={(e) => {
+                                                    const updatedMessages = [...messages];
+                                                    updatedMessages[index].role = e.target.value;
+                                                    setMessages(updatedMessages);
+                                                }}
+                                                buttonStyle="solid"
+                                            >
+                                                <Radio.Button value="user">User</Radio.Button>
+                                                <Radio.Button value="system">System</Radio.Button>
+                                                <Radio.Button value="assistant">Assistant</Radio.Button>
+                                            </Radio.Group>
+                                        )}
+                                    </div>
+
                                     {withSidebar && (
                                         <Button style={color(item.role)}>
                                             {item.role}
                                         </Button>
                                     )}
-                                    {withControl && (
-                                        <>
-                                            <Typography.Text>Enable</Typography.Text>
+
+                                    <Divider type="vertical" />
+
+                                    <div>
+
+                                        {withCopy && (
+                                            <Button
+                                                onClick={() => handleCopy(JSON.stringify(item.content))}
+                                                icon={<CopyOutlined />}
+                                            />
+                                        )}
+
+                                        <Divider type="vertical" />
+
+                                        {withControl && (
                                             <Switch
                                                 checked={item.enable}
                                                 onChange={(checked) => {
-                                                    item.enable = checked;
+                                                    const updatedMessages = [...messages];
+                                                    updatedMessages[index].enable = checked;
+                                                    setMessages(updatedMessages);
                                                 }}
+                                                checkedChildren="Enable"
+                                                unCheckedChildren="Disable"
                                             />
-                                        </>
-                                    )}
-                                    {withCopy && (
-                                        <Button onClick={() => handleCopy(JSON.stringify(item.content))}>
-                                            Copy JSON
-                                        </Button>
-                                    )}
+                                        )}
+
+                                        <Divider type="vertical" />
+
+                                        <Switch
+                                            checked={item.maxRows === item.content.split('\n').length}
+                                            onChange={(checked) => {
+                                                const updatedMessages = [...messages];
+                                                updatedMessages[index].maxRows = checked
+                                                    ? item.content.split('\n').length
+                                                    : 5;
+                                                setMessages(updatedMessages);
+                                            }}
+                                            checkedChildren="Expanded"
+                                            unCheckedChildren="Collapsed"
+                                        />
+                                    </div>
                                 </Space>
                             </Row>
                             <Row gutter={12} align="middle">
-                                <Col span={24}>
-                                    <Input.TextArea
-                                        disabled={!item.enable}
-                                        value={item.content}
-                                        onChange={(e) => {
-                                            item.content = e.target.value;
-                                        }}
-                                        autoSize={{ minRows: 3, maxRows: 5 }}
-                                        placeholder="textarea with clear icon"
-                                    />
-                                </Col>
+                                <Input.TextArea
+                                    disabled={!item.enable}
+                                    value={item.content}
+                                    onChange={(e) => {
+                                        const updatedMessages = [...messages];
+                                        updatedMessages[index].content = e.target.value;
+                                        setMessages(updatedMessages);
+                                    }}
+                                    autoSize={{ minRows: 3, maxRows: item.maxRows ? item.maxRows : 5 }}
+                                    placeholder="textarea with clear icon"
+                                    style={{ width: '100%' }}
+                                />
                             </Row>
-                        </Row>
+                        </>
                     ) : null}
-                </div>
+                </div >
             ))}
-        </div>
+        </>
     );
 };
 

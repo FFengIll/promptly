@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
-import { Select, Button } from 'antd';
 import { HeartOutlined, HeartTwoTone } from '@ant-design/icons';
+import { Button, Select } from 'antd';
+import React from 'react';
 
 interface Props {
     selected: string;
@@ -28,7 +28,7 @@ const ModelSelect: React.FC<Props> = ({ selected, prefer, models, onSelect, onPr
                 value={selected}
                 onChange={handleSelect}
             >
-                {models.map((value) => (
+                {Array.isArray(models) ? models.map((value) => (
                     <Select.Option key={value} value={value}>
                         <Button onClick={() => handleDefault(value)}>
                             {value === prefer ? (
@@ -39,7 +39,7 @@ const ModelSelect: React.FC<Props> = ({ selected, prefer, models, onSelect, onPr
                         </Button>
                         {value}
                     </Select.Option>
-                ))}
+                )) : null}
             </Select>
         </div>
     );

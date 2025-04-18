@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 
 interface Argument {
     key: string;
@@ -42,7 +42,7 @@ const ArgumentPanel: React.FC<Props> = ({ setting, args, mask, onSelect }) => {
         return selectedValues[key] || '';
     };
 
-    const data = Object.keys(setting.args).map((key) => ({
+    const data = Object.keys(setting.args || {}).map((key) => ({
         key: key,
         values: setting.args[key],
     }));

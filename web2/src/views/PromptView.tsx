@@ -6,7 +6,6 @@ import {
     Button,
     Card,
     Col,
-    Collapse,
     Divider,
     Input,
     InputNumber,
@@ -34,25 +33,19 @@ import { openNotification } from '../scripts/notice';
 import { useConfigStore } from '../stores/global';
 
 const { Title } = Typography;
-const { Panel } = Collapse;
 const { TabPane } = Tabs;
 const { Option } = Select;
 
-// CSS classes
-const styles = {
-    scrollShort: {
-        height: '200px',
-        overflow: 'auto',
-    }
-};
 
 function PromptView() {
     const { key } = useParams();
+    console.log("param:", key);
     const store = useConfigStore();
 
     // State variables
     const [loading, setLoading] = useState(false);
     const [model, setModel] = useState("");
+    const [models, setModels] = useState([]);
     const [timecost, setTimecost] = useState(0);
     const [description, setDescription] = useState("");
     const [withEmbed, setWithEmbed] = useState(false);
@@ -60,14 +53,16 @@ function PromptView() {
     const [argKey, setArgKey] = useState("");
     const [response, setResponse] = useState("test");
     const [responseMode, setResponseMode] = useState("1");
-    const [argSetting, setArgSetting] = useState({ name: "", args: [] });
+    const [argSetting, setArgSetting] = useState({});
     const [args, setArgs] = useState([]);
-    const [prompt, setPrompt] = useState({ messages: [] });
-    const [options, setOptions] = useState({});
+    const [messages, setMessages] = useState([]); // Default empty array for messages
+    const [plugins, setPlugins] = useState([]); // Default empty array for plugins
+    const [options, setOptions] = useState({}); // Default empty object for options
 
     // Effects
     useEffect(() => {
         fetchPrompt(key);
+        fetchModels();
     }, [key]);
 
     // Methods
@@ -79,17 +74,18 @@ function PromptView() {
         });
     };
 
-    const reloadModels = async () => {
+    const fetchModels = async () => {
         try {
             const res = await backend.apiGlobalModelsGet();
-            store.setGlobalModels(res.data);
+            console.log("fetch models: ", res.data);
+            setModels(res.data.models || []);
         } catch (err) {
-            openNotification(err.toString(), 'error');
+            openNotification('Failed to reload models: ' + err.toString(), 'error');
         }
     };
 
     const updatePreferModel = (modelName) => {
-        const newOptions = { ...options, prefer: modelName };
+        const newOptions = { ...(options || {}), prefer: modelName }; // 防止 options 为 undefined
         setOptions(newOptions);
 
         const body = { options: newOptions };
@@ -132,20 +128,20 @@ function PromptView() {
     };
 
     const responseToPrompt = () => {
-        addPrompt(prompt.messages.length, 'assistant', response);
+        addPrompt(messages.length, 'assistant', response);
     };
 
     const deletePrompt = (index) => {
-        const newMessages = [...prompt.messages];
+        const newMessages = [...messages];
         newMessages.splice(index, 1);
-        setPrompt({ ...prompt, messages: newMessages });
+        setMessages(newMessages);
     };
 
     const doCommit = async () => {
         const body = {
             name: key,
             commit: {
-                messages: prompt.messages,
+                messages: messages,
                 response,
                 args,
                 options,
@@ -161,7 +157,7 @@ function PromptView() {
     };
 
     const addPrompt = (index, role, content) => {
-        const newMessages = [...prompt.messages];
+        const newMessages = [...messages];
         const newMessage = { content, role, enable: true };
 
         let insertIndex = index;
@@ -170,30 +166,32 @@ function PromptView() {
         }
 
         newMessages.splice(insertIndex, 0, newMessage);
-        setPrompt({ ...prompt, messages: newMessages });
+        setMessages(newMessages);
     };
 
     const order = (index, delta) => {
         const anotherIndex = index + delta;
-        if (anotherIndex < 0 || anotherIndex >= prompt.messages.length) {
+        if (anotherIndex < 0 || anotherIndex >= messages.length) {
             return;
         }
 
-        const newMessages = [...prompt.messages];
+        const newMessages = [...messages];
         const temp = newMessages[index];
         newMessages[index] = newMessages[anotherIndex];
         newMessages[anotherIndex] = temp;
 
-        setPrompt({ ...prompt, messages: newMessages });
+        setMessages(newMessages);
     };
 
     const fetchArgument = async (name) => {
-        try {
-            const response = await backend.apiPromptArgsNameGet(name);
-            setArgSetting(response.data);
-        } catch (err) {
-            openNotification(err.toString(), "error");
-        }
+        setArgSetting({})
+        // try {
+        //     const response = await backend.apiPromptArgsNameGet(name);
+        //     // setArgSetting(response.data || { name: "", args: [] }); // 确保 response.data 有默认值
+        //     setArgSetting({})
+        // } catch (err) {
+        //     openNotification(err.toString(), "error");
+        // }
     };
 
     const fetchPrompt = async (name) => {
@@ -203,16 +201,18 @@ function PromptView() {
             const response = await backend.apiPromptNameGet(name);
             const promptData = response.data;
 
-            setPrompt(promptData);
+            setMessages(promptData.messages || [],)
+            setPlugins(promptData.plugins || [],)
             setDescription(promptData.description || "");
             setArgs(promptData.args || []);
             setOptions(promptData.options || {});
             setModel(promptData.options?.model || "");
 
-            const hasEmbed = promptData.plugins?.includes('embed');
+            const hasEmbed = (promptData.plugins || []).includes('embed');
             setWithEmbed(hasEmbed);
-        } catch (err) {
-            openNotification(err.toString(), "error");
+        } catch (err: any) {
+            console.log(err);
+            // openNotification("" + err.toString(), "error");
         }
     };
 
@@ -222,7 +222,7 @@ function PromptView() {
 
     const update = async () => {
         const body = {
-            messages: prompt.messages,
+            messages: messages,
             args: args,
             options: options,
             description: description,
@@ -231,7 +231,7 @@ function PromptView() {
         try {
             await backend.apiPromptNamePut(body, key);
         } catch (err) {
-            openNotification(err.toString(), "error");
+            openNotification("" + err.toString(), "error");
         }
     };
 
@@ -245,10 +245,9 @@ function PromptView() {
 
     const chatWithRAG = async () => {
         try {
-            const messages = prompt.messages;
 
             const body = {
-                messages: prompt.messages,
+                messages: messages,
                 options: options,
                 args: args,
                 plugins: ['embed']
@@ -266,7 +265,8 @@ function PromptView() {
 
             setResponse(res.data);
         } catch (err) {
-            openNotification(err.toString(), "error");
+            openNotification("" + err.toString(), "error");
+
         } finally {
             setLoading(false);
         }
@@ -275,7 +275,7 @@ function PromptView() {
     const chatWithPrompt = async () => {
         try {
             const body = {
-                messages: prompt.messages,
+                messages: messages,
                 args: args,
                 options: options,
             };
@@ -289,7 +289,7 @@ function PromptView() {
             setOptions(newOptions);
 
             const start = new Date().getTime();
-            const res = await BackendHelper.doChat(newOptions, prompt.messages, args);
+            const res = await BackendHelper.doChat(newOptions, messages, args);
             const end = new Date().getTime();
 
             setResponse(res.data);
@@ -313,7 +313,7 @@ function PromptView() {
     };
 
     return (
-        <div>
+        <>
             <Space align="center" style={{ width: '100%' }}>
                 <Title>{key}</Title>
                 <Space direction="horizontal" align="baseline">
@@ -378,42 +378,41 @@ function PromptView() {
                             <Space>
                                 <Button onClick={() => copy(JSON.stringify({
                                     name: key,
-                                    prompt: prompt.messages.filter(item => item.enable)
+                                    prompt: messages.filter(item => item.enable)
                                 }, null, 2))}>
                                     CopyAll
                                 </Button>
                                 <Divider type="vertical" />
                                 <Button onClick={() => {
-                                    const newMessages = prompt.messages.map(item => ({ ...item, enable: false }));
-                                    setPrompt({ ...prompt, messages: newMessages });
+                                    const newMessages = messages.map(item => ({ ...item, enable: false }));
+                                    setMessages(newMessages);
                                 }}>
                                     DisableAll
                                 </Button>
                                 <Button onClick={() => {
-                                    const newMessages = prompt.messages.map(item => ({ ...item, enable: true }));
-                                    setPrompt({ ...prompt, messages: newMessages });
+                                    const newMessages = messages.map(item => ({ ...item, enable: true }));
+                                    setMessages(newMessages)
                                 }}>
                                     EnableAll
                                 </Button>
                             </Space>
                         }
                     >
-                        <Row justify="space-around">
-                            <PromptInput
-                                messages={prompt.messages}
-                                withCopy={true}
-                                withControl={true}
-                                onOrderUp={index => order(index, -1)}
-                                onOrderDown={index => order(index, 1)}
-                                onRemove={index => deletePrompt(index)}
-                                onAdd={(index, role, content) => addPrompt(index, role, content)}
-                            />
-                        </Row>
+                        <PromptInput
+                            messages={messages}
+                            setMessages={setMessages}
+                            withCopy={true}
+                            withControl={true}
+                            onOrderUp={index => order(index, -1)}
+                            onOrderDown={index => order(index, 1)}
+                            onRemove={index => deletePrompt(index)}
+                            onAdd={(index, role, content) => addPrompt(index, role, content)}
+                        />
 
                         <Divider>
                             <Space>
                                 <Button onClick={() => {
-                                    const newMessages = [...prompt.messages, { role: 'system', enable: true, content: '' }];
+                                    const newMessages = [...prompt.messages, { role: 'user', enable: true, content: '' }];
                                     setPrompt({ ...prompt, messages: newMessages });
                                 }}>
                                     <PlusOutlined />
@@ -436,22 +435,34 @@ function PromptView() {
                             </Space>
                         }
                     >
-                        <Skeleton loading={loading} active avatar>
+                        <Skeleton loading={loading} active>
                             <div>
                                 <Typography.Text>time cost: {timecost / 1000} second</Typography.Text>
                                 <Divider />
-                                <Tabs activeKey={responseMode} onChange={key => setResponseMode(key)}>
-                                    <TabPane key="1" tab="Markdown">
-                                        <ReactMarkdown>{response}</ReactMarkdown>
-                                    </TabPane>
-                                    <TabPane key="2" tab="Text" forceRender>
-                                        <Input.TextArea
-                                            value={response}
-                                            onChange={e => setResponse(e.target.value)}
-                                            autoSize={{ maxRows: 16 }}
-                                        />
-                                    </TabPane>
-                                </Tabs>
+                                <Tabs
+                                    activeKey={responseMode}
+                                    onChange={key => setResponseMode(key)}
+                                    items={[
+                                        {
+                                            key: "1",
+                                            label: "Markdown",
+                                            children: <ReactMarkdown>{response}</ReactMarkdown>
+                                        },
+                                        {
+                                            key: "2",
+                                            label: "Text",
+                                            children: (
+                                                <Input.TextArea
+                                                    value={response}
+                                                    onChange={e => setResponse(e.target.value)}
+                                                    autoSize={{ minRows: 3 }}
+                                                    style={{ width: '100%' }}
+                                                />
+                                            ),
+                                            forceRender: true
+                                        }
+                                    ]}
+                                />
                             </div>
                         </Skeleton>
                     </Card>
@@ -465,11 +476,11 @@ function PromptView() {
                                         style={{ width: 200 }}
                                         selected={model}
                                         prefer={options?.prefer}
-                                        models={store.globalModels?.models || []}
+                                        models={models}
                                         onSelect={value => setModel(value)}
                                         onPrefer={value => updatePreferModel(value)}
                                     />
-                                    <Button onClick={reloadModels}>
+                                    <Button onClick={fetchModels}>
                                         <SyncOutlined />
                                     </Button>
                                 </Space>
@@ -519,7 +530,7 @@ function PromptView() {
                     </Card>
                 </Col>
             </Row>
-        </div>
+        </>
     );
 }
 

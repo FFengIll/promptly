@@ -1,17 +1,22 @@
-import React, { useEffect, useState } from 'react';
-import { Card, Space, Input, Button, Divider, Modal, List, Typography } from 'antd';
 import { EditFilled, SyncOutlined } from '@ant-design/icons';
+import { Button, Card, Divider, Input, List, Modal, Space, Typography } from 'antd';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { backend } from "../scripts/backend";
 
 const IndexView: React.FC = () => {
     const navigate = useNavigate();
-    const [group, setGroup] = useState<Record<string, string[]>>({ "": [] });
+    // Initialize group state with empty object instead of default value
+    // since it will be populated by fetchList useEffect
+    const [group, setGroup] = useState<Record<string, string[]>>({});
     const [open, setOpen] = useState(false);
     const [sourceKey, setSourceKey] = useState("");
     const [targetKey, setTargetKey] = useState("");
     const [newName, setNewName] = useState("");
     const [newGroup, setNewGroup] = useState("");
+
+    // setGroup({})
+    console.log(group)
 
     useEffect(() => {
         fetchList(false);
@@ -36,17 +41,19 @@ const IndexView: React.FC = () => {
     };
 
     const create_profile = async (group: string, name: string) => {
-        await backend.apiPromptPost({group: group}, name);
+        await backend.apiPromptPost({ group: group }, name);
         fetchList(true);
     };
 
     const fetchList = async (refresh: boolean) => {
         try {
             const response = await backend.apiPromptGet(refresh);
-            setGroup(response.data.data);
+            const data = response.data.data;
+            setGroup(data && typeof data === 'object' ? data : {});
             console.log(response.data);
             return response.data;
         } catch (error) {
+            setGroup({});
             console.error(error);
         }
     };
@@ -54,13 +61,13 @@ const IndexView: React.FC = () => {
     return (
         <Card title="Project List">
             <Space direction="horizontal">
-                <Input 
+                <Input
                     value={newGroup}
                     onChange={(e) => setNewGroup(e.target.value)}
                     placeholder="group name"
                     size="large"
                 />
-                <Input 
+                <Input
                     value={newName}
                     onChange={(e) => setNewName(e.target.value)}
                     placeholder="prompt name"
@@ -79,7 +86,7 @@ const IndexView: React.FC = () => {
             {Object.entries(group).map(([key, values]) => (
                 <Card key={key} title={key || '[default]'}>
                     <Space direction="horizontal">
-                        <Input 
+                        <Input
                             value={newName}
                             onChange={(e) => setNewName(e.target.value)}
                             placeholder="prompt name"
@@ -90,7 +97,7 @@ const IndexView: React.FC = () => {
                     </Space>
 
                     <Divider />
-                    
+
                     <Modal
                         open={open}
                         title="Rename"
@@ -100,7 +107,7 @@ const IndexView: React.FC = () => {
                         <p>source name: {sourceKey}</p>
                         <p>
                             target name:
-                            <Input 
+                            <Input
                                 value={targetKey}
                                 onChange={(e) => setTargetKey(e.target.value)}
                             />
@@ -117,7 +124,7 @@ const IndexView: React.FC = () => {
                                     <Button type="primary" onClick={() => showModal(item)}>
                                         <EditFilled />
                                     </Button>
-                                    <Typography.Link 
+                                    <Typography.Link
                                         className="large-font"
                                         onClick={() => openPrompt(item)}
                                     >
