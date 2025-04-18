@@ -121,6 +121,11 @@ tasks:
     cmds:
       - pnpm run dev
   
+  debug:
+    dir: "{{.ROOT_DIR}}"
+    cmds:
+      - poetry run python bin/main.py -c config/llm.yaml --reload
+  
   backend:
     desc: start backend for dev
     dir: "{{.ROOT_DIR}}"
