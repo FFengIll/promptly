@@ -412,8 +412,8 @@ function PromptView() {
                         <Divider>
                             <Space>
                                 <Button onClick={() => {
-                                    const newMessages = [...prompt.messages, { role: 'user', enable: true, content: '' }];
-                                    setPrompt({ ...prompt, messages: newMessages });
+                                    const newMessages = [...messages, { role: 'user', enable: true, content: '' }];
+                                    setMessages(newMessages);
                                 }}>
                                     <PlusOutlined />
                                 </Button>
