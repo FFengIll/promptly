@@ -58,9 +58,4 @@ async def chat(messages, model="", **kwargs):
     choice = response.choices[0]
     log.info("choice: {}", choice)
 
-    try:
-        return choice["message"]["content"]
-    except Exception as e:
-        log.exception(e)
-
-    return choice["text"]
+    return choice.message.content
