@@ -18,14 +18,6 @@ const headerStyle: React.CSSProperties = {
     alignItems: 'center'
 };
 
-const contentStyle: React.CSSProperties = {
-    // textAlign: 'center',
-    // minHeight: 120,
-    // lineHeight: '120px',
-    // color: '#fff',
-    // backgroundColor: '#0958d9',
-};
-
 const layoutStyle = {
     borderRadius: 8,
     minWidth: '1600px',
@@ -80,18 +72,6 @@ const App = () => {
     //             });
     //     }
     // }, [store]);
-
-    const routerTo = (view: string) => {
-        const key = params.key;
-        let path = `/view/${view}`;
-        console.log(view);
-        if (view !== 'index') {
-            if (key && key.length > 0) {
-                path = `${path}/${key}`;
-            }
-        }
-        navigate(path);
-    };
 
     return (
         <ConfigProvider locale={locale}>
