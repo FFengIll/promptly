@@ -30,14 +30,17 @@ const ModelSelect: React.FC<Props> = ({ selected, prefer, models, onSelect, onPr
             >
                 {Array.isArray(models) ? models.map((value) => (
                     <Select.Option key={value} value={value}>
-                        <Button onClick={() => handleDefault(value)}>
+                        <Button 
+                            onClick={() => handleDefault(value)}
+                            style={{ marginRight: 8, border: 'none', background: 'none', padding: 0 }}
+                        >
                             {value === prefer ? (
                                 <HeartTwoTone twoToneColor="#eb2f96" />
                             ) : (
                                 <HeartOutlined />
                             )}
                         </Button>
-                        {value}
+                        <span>{value}</span>
                     </Select.Option>
                 )) : null}
             </Select>
