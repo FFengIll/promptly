@@ -8,15 +8,15 @@ import ArgumentPanel from '../components/ArgumentPanel';
 import PromptInput from "../components/PromptInput";
 import { backend, BackendHelper } from "../scripts/backend";
 import { openNotification } from "../scripts/notice";
-import { useConfigStore } from "../stores/global";
 
+import { useRouteHelper } from '../scripts/router';
 import type { Argument, ArgumentSetting, CommitItem, UpdatePromptBody } from "../sdk/models";
 
 const { Text } = Typography;
 
 export const CommitView: React.FC = () => {
-    const store = useConfigStore();
     const { key } = useParams();
+    const { toPrompt } = useRouteHelper();
 
     const [autoSave, setAutoSave] = useState(true);
     const [starOnly, setStarOnly] = useState(false);
@@ -102,7 +102,7 @@ export const CommitView: React.FC = () => {
             args: args
         };
         try {
-            RouteHelper.toPrompt(key!);
+            toPrompt(key!);
             await backend.apiPromptNamePut(body, key!);
         } catch (err) {
             openNotification(err.toString(), 'error');

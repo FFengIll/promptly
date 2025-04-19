@@ -15,7 +15,6 @@ const IndexView: React.FC = () => {
     const [newName, setNewName] = useState("");
     const [newGroup, setNewGroup] = useState("");
 
-    // setGroup({})
     console.log(group)
 
     useEffect(() => {
