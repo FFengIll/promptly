@@ -7,6 +7,7 @@ import {
     Card,
     Col,
     Divider,
+    FloatButton,
     Input,
     InputNumber,
     List,
@@ -33,7 +34,6 @@ import { openNotification } from '../scripts/notice';
 import { useConfigStore } from '../stores/global';
 
 const { Title } = Typography;
-const { TabPane } = Tabs;
 const { Option } = Select;
 
 
@@ -423,17 +423,90 @@ function PromptView() {
                 </Col>
 
                 <Col span={12}>
+                    <Card>
+                        <Space direction="horizontal">
+                            <Button onClick={update}>Update</Button>
+                            <Button onClick={chat}>Request</Button>
+                            <Button onClick={doCommit}>Commit</Button>
+                            <Button onClick={() => copy(response)}>Copy</Button>
+                            <Button onClick={responseToPrompt}>Append</Button>
+                        </Space>
+                    </Card>
+                    <Card title="LLM Options">
+                        <List itemLayout="horizontal">
+                            <List.Item>
+                                <Space direction="vertical">
+                                    <Row align="middle">
+                                        <Col span={12}>Model:</Col>
+                                        <Col span={12}>
+                                            <Space>
+                                                <ModelSelect
+                                                    selected={model}
+                                                    prefer={options?.prefer}
+                                                    models={models}
+                                                    onSelect={value => setModel(value)}
+                                                    onPrefer={value => updatePreferModel(value)}
+                                                />
+                                                <Button onClick={fetchModels}>
+                                                    <SyncOutlined />
+                                                </Button>
+                                            </Space>
+                                        </Col>
+                                    </Row>
+                                    <Row align="middle">
+                                        <Col span={12}>Temperature:</Col>
+                                        <Col span={12}>
+                                            <InputNumber
+                                                style={{ width: 100 }}
+                                                min={0}
+                                                max={2}
+                                                step={0.1}
+                                                value={options.temperature}
+                                                onChange={value => setOptions({ ...options, temperature: value })}
+                                            />
+                                        </Col>
+                                    </Row>
+                                    <Row align="middle">
+                                        <Col span={12}>Top_P:</Col>
+                                        <Col span={12}>
+                                            <InputNumber
+                                                style={{ width: 100 }}
+                                                min={0}
+                                                max={2}
+                                                step={0.1}
+                                                value={options.topP}
+                                                onChange={value => setOptions({ ...options, topP: value })}
+                                            />
+                                        </Col>
+                                    </Row>
+                                </Space>
+                            </List.Item>
+
+                            <List.Item>
+                                Use Embed
+                                <Switch
+                                    checked={withEmbed}
+                                    onChange={handleEmbedChange}
+                                />
+                            </List.Item>
+
+                            <Space>
+                                <ArgumentPanel
+                                    setting={store.globalArgs}
+                                    args={args}
+                                    onSelect={selectArg}
+                                />
+                            </Space>
+                        </List>
+                    </Card>
+
                     <Card
                         title="Response"
-                        extra={
-                            <Space direction="horizontal">
-                                <Button onClick={update}>Update</Button>
-                                <Button onClick={chat}>Request</Button>
-                                <Button onClick={doCommit}>Commit</Button>
-                                <Button onClick={() => copy(response)}>Copy</Button>
-                                <Button onClick={responseToPrompt}>Append</Button>
-                            </Space>
-                        }
+                        style={{
+                            position: 'sticky',
+                            top: 20,
+                            zIndex: 1
+                        }}
                     >
                         <Skeleton loading={loading} active>
                             <div>
@@ -466,70 +539,15 @@ function PromptView() {
                             </div>
                         </Skeleton>
                     </Card>
-
-                    <Card title="LLM Options">
-                        <List itemLayout="horizontal">
-                            <List.Item>
-                                <Space>
-                                    Model:
-                                    <ModelSelect
-                                        style={{ width: 200 }}
-                                        selected={model}
-                                        prefer={options?.prefer}
-                                        models={models}
-                                        onSelect={value => setModel(value)}
-                                        onPrefer={value => updatePreferModel(value)}
-                                    />
-                                    <Button onClick={fetchModels}>
-                                        <SyncOutlined />
-                                    </Button>
-                                </Space>
-                            </List.Item>
-
-                            <List.Item>
-                                <Space>
-                                    Temperature:
-                                    <InputNumber
-                                        style={{ width: 100 }}
-                                        min={0}
-                                        max={2}
-                                        step={0.1}
-                                        value={options.temperature}
-                                        onChange={value => setOptions({ ...options, temperature: value })}
-                                    />
-                                </Space>
-                                <Space>
-                                    Top_P:
-                                    <InputNumber
-                                        style={{ width: 100 }}
-                                        min={0}
-                                        max={2}
-                                        step={0.1}
-                                        value={options.topP}
-                                        onChange={value => setOptions({ ...options, topP: value })}
-                                    />
-                                </Space>
-                            </List.Item>
-
-                            <List.Item>
-                                Use Embed
-                                <Switch
-                                    checked={withEmbed}
-                                    onChange={handleEmbedChange}
-                                />
-                            </List.Item>
-
-                            <Space>
-                                <ArgumentPanel
-                                    setting={store.globalArgs}
-                                    args={args}
-                                    onSelect={selectArg}
-                                />
-                            </Space>
-                        </List>
-                    </Card>
                 </Col>
             </Row>
+
+            <FloatButton.Group shape="circle" style={{ insetInlineEnd: 94 }} >
+                {/* <FloatButton icon={<QuestionCircleOutlined />} /> */}
+                {/* <FloatButton /> */}
+                {/* <FloatButton icon={<SyncOutlined />} /> */}
+                <FloatButton.BackTop type="primary" visibilityHeight={0} />
+            </FloatButton.Group>
         </>
     );
 }
