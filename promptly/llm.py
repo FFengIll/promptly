@@ -51,7 +51,9 @@ async def chat(messages, model="", **kwargs):
 
         client_pool[key] = client
 
-    response = client.chat.completions.create(model=model, messages=messages, timeout=30)
+    response = client.chat.completions.create(
+        model=model, messages=messages, timeout=30
+    )
 
     log.info("response: {}", response)
 
