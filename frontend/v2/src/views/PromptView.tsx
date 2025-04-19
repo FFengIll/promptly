@@ -423,7 +423,11 @@ function PromptView() {
                 </Col>
 
                 <Col span={12}>
-                    <Card>
+                    <Card style={{
+                        position: 'sticky',
+                        top: 20,
+                        zIndex: 1
+                    }}>
                         <Space direction="horizontal">
                             <Button onClick={update}>Update</Button>
                             <Button onClick={chat}>Request</Button>
@@ -467,7 +471,7 @@ function PromptView() {
                                         </Col>
                                     </Row>
                                     <Row align="middle">
-                                        <Col span={12}>Top_P:</Col>
+                                        <Col span={12}>TopP:</Col>
                                         <Col span={12}>
                                             <InputNumber
                                                 style={{ width: 100 }}
@@ -479,15 +483,19 @@ function PromptView() {
                                             />
                                         </Col>
                                     </Row>
-                                </Space>
-                            </List.Item>
+                                    <Row align="middle">
+                                        <Col span={12}>Embedding:</Col>
+                                        <Col span={12}>
 
-                            <List.Item>
-                                Use Embed
-                                <Switch
-                                    checked={withEmbed}
-                                    onChange={handleEmbedChange}
-                                />
+                                            <Switch
+                                                checked={withEmbed}
+                                                onChange={handleEmbedChange}
+                                            />
+                                        </Col>
+                                    </Row>
+                                </Space>
+
+
                             </List.Item>
 
                             <Space>
@@ -504,8 +512,8 @@ function PromptView() {
                         title="Response"
                         style={{
                             position: 'sticky',
-                            top: 20,
-                            zIndex: 1
+                            top: 100, // Increased top value to prevent overlap
+                            zIndex: 1 // Reduced zIndex since higher values aren't needed
                         }}
                     >
                         <Skeleton loading={loading} active>
